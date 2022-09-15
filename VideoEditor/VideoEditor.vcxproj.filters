@@ -42,6 +42,12 @@
     <ClCompile Include="Bezier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceClip.h">
@@ -72,6 +78,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bezier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Projects\wxWidgets_Example\wxWidgets_Example\id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Projects\wxWidgets_Example\wxWidgets_Example\MainWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Projects\wxWidgets_Example\wxWidgets_Example\App.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

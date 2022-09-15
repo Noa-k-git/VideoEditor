@@ -11,6 +11,7 @@
 
 using std::string;
 using std::vector;
+using cv::Mat;
 
 struct Info {
 	double fps; // clip's frames per seconds
@@ -23,7 +24,7 @@ class SourceClip : public SourceID, public ISourceFile
 {
 private:
 	Info info; // struct that contains all the clips configurations
-	vector<Mat> clip; // the source clip
+	vector<cv::Mat> clip; // the source clip
 
 public:
 	SourceClip(string);

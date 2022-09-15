@@ -40,7 +40,9 @@ SourceClip::SourceClip(string path) {
 	Mat blackImage(info.resulusion[0], info.resulusion[1], CV_8UC3, cv::Scalar(0, 0, 0));
 	clip = vector<Mat>(info.framesNum, blackImage);
 
-	std::thread read_clip(&ReadClip, vidCapture);
+	this->ReadClip(vidCapture);
+	vidCapture.release(); // closes the file
+	delete &vidCapture; // deleting object from memory
 }
 
 void SourceClip::ReadClip(VideoCapture& vidCapture) {
@@ -71,7 +73,6 @@ void SourceClip::ReadClip(VideoCapture& vidCapture) {
 			break;
 		}
 	}
-	vidCapture.release();
 };
 
 
