@@ -8,7 +8,6 @@ class ScaleEffect :
 private:
     EffectProperty<double> scale;
 public:
-    ScaleEffect();
     void applyEffect(vector<Mat>&, SourceClip&, bool defult = false) override;
 };
 

@@ -93,14 +93,5 @@ void SourceClip::ShowSource() {
 		}
 	}
 	cv::destroyAllWindows();
-}
-inline const Info SourceClip::getInfo() const
-{
-	return this->info;
-}
-inline vector<Mat>& SourceClip::GetSource()
-{
-	return this->clip;
-}
-;
+};
 

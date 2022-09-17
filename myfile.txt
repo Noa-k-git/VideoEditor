@@ -1,0 +1,5 @@
+// forbiden file chars \/:*?<>"|
+---
+<1.0>
+*id|file-name|"path\to\file\this.mp4"|layer|startClip?endClip|startFrame|:size<<><><>>:opacity<<>>
+*id|file-name|"path\to\file2\this.mp4"|layer|startClip?endClip|startFrame|:size<<><><>>:opacity<<>>

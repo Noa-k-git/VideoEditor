@@ -30,9 +30,18 @@ public:
 	SourceClip(string);
 	void ShowSource() override;
 
-	inline const Info getInfo() const; // returns the info of the video
+	inline Info GetInfo() const; // returns the info of the video
 	inline vector<Mat>& GetSource();
 private:
 	void ReadClip(cv::VideoCapture&); // helper function to constuctor -> reads the video
 
+};
+
+inline Info SourceClip::GetInfo() const
+{
+	return this->info;
+};
+inline vector<Mat>& SourceClip::GetSource()
+{
+	return this->clip;
 };

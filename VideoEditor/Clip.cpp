@@ -15,7 +15,7 @@ Clip::Clip(SourceClip& clip)
 {
 	this->clipPtr = &clip;
 	this->limits.start = 0;
-	this->limits.end = (*this->clipPtr).getInfo().framesNum;
+	this->limits.end = (*this->clipPtr).GetInfo().framesNum;
 }
 
 vector<Mat>& Clip::getClip()
@@ -40,7 +40,7 @@ void Clip::setStartFrame(int newStart)
 
 void Clip::setEndFrame(int newEnd)
 {
-	int length = (*this->clipPtr).getInfo().framesNum;
+	int length = (*this->clipPtr).GetInfo().framesNum;
 	if (newEnd <= this->limits.start)
 		this->limits.end = this->limits.start;
 	else if (newEnd >= this->limits.end)

@@ -1,16 +1,12 @@
+#include "SourceClip.h"
 #include "ScaleEffect.h"
 using cv::Size;
-
-ScaleEffect::ScaleEffect() : scale (1)
-{
-	
-}
 
 void ScaleEffect::applyEffect(vector<Mat>& clip, SourceClip& sc, bool defult)
 {
 	if (clip.empty())
 		return;
-	auto res = sc.getInfo().resulusion;
+	auto res = sc.GetInfo().resulusion;
 	auto def = this->scale.getDefualt();
 	if (defult || this->scale.getKeyframes().empty()) {
 		for (Mat& frame : clip) {
@@ -23,7 +19,7 @@ void ScaleEffect::applyEffect(vector<Mat>& clip, SourceClip& sc, bool defult)
 		auto kfs = this->scale.getKeyframes();
 		for (int frame = 0; frame < kfs[0].frame; frame++) {
 			if (clip[0].rows != res[0] * kfs[0].frame) {
-				resize(clip[frame], clip[frame], Size(kfs[0].value * res[0], kfs[0].value * res[1]))
+				resize(clip[frame], clip[frame], Size(kfs[0].value * res[0], kfs[0].value * res[1]));
 			}
 		}
 	}

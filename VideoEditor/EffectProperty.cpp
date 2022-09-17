@@ -7,58 +7,7 @@ EffectProperty<T>::EffectProperty(T value)
 }
 
 template<typename T>
-inline T EffectProperty<T>::getDefualt()
-{
-	return this->defualt;
-}
-
-template<typename T>
-inline const vector<Keyframe<T>>& EffectProperty<T>::getKeyframes() const
-{
-	return this->keyframes;
-}
-
-template<typename T>
-inline void EffectProperty<T>::newKeyframe()
-{
-	this->keyframes.back().bezierCurve = { {0, 0}, {1, 1} };
-	this->sortKeyframes();
-}
-
-
-template<typename T>
-inline void EffectProperty<T>::newKeyframe(Keyframe<T> kf)
-{
-	this->keyframes.push_back(kf);
-	this->newKeyframe();
-}
-
-template<typename T>
-inline void EffectProperty<T>::newKeyframe(int frame, T value)
-{
-	this->keyframes.push_back({ frame, value });
-	this->newKeyframe();
-}
-
-template<typename T>
-inline void EffectProperty<T>::setKeyframe(T value, int loc)
-{
-	if (loc >= 0 && loc < this->keyframes.size()) {
-		this->keyframes[loc].value = value;
-	}
-}
-
-template<typename T>
-inline void EffectProperty<T>::setKeyframe(Keyframe<T> kf)
-{
-	int loc = binarySearchKeyframe(kf.frame);
-	if (loc >= 0 && loc < this->keyframes.size()) {
-		this->keyframes[loc] = kf;
-	}
-}
-
-template<typename T>
-inline void EffectProperty<T>::setCloseKeyframe(int currFrame, T oldValue, T value)
+void EffectProperty<T>::setCloseKeyframe(int currFrame, T oldValue, T value)
 {
 	int loc = binarySearchKeyframe(currFrame);
 	int i = loc;
@@ -73,7 +22,7 @@ inline void EffectProperty<T>::setCloseKeyframe(int currFrame, T oldValue, T val
 }
 
 template<typename T>
-inline void EffectProperty<T>::setAllKeyframes(T oldValue, T value)
+void EffectProperty<T>::setAllKeyframes(T oldValue, T value)
 {
 	int loc = 0;
 	while (loc < this->keyframes.size())
@@ -91,15 +40,7 @@ void EffectProperty<T>::deleteAllKeyframes(T value)
 }
 
 template<typename T>
-inline void EffectProperty<T>::sortKeyframes()
-{
-	sort(this->keyframes.begin(), this->keyframes.end(), [](Keyframe a, Keyframe b) {
-		return a.frame < b.frame;
-		});
-}
-
-template<typename T>
-inline int EffectProperty<T>::binarySearchKeyframe(int frame)
+int EffectProperty<T>::binarySearchKeyframe(int frame)
 { // if the frame doesnt exist, returns the prev one.
 	// if returns -1, there is no previous one.
 	int start = 0;

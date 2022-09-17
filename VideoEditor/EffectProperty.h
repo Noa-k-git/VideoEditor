@@ -36,6 +36,66 @@ public:
 	void deleteAllKeyframes(T value);
 private:
 	inline void sortKeyframes();
-	int binarySearchKeyframe(int frame);
 	inline void newKeyframe();
+	int binarySearchKeyframe(int frame);
 };
+
+// --- inline functions ---
+template<typename T>
+inline T EffectProperty<T>::getDefualt()
+{
+	return this->defualt;
+}
+
+template<typename T>
+inline const vector<Keyframe<T>>& EffectProperty<T>::getKeyframes() const
+{
+	return this->keyframes;
+}
+
+template<typename T>
+inline void EffectProperty<T>::newKeyframe()
+{
+	this->keyframes.back().bezierCurve = { {0, 0}, {1, 1} };
+	this->sortKeyframes();
+}
+
+
+template<typename T>
+inline void EffectProperty<T>::newKeyframe(Keyframe<T> kf)
+{
+	this->keyframes.push_back(kf);
+	this->newKeyframe();
+}
+
+template<typename T>
+inline void EffectProperty<T>::newKeyframe(int frame, T value)
+{
+	this->keyframes.push_back({ frame, value });
+	this->newKeyframe();
+}
+
+template<typename T>
+inline void EffectProperty<T>::setKeyframe(T value, int loc)
+{
+	if (loc >= 0 && loc < this->keyframes.size()) {
+		this->keyframes[loc].value = value;
+	}
+}
+
+template<typename T>
+inline void EffectProperty<T>::setKeyframe(Keyframe<T> kf)
+{
+	int loc = binarySearchKeyframe(kf.frame);
+	if (loc >= 0 && loc < this->keyframes.size()) {
+		this->keyframes[loc] = kf;
+	}
+}
+
+template<typename T>
+inline void EffectProperty<T>::sortKeyframes()
+{
+	sort(this->keyframes.begin(), this->keyframes.end(), [](Keyframe a, Keyframe b) {
+		return a.frame < b.frame;
+		});
+}

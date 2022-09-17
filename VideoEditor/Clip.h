@@ -1,5 +1,5 @@
 #include "SourceClip.h"
-#include "Effect.h"
+//#include "Effect.h"
 
 using std::string;
 
@@ -17,7 +17,7 @@ public:
 	SourceClip *clipPtr; // the source clip
 	
 public:
-	vector<Effect> effects;
+	//vector<Effect> effects;
 
 public:
 	Clip(SourceClip&);
