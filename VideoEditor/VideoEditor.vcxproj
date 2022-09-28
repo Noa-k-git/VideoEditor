@@ -141,7 +141,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Learning Basics\VideoEditor1\VideoEditor1\Source.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="Clip.cpp" />
@@ -154,14 +153,14 @@
     <ClCompile Include="SourceClip.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Projects\wxWidgets_Example\wxWidgets_Example\App.h" />
-    <ClInclude Include="..\..\Projects\wxWidgets_Example\wxWidgets_Example\id.h" />
-    <ClInclude Include="..\..\Projects\wxWidgets_Example\wxWidgets_Example\MainWindow.h" />
+    <ClInclude Include="App.h" />
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="Clip.h" />
     <ClInclude Include="EffectProperty.h" />
+    <ClInclude Include="id.h" />
     <ClInclude Include="IEffect.h" />
     <ClInclude Include="ISourceFile.h" />
+    <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Transition.h" />
     <ClInclude Include="ScaleEffect.h" />
     <ClInclude Include="Sequence.h" />

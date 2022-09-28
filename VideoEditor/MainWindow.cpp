@@ -17,12 +17,17 @@ MainWindow::MainWindow(wxWindow* parent,
     const wxString& name) :
     wxFrame(parent, id, title, pos, size, style, name)
 {
+    // App Architecture
+    wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+    // Panels
     wxPanel* panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(200, 100));
     panel->SetBackgroundColour(wxColor(100, 100, 200));
+    wxPanel* videoPanel = new wxPanel(this, wxID_ANY);
 
-    wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(panel, 1, wxEXPAND | wxALL, 5);
     this->SetSizerAndFit(sizer);
+
 }
 
 MainWindow::~MainWindow()
@@ -37,3 +42,10 @@ void MainWindow::onNew(wxCommandEvent& WXUNUSED(event))
     wxSleep(5);
     PopStatusText();
 }
+
+void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
+{
+
+}
+
+

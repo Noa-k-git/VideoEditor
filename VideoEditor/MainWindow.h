@@ -16,6 +16,7 @@ public:
 	~MainWindow();
 
     void onNew(wxCommandEvent& event);
+    void OnImport(wxCommandEvent& event);
     void onTest(wxCommandEvent& event);
     void onQuit(wxCommandEvent& event);
     void onClose(wxCloseEvent& event);
