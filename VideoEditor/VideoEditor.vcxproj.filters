@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Learning Basics\VideoEditor1\VideoEditor1\Source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SourceClip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -80,13 +77,13 @@
     <ClInclude Include="Bezier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Projects\wxWidgets_Example\wxWidgets_Example\id.h">
+    <ClInclude Include="MainWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Projects\wxWidgets_Example\wxWidgets_Example\MainWindow.h">
+    <ClInclude Include="id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Projects\wxWidgets_Example\wxWidgets_Example\App.h">
+    <ClInclude Include="App.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
