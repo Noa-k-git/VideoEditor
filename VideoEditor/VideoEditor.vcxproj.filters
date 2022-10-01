@@ -56,9 +56,6 @@
     <ClInclude Include="SourceID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ISourceFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Sequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -86,10 +83,16 @@
     <ClInclude Include="App.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ISource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\functions.png">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="vidEd.txt" />
   </ItemGroup>
 </Project>

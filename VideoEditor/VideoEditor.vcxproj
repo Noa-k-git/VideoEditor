@@ -159,7 +159,7 @@
     <ClInclude Include="EffectProperty.h" />
     <ClInclude Include="id.h" />
     <ClInclude Include="IEffect.h" />
-    <ClInclude Include="ISourceFile.h" />
+    <ClInclude Include="ISource.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Transition.h" />
     <ClInclude Include="ScaleEffect.h" />
@@ -169,6 +169,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\functions.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="vidEd.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

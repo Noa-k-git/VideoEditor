@@ -1,0 +1,232 @@
+/*
+// Include Libraries
+#include<opencv2/opencv.hpp>
+#include<wx/wxprec.h>
+#include<iostream>
+#include<cmath>
+#include <vector>;
+#include <sstream>
+#include <chrono>
+#include <thread>
+
+using namespace std;
+using namespace std::chrono;
+using namespace cv;
+
+struct VideoData {
+	double fps;
+	int framesNum;
+
+	// video resolution
+	int frameWidth;
+	int frameHeight;
+
+	// video frames
+	vector<Mat> video;
+};
+
+VideoData readVideo(string);
+void _readImage(VideoCapture, VideoData);
+
+void showVideo(VideoData);
+void writeVideo(VideoData, string);
+/*
+void showVideo(VideoCapture, double)
+
+void showVideo(VideoCapture vid_capture, double fps) {
+
+	auto start = high_resolution_clock::now();
+	// Read the frames to the last frame
+
+	while (vid_capture.isOpened())
+	{
+
+		// Initialise frame matrix
+		Mat frame;
+
+		// Initialize a boolean to check if frames are there or not
+		bool isSuccess = vid_capture.read(frame);
+
+
+		// If frames are present, show it
+		if (isSuccess)
+		{
+			//display frames
+			imshow("Frame", frame);
+		}
+
+		// Get duration. Substart timepoints to
+		// get duration. To cast it to proper unit
+		// use duration cast method
+		auto stop = high_resolution_clock::now();
+
+		auto duration = duration_cast<microseconds>(stop - start).count() / 1e3;
+		start = high_resolution_clock::now();
+		auto delay = round(1.0 / fps * 1e3 - duration - 3);// - 4;
+
+		if (delay > 0)
+		{
+			int key = waitKey(delay);
+			start = high_resolution_clock::now();
+
+			if (key == 'q')
+			{
+				cout << "q key is pressed by the user. Stopping the video" << endl;
+				break;
+			}
+		}
+		else {
+		}
+		//cout << delay << endl;
+
+		// If frames are not there, close it
+		if (!isSuccess)
+		{
+			cout << "Video camera is disconnected" << endl;
+			break;
+		}
+	}
+	// Release the video capture object
+	vid_capture.release();
+	destroyAllWindows();
+}---------------------------------------------------*
+
+int main()
+{
+	double fps;
+	auto start = high_resolution_clock::now();
+	if (1 > 0)
+	{
+		int key = waitKey(0);
+		if (key == 'q')
+		{
+			cout << "q key is pressed by the user. Stopping the video" << endl;
+		}
+	}
+	auto stop = high_resolution_clock::now();
+	auto diff = duration_cast<microseconds>(stop - start).count() / 1e3;
+	cout << diff << endl;
+
+	
+	// initialize a video capture object
+	string path = "D:\\איתי בר מצווה\\איל ומיטל\\שיר.mpg";
+	VideoCapture vid_capture(path);
+	
+	
+	auto vidArr = readVideo(path);
+	auto Mstart = high_resolution_clock::now();
+	showVideo(vidArr);
+	//path = "D:\\איתי בר מצווה\\איל ומיטל\\שיר1.mp4";
+	//writeVideo(vidArr, path);
+
+	Mat result;
+	putText(vidArr.video.front(), "Differencing the two images.", cv::Point(30, 30),
+		FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(200, 200, 250), 1, cv::LINE_AA);
+	//imshow("Text", vidArr.video.front());
+	cout << duration_cast<microseconds>(high_resolution_clock::now() - Mstart).count() / 1e3 << endl;
+	
+
+
+}
+
+
+VideoData readVideo(string path) {
+	VideoCapture vid_capture(path);
+	VideoData vd;
+	cout << &vid_capture;
+	int frame_count = 0;
+	// Print error message if the stream is invalid
+	if (!vid_capture.isOpened())
+	{
+		cout << "Error opening video stream or file" << endl;
+	}
+
+	else
+	{
+		// Obtain fps and frame count by get() method and print
+		// You can replace 5 with CAP_PROP_FPS as well, they are enumerations
+		vd.fps = vid_capture.get(5);
+		cout << "Frames per second :" << vd.fps << endl;
+
+		// Obtain frame_count using opencv built in frame count reading method
+		// You can replace 7 with CAP_PROP_FRAME_COUNT as well, they are enumerations
+		vd.framesNum = vid_capture.get(7);
+
+		vd.frameWidth = vid_capture.get(cv::CAP_PROP_FRAME_WIDTH);
+		vd.frameHeight = vid_capture.get(cv::CAP_PROP_FRAME_HEIGHT);
+		cout << "  Frame count :" << vd.framesNum << endl;
+	}
+
+	Mat blackImage(vd.frameWidth, vd.frameHeight, CV_8UC3, cv::Scalar(0, 0, 0));
+	vd.video = vector<Mat> (vd.framesNum, blackImage);
+
+
+	while (vid_capture.isOpened())
+	{
+		// Initialise frame matrix
+		Mat frame;
+
+		// Initialize a boolean to check if frames are there or not
+		bool isSuccess = vid_capture.read(frame);
+
+
+		// Unhandled exception at 0x00007FFA6A4E4FD9 in VideoEditor1.exe: Microsoft C++ exception: cv::Exception at memory location 0x0000004F7E2FE890.
+
+		// cout << cell;
+		if (isSuccess) {
+			if (vd.video.size() == vd.video.max_size()) {
+				cout << "Video is too big";
+			}
+			vd.video.push_back(frame);
+		}
+		//cout << delay << endl;
+
+		// If frames are not there, close it
+		if (!isSuccess)
+		{
+			cout << "Video camera is disconnected" << endl;
+			break;
+		}
+	}
+	vid_capture.release();
+
+	return vd;
+}
+
+void _readImage(VideoCapture vidCapture, VideoData vd) {
+
+}
+
+
+void showVideo(VideoData vd) {
+
+	auto start = high_resolution_clock::now();
+	// Read the frames to the last frame
+	auto sec_delay = milliseconds(long long(float(1 / vd.fps) * 1e3));
+	for (int frame = 0; frame < vd.video.size(); frame++)
+	{
+		//display frames
+		imshow("Frame", vd.video[frame]);
+		int key = waitKey(1 / vd.fps * 1e3 - 9);
+		if (key == 'q')
+		{
+			cout << "q key is pressed by the user. Stopping the video" << endl;
+			destroyAllWindows();
+			return;
+		}
+	}
+	cv::destroyAllWindows();
+}
+
+void writeVideo(VideoData vd, string path)
+{
+	VideoWriter output(path, VideoWriter::fourcc('m', 'p', '4', 'v'), 30, cv::Size(vd.frameWidth, vd.frameHeight));
+	for (int frame = 0; frame < vd.video.size(); frame++) {
+			cout << frame<< "/" << vd.video.size() << endl;
+			output.write(frame);
+
+	}
+
+	output.release();
+}
+*/
