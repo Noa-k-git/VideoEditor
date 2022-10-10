@@ -143,21 +143,15 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Bezier.cpp" />
-    <ClCompile Include="Clip.cpp" />
-    <ClCompile Include="EffectProperty.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Transition.cpp" />
-    <ClCompile Include="ScaleEffect.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="SourceID.cpp" />
-    <ClCompile Include="SourceClip.cpp" />
     <ClCompile Include="VideoSource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="Bezier.h" />
-    <ClInclude Include="Clip.h" />
-    <ClInclude Include="EffectProperty.h" />
     <ClInclude Include="id.h" />
     <ClInclude Include="IEffect.h" />
     <ClInclude Include="IImg.h" />
@@ -165,10 +159,8 @@
     <ClInclude Include="ISource.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Transition.h" />
-    <ClInclude Include="ScaleEffect.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="SourceID.h" />
-    <ClInclude Include="SourceClip.h" />
     <ClInclude Include="VideoSource.h" />
   </ItemGroup>
   <ItemGroup>
