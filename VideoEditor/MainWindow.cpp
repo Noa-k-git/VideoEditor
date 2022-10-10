@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 #include <wx/artprov.h>
-
+#include "VideoSource.h"
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
     //EVT_MENU(wxID_NEW, MainWindow::onNew)
     //EVT_MENU(wxID_EXIT, MainWindow::onQuit)
@@ -23,11 +23,19 @@ MainWindow::MainWindow(wxWindow* parent,
     // Panels
     wxPanel* panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(200, 100));
     panel->SetBackgroundColour(wxColor(100, 100, 200));
-    wxPanel* videoPanel = new wxPanel(this, wxID_ANY);
+    //wxPanel* videoPanel = new wxPanel(this, wxID_ANY);
+
+    wxBoxSizer* s = new wxBoxSizer(wxVERTICAL);
+    wxButton* b = new wxButton(this, wxID_ANY, "he");
+    s->Add(b);
+    //panel->SetSizer(s);
 
     sizer->Add(panel, 1, wxEXPAND | wxALL, 5);
     this->SetSizerAndFit(sizer);
 
+    VideoSource* vd = new VideoSource("D:\\קונצרט נועלה 12.6.2019\\20190612_194814.mp4");
+    vd->Show();
+    delete vd;
 }
 
 MainWindow::~MainWindow()
