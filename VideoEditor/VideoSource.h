@@ -17,16 +17,14 @@ extern "C" {
 #include <opencv2/highgui.hpp>
 
 class VideoSource :
-    public ISource, public IImg, public IPlayable
+    public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
 {
-private:
-    std::vector<cv::Mat> clip;
 public:
     VideoSource(std::string);
     virtual ~VideoSource();
-    void ReadSource(std::string) override;
     void Show() override;
     void Play() override;
-    
+private:
+    void ReadSource(std::string) override;
 };
 

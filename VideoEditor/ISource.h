@@ -1,21 +1,26 @@
 #pragma once
 #include<string>
-
-using std::string;
-
+#include<thread>
+/*
 struct Info {
 	double fps; // clip's frames per seconds
 	int framesNum; // number of frames in the source clip
 	int resulusion[2]; // width, hight.
-	string type;
-};
-
+	std::string type;
+};*/
+template <typename T>
 class ISource {
-private:
-	Info info; // struct that contains all the clips configurations
-
+public:
+	//Info info; // struct that contains all the clips configurations
+	std::string path;
+	T source;
+	ISource(std::string path) {
+		this->path = path;
+		std::thread readData(&ISource::ReadSource, this, path);
+		readData.detach();
+	}
 	virtual ~ISource() {}
-
-	virtual void ShowSource() = 0;
+private:
+	virtual void ReadSource(std::string) = 0;
 
 };

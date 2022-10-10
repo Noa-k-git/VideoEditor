@@ -160,6 +160,8 @@
     <ClInclude Include="EffectProperty.h" />
     <ClInclude Include="id.h" />
     <ClInclude Include="IEffect.h" />
+    <ClInclude Include="IImg.h" />
+    <ClInclude Include="IPlayable.h" />
     <ClInclude Include="ISource.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Transition.h" />

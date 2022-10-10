@@ -23,7 +23,7 @@ VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 	}
 
 	cv::Mat blackImage(this->resolution[0], this->resolution[1], CV_8UC3, cv::Scalar(0, 0, 0));
-	clip = std::vector<cv::Mat>(this->length, blackImage);
+	source = std::vector<cv::Mat>(this->length, blackImage);
 	vidCapture.release(); // closes the file
 	//delete& vidCapture; // deleting object from memory
     
@@ -33,8 +33,8 @@ VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 
 VideoSource::~VideoSource()
 {
-	//this->clip.clear();
-	//std::vector<cv::Mat>().swap(clip);
+	//this->source.clear();
+	//std::vector<cv::Mat>().swap(source);
 }
 /*
 void VideoSource::ReadSource(std::string path)
@@ -162,19 +162,16 @@ void VideoSource::ReadSource(std::string path)
         return 0;
     }
 }*/
-void VideoSource::ReadSource(std::string path)
+void VideoSource::ReadSource(std::string path) 
 {
 	cv::VideoCapture vidCapture(path, cv::CAP_FFMPEG);
-	int i = -1;
 	std::vector<cv::Mat> imgs;
 	while (vidCapture.isOpened())
 	{
 		// Initialise frame matrix
 		cv::Mat frame;
-		i++;
 		// Initialize a boolean to check if frames are there or not
 		bool isSuccess = vidCapture.read(frame);
-
 
 		// Unhandled exception at 0x00007FFA6A4E4FD9 in VideoEditor1.exe: Microsoft C++ exception: cv::Exception at memory location 0x0000004F7E2FE890.
 
@@ -198,17 +195,16 @@ void VideoSource::ReadSource(std::string path)
 			std::cout << "Video camera is disconnected" << std::endl;
 			break;
 		}
-		if (i > 100 && !cv::norm(imgs[0], imgs[99], cv::NORM_L1)) {
-			break;
-		}
+
 	}
-	clip.swap(imgs);
+	source.swap(imgs);
 	vidCapture.release();
 }
 
 void VideoSource::Show()
 {
-	cv::imshow("Frame", clip[0]);
+    // TODO: add exeption handling for not having anything inside source
+	cv::imshow("Frame", source[0]);
 	int key = cv::waitKey(1);
 	cv::destroyAllWindows();
 
@@ -220,10 +216,10 @@ void VideoSource::Play()
 	auto start = std::chrono::high_resolution_clock::now();
 	// Read the frames to the last frame
 	auto sec_delay = std::chrono::milliseconds(long long(float(1 / this->fps) * 1e3));
-	for (int frame = 0; frame < clip.size(); frame++)
+	for (int frame = 0; frame < source.size(); frame++)
 	{
 		//display frames
-		cv::imshow("Frame", clip[frame]);
+		cv::imshow("Frame", source[frame]);
 		int key = cv::waitKey(1 / this->fps * 1e3 - 9);
 		if (key == 'q')
 		{
