@@ -15,9 +15,10 @@ public:
 	std::string path;
 	T source;
 	ISource(std::string path) {
-		this->path = path;
+		this->path = path;/*
 		std::thread readData(&ISource::ReadSource, this, path);
-		readData.detach();
+		// TODO: handle object getting deleted
+		readData.detach();*/
 	}
 	virtual ~ISource() {}
 private:

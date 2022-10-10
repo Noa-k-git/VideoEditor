@@ -10,8 +10,13 @@
 // FFmpeg
 
 extern "C" {
-
+#include <libavformat\avformat.h>
+#include <libavcodec\avcodec.h>
+#include <libavutil/avutil.h>
+#include <libavutil/pixdesc.h>
+#include <libswscale/swscale.h>
 }
+// OpenCV
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>

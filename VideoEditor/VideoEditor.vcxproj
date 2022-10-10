@@ -112,13 +112,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(opencv)\build\include;$(wxwin)\include;$(wxwin)\lib\vc_x64_dll\mswud;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include\ffmpeg\;$(SolutionDir)\include\opencv\;$(SolutionDir)\include\wxwidgets\;$(SolutionDir)\include\wx_lib_x64_dll\mswud\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>wxbase32ud.lib;wxmsw32ud_core.lib;opencv_world460d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ffmpeg)\lib;$(opencv)\build\x64\vc15\lib;$(wxwin)\lib\vc_x64_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxbase32ud.lib;wxmsw32ud_core.lib;opencv_world460d.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;postproc.lib;swresample.lib;swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\lib\ffmpeg\;$(SolutionDir)\lib\opencv\;$(SolutionDir)\lib\wxwidgets\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,7 +129,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(opencv)\build\include;$(wxwin)\include;$(wxwin)\lib\vc_x64_dll\mswu;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include\ffmpeg\;$(SolutionDir)\include\opencv\;$(SolutionDir)\include\wxwidgets\;$(SolutionDir)\include\wx_lib_x64_dll\mswu\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,7 +145,6 @@
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Transition.cpp" />
-    <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="SourceID.cpp" />
     <ClCompile Include="VideoSource.cpp" />
   </ItemGroup>
@@ -159,7 +158,6 @@
     <ClInclude Include="ISource.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Transition.h" />
-    <ClInclude Include="Sequence.h" />
     <ClInclude Include="SourceID.h" />
     <ClInclude Include="VideoSource.h" />
   </ItemGroup>
