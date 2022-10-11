@@ -3,6 +3,7 @@
 #include "IImg.h"
 #include "IPlayable.h"
 
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include<chrono>
@@ -10,11 +11,13 @@
 // FFmpeg
 
 extern "C" {
-#include <libavformat\avformat.h>
-#include <libavcodec\avcodec.h>
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 #include <libavutil/avutil.h>
 #include <libavutil/pixdesc.h>
 #include <libswscale/swscale.h>
+    // types
+#include <inttypes.h>
 }
 // OpenCV
 #include <opencv2/opencv.hpp>
@@ -22,7 +25,8 @@ extern "C" {
 #include <opencv2/highgui.hpp>
 
 class VideoSource :
-    public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
+    //public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
+    public ISource<std::vector<AVFrame>>, public IImg, public IPlayable
 {
 public:
     VideoSource(std::string);
@@ -31,5 +35,8 @@ public:
     void Play() override;
 private:
     void ReadSource(std::string) override;
+
+    cv::Mat Avframe2Cvmat(const AVFrame*);
+    //AVFrame* Cvmat2Avframe(cv::Mat* image, AVFrame* frame);
 };
 

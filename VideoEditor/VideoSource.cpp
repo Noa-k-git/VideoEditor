@@ -1,4 +1,8 @@
 #include "VideoSource.h"
+#undef av_err2str(errnum)
+char x[AV_ERROR_MAX_STRING_SIZE];
+#define av_err2str(errnum) \
+    av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
 VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 {
@@ -23,7 +27,7 @@ VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 	}
 
 	cv::Mat blackImage(this->resolution[0], this->resolution[1], CV_8UC3, cv::Scalar(0, 0, 0));
-	source = std::vector<cv::Mat>(this->length, blackImage);
+	//source = std::vector<cv::Mat>(this->length, blackImage);
 	vidCapture.release(); // closes the file
 	//delete& vidCapture; // deleting object from memory
     
@@ -36,132 +40,120 @@ VideoSource::~VideoSource()
 	//this->source.clear();
 	//std::vector<cv::Mat>().swap(source);
 }
-/*
+
 void VideoSource::ReadSource(std::string path)
 {
-    {
-        if (argc < 2) {
-            std::cout << "Usage: ff2cv <infile>" << std::endl;
-            return 1;
-        }
-        const char* infile = argv[1];
+	// Open the file using libavformat
+	AVFormatContext* av_format_ctx = avformat_alloc_context();
+	if (!av_format_ctx) {
+		printf("Couldn't create AVFormatContext\n");
+		return; 
+	}
+	if (avformat_open_input(&av_format_ctx, path.c_str(), NULL, NULL) != 0) {
+		printf("Couldn't open video file\n");
+		return;
+	}
 
-        // initialize FFmpeg library
-        av_register_all();
-        //  av_log_set_level(AV_LOG_DEBUG);
-        int ret;
+	// Find the first valid video stream inside the file
+	int video_stream_index = -1;
+	AVCodecParameters* av_codec_params = NULL;
+	const AVCodec* av_codec = NULL;
+	for (int i = 0; i < av_format_ctx->nb_streams; i)
+	{
+		av_codec_params = av_format_ctx->streams[i]->codecpar;
+		av_codec = avcodec_find_decoder(av_codec_params->codec_id);
 
-        // open input file context
-        AVFormatContext* inctx = nullptr;
-        ret = avformat_open_input(&inctx, infile, nullptr, nullptr);
-        if (ret < 0) {
-            std::cerr << "fail to avforamt_open_input(\"" << infile << "\"): ret=" << ret;
-            return 2;
-        }
-        // retrive input stream information
-        ret = avformat_find_stream_info(inctx, nullptr);
-        if (ret < 0) {
-            std::cerr << "fail to avformat_find_stream_info: ret=" << ret;
-            return 2;
-        }
+		if (!av_codec) {
+			continue;
+		}
+		if (av_codec_params->codec_type == AVMEDIA_TYPE_VIDEO) {
+			video_stream_index = i;
+			break;
+		}
+	}
 
-        // find primary video stream
-        AVCodec* vcodec = nullptr;
-        ret = av_find_best_stream(inctx, AVMEDIA_TYPE_VIDEO, -1, -1, &vcodec, 0);
-        if (ret < 0) {
-            std::cerr << "fail to av_find_best_stream: ret=" << ret;
-            return 2;
-        }
-        const int vstrm_idx = ret;
-        AVStream* vstrm = inctx->streams[vstrm_idx];
+	if (video_stream_index == -1) {
+		printf("Couldn't find valid video stream inside file\n");
+		return;
+	}
 
-        // open video decoder context
-        ret = avcodec_open2(vstrm->codec, vcodec, nullptr);
-        if (ret < 0) {
-            std::cerr << "fail to avcodec_open2: ret=" << ret;
-            return 2;
-        }
+	// Set up a codec context for the decoder
+	AVCodecContext* av_codec_ctx = avcodec_alloc_context3(av_codec);
+	if (!av_codec_ctx) {
+		printf("Couldn't create AVCpdecContext\n");
+		return;
+	}
 
-        // print input video stream informataion
-        std::cout
-            << "infile: " << infile << "\n"
-            << "format: " << inctx->iformat->name << "\n"
-            << "vcodec: " << vcodec->name << "\n"
-            << "size:   " << vstrm->codec->width << 'x' << vstrm->codec->height << "\n"
-            << "fps:    " << av_q2d(vstrm->codec->framerate) << " [fps]\n"
-            << "length: " << av_rescale_q(vstrm->duration, vstrm->time_base, { 1,1000 }) / 1000. << " [sec]\n"
-            << "pixfmt: " << av_get_pix_fmt_name(vstrm->codec->pix_fmt) << "\n"
-            << "frame:  " << vstrm->nb_frames << "\n"
-            << std::flush;
+	if (avcodec_parameters_to_context(av_codec_ctx, av_codec_params) < 0)
+	{
+		printf("Couldn't initialize AVCodecContext\n");
+		return;
+	}
+	if (avcodec_open2(av_codec_ctx, av_codec, NULL) < 0) {
+		printf("Couldn't open codec\n");
+		return;
+	}
 
-        // initialize sample scaler
-        const int dst_width = vstrm->codec->width;
-        const int dst_height = vstrm->codec->height;
-        const AVPixelFormat dst_pix_fmt = AV_PIX_FMT_BGR24;
-        SwsContext* swsctx = sws_getCachedContext(
-            nullptr, vstrm->codec->width, vstrm->codec->height, vstrm->codec->pix_fmt,
-            dst_width, dst_height, dst_pix_fmt, SWS_BICUBIC, nullptr, nullptr, nullptr);
-        if (!swsctx) {
-            std::cerr << "fail to sws_getCachedContext";
-            return 2;
-        }
-        std::cout << "output: " << dst_width << 'x' << dst_height << ',' << av_get_pix_fmt_name(dst_pix_fmt) << std::endl;
+	AVFrame* av_frame = av_frame_alloc();
+	if (!av_frame) {
+		printf("Couldn't allocate AVFrame\n");
+		return;
+	}
+	AVPacket* av_packet = av_packet_alloc();
+	if (!av_packet) {
+		printf("Couldn't allocate AVPacket\n");
+		return;
+	}
+	int response;
 
-        // allocate frame buffer for output
-        AVFrame* frame = av_frame_alloc();
-        std::vector<uint8_t> framebuf(avpicture_get_size(dst_pix_fmt, dst_width, dst_height));
-        avpicture_fill(reinterpret_cast<AVPicture*>(frame), framebuf.data(), dst_pix_fmt, dst_width, dst_height);
+	while (av_read_frame(av_format_ctx, av_packet) >= 0) {
+		if (av_packet->stream_index != video_stream_index) {
+			continue;
+		}
+		response = avcodec_send_packet(av_codec_ctx, av_packet);
+		if (response < 0) {
+			printf("Failed to decode packet: %s\n", av_err2str(response));
+			return;
+		}
+		response = avcodec_receive_frame(av_codec_ctx, av_frame);
+		if (response == AVERROR(EAGAIN) || response == AVERROR_EOF) {
+			continue;
+		}
+		else if (response < 0) {
+			printf("Failed to decode packet: %s\n", av_err2str(response));
+			return;
+		}
+		av_packet_unref(av_packet);
+		source.push_back(*av_frame);
+		av_frame_unref(av_frame);
+		//source.push_back(Avframe2Cvmat(av_frame));
+	}
+	
 
-        // decoding loop
-        AVFrame* decframe = av_frame_alloc();
-        unsigned nb_frames = 0;
-        bool end_of_stream = false;
-        int got_pic = 0;
-        AVPacket pkt;
-        do {
-            if (!end_of_stream) {
-                // read packet from input file
-                ret = av_read_frame(inctx, &pkt);
-                if (ret < 0 && ret != AVERROR_EOF) {
-                    std::cerr << "fail to av_read_frame: ret=" << ret;
-                    return 2;
-                }
-                if (ret == 0 && pkt.stream_index != vstrm_idx)
-                    goto next_packet;
-                end_of_stream = (ret == AVERROR_EOF);
-            }
-            if (end_of_stream) {
-                // null packet for bumping process
-                av_init_packet(&pkt);
-                pkt.data = nullptr;
-                pkt.size = 0;
-            }
-            // decode video frame
-            avcodec_decode_video2(vstrm->codec, decframe, &got_pic, &pkt);
-            if (!got_pic)
-                goto next_packet;
-            // convert frame to OpenCV matrix
-            sws_scale(swsctx, decframe->data, decframe->linesize, 0, decframe->height, frame->data, frame->linesize);
-            {
-                cv::Mat image(dst_height, dst_width, CV_8UC3, framebuf.data(), frame->linesize[0]);
-                cv::imshow("press ESC to exit", image);
-                if (cv::waitKey(1) == 0x1b)
-                    break;
-            }
-            std::cout << nb_frames << '\r' << std::flush;  // dump progress
-            ++nb_frames;
-        next_packet:
-            av_free_packet(&pkt);
-        } while (!end_of_stream || got_pic);
-        std::cout << nb_frames << " frames decoded" << std::endl;
+	avformat_close_input(&av_format_ctx);
+	avformat_free_context(av_format_ctx);
+	av_frame_free(&av_frame);
+	av_packet_free(&av_packet);
+	avcodec_free_context(&av_codec_ctx);
+}
 
-        av_frame_free(&decframe);
-        av_frame_free(&frame);
-        avcodec_close(vstrm->codec);
-        avformat_close_input(&inctx);
-        return 0;
-    }
-}*/
+cv::Mat VideoSource::Avframe2Cvmat(const AVFrame* av_frame)
+{
+	int width = av_frame->width;
+	int height = av_frame->height;
+	cv::Mat image(height, width, CV_8UC3);
+	int cvLinesizes[1];
+	cvLinesizes[0] = image.step1();
+	SwsContext* conversion = sws_getContext(
+		width, height, (AVPixelFormat)av_frame->format, width, height,
+		AVPixelFormat::AV_PIX_FMT_BGR24, SWS_FAST_BILINEAR, NULL, NULL, NULL);
+	sws_scale(conversion, av_frame->data, av_frame->linesize, 0, height, &image.data,
+		cvLinesizes);
+	sws_freeContext(conversion);
+	return image;
+}
+
+/*
 void VideoSource::ReadSource(std::string path) 
 {
 	cv::VideoCapture vidCapture(path, cv::CAP_FFMPEG);
@@ -199,12 +191,12 @@ void VideoSource::ReadSource(std::string path)
 	}
 	source.swap(imgs);
 	vidCapture.release();
-}
+}*/
 
 void VideoSource::Show()
 {
     // TODO: add exeption handling for not having anything inside source
-	cv::imshow("Frame", source[0]);
+	//cv::imshow("Frame", source[0]);
 	int key = cv::waitKey(1);
 	cv::destroyAllWindows();
 
@@ -219,7 +211,7 @@ void VideoSource::Play()
 	for (int frame = 0; frame < source.size(); frame++)
 	{
 		//display frames
-		cv::imshow("Frame", source[frame]);
+		//cv::imshow("Frame", source[frame]);
 		int key = cv::waitKey(1 / this->fps * 1e3 - 9);
 		if (key == 'q')
 		{

@@ -33,9 +33,9 @@ MainWindow::MainWindow(wxWindow* parent,
     sizer->Add(panel, 1, wxEXPAND | wxALL, 5);
     this->SetSizerAndFit(sizer);
 
-    VideoSource* vd = new VideoSource("D:\\קונצרט נועלה 12.6.2019\\20190612_194814.mp4");
-    vd->Show();
-    delete vd;
+    VideoSource* vd = new VideoSource("D:\\Downloads\\20190612_195422.mp4");
+    //vd->Show();
+    //delete vd;
 }
 
 MainWindow::~MainWindow()
