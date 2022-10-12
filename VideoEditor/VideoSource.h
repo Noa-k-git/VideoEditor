@@ -37,6 +37,7 @@ private:
     void ReadSource(std::string) override;
 
     cv::Mat Avframe2Cvmat(const AVFrame*);
+    //AVFrame* CopyFrame(const AVFrame*);
     //AVFrame* Cvmat2Avframe(cv::Mat* image, AVFrame* frame);
 };
 

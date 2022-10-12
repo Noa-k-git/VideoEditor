@@ -37,7 +37,7 @@ VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 
 VideoSource::~VideoSource()
 {
-	//this->source.clear();
+	this->source.clear();
 	//std::vector<cv::Mat>().swap(source);
 }
 
@@ -108,6 +108,7 @@ void VideoSource::ReadSource(std::string path)
 
 	while (av_read_frame(av_format_ctx, av_packet) >= 0) {
 		if (av_packet->stream_index != video_stream_index) {
+			av_packet_unref(av_packet);
 			continue;
 		}
 		response = avcodec_send_packet(av_codec_ctx, av_packet);
@@ -117,16 +118,36 @@ void VideoSource::ReadSource(std::string path)
 		}
 		response = avcodec_receive_frame(av_codec_ctx, av_frame);
 		if (response == AVERROR(EAGAIN) || response == AVERROR_EOF) {
+			av_packet_unref(av_packet);
 			continue;
 		}
 		else if (response < 0) {
-			printf("Failed to decode packet: %s\n", av_err2str(response));
+			printf("Failed to decode frame: %s\n", av_err2str(response));
 			return;
 		}
 		av_packet_unref(av_packet);
-		source.push_back(*av_frame);
+
+		av_packet = av_packet_alloc();
+
+		//response = avcodec_send_frame(av_codec_ctx, av_frame);
+		//source.push_back(*av_frame);
+		//auto mat_frame = Avframe2Cvmat(av_frame);
+
+		//source.push_back(im);
+		//bool isEqual = (cv::sum(Avframe2Cvmat(av_frame) != Avframe2Cvmat(&source[0])) == cv::Scalar(0, 0, 0, 0));
+		//bool isEqual = (cv::sum(im != source[0]) == cv::Scalar(0, 0, 0, 0));
+		//im.release();
+
+		source.push_back(*new AVFrame);
+		source.back() = *av_frame_clone(av_frame);
+		/*
+		if (int iRet = av_frame_copy(&source.back(), av_frame) == 0) {
+			av_log(NULL, AV_LOG_INFO, "Ok");
+		}
+		else {
+			av_log(NULL, AV_LOG_INFO, "Error: %s\n", av_err2str(iRet));
+		}*/
 		av_frame_unref(av_frame);
-		//source.push_back(Avframe2Cvmat(av_frame));
 	}
 	
 
