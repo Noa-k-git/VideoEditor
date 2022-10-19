@@ -129,7 +129,8 @@ void VideoSource::ReadSource(std::string path)
 
 		av_packet = av_packet_alloc();
 
-		//response = avcodec_send_frame(av_codec_ctx, av_frame);
+		response = avcodec_send_frame(av_codec_ctx, av_frame);
+		std::string tmp = av_err2str(response);
 		//source.push_back(*av_frame);
 		//auto mat_frame = Avframe2Cvmat(av_frame);
 

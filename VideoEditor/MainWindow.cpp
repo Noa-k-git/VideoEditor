@@ -33,7 +33,7 @@ MainWindow::MainWindow(wxWindow* parent,
     sizer->Add(panel, 1, wxEXPAND | wxALL, 5);
     this->SetSizerAndFit(sizer);
 
-    VideoSource* vd = new VideoSource("D:\\Downloads\\20190612_195442.mp4");
+    VideoSource* vd = new VideoSource("D:\\Downloads\\20190612_195422.mp4");
     //vd->Show();
     //delete vd;
 }
