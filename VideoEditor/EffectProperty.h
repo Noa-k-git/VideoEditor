@@ -1,9 +1,8 @@
 #pragma once
-#include "SourceClip.h"
-
 #include <array>
-
+#include<vector>
 using std::array;
+
 template <typename T>
 struct Keyframe {
 		int frame;
@@ -21,7 +20,7 @@ public:
 	EffectProperty(T);
 	
 	inline T getDefualt();
-	inline const vector<Keyframe<T>>& getKeyframes() const;
+	inline const std::vector<Keyframe<T>>& getKeyframes() const;
 
 	inline void newKeyframe(Keyframe<T>); // Generate a new keyframe
 	inline void newKeyframe(int frame, T value); // Generate a new keyframe
@@ -48,7 +47,7 @@ inline T EffectProperty<T>::getDefualt()
 }
 
 template<typename T>
-inline const vector<Keyframe<T>>& EffectProperty<T>::getKeyframes() const
+inline const std::vector<Keyframe<T>>& EffectProperty<T>::getKeyframes() const
 {
 	return this->keyframes;
 }
