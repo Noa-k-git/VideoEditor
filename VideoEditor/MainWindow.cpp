@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include <wx/artprov.h>
+#include "MainWindow.h"
 
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
     //EVT_MENU(wxID_NEW, MainWindow::onNew)
