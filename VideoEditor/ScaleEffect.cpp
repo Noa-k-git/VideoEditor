@@ -1,27 +1,7 @@
-#include "SourceClip.h"
 #include "ScaleEffect.h"
-using cv::Size;
+#include "VideoSource.h"
 
-void ScaleEffect::applyEffect(vector<Mat>& clip, SourceClip& sc, bool defult)
+void ScaleEffect::ApplyEffect(AVFrame& src, AVFrame& otp, int frame)
 {
-	if (clip.empty())
-		return;
-	auto res = sc.GetInfo().resulusion;
-	auto def = this->scale.getDefualt();
-	if (defult || this->scale.getKeyframes().empty()) {
-		for (Mat& frame : clip) {
-			if (res[0] * def != clip[0].rows) {
-				resize(frame, frame, Size(res[0] * def, res[1] * def));
-			}
-		}
-	}
-	else {
-		auto kfs = this->scale.getKeyframes();
-		for (int frame = 0; frame < kfs[0].frame; frame++) {
-			if (clip[0].rows != res[0] * kfs[0].frame) {
-				resize(clip[frame], clip[frame], Size(kfs[0].value * res[0], kfs[0].value * res[1]));
-			}
-		}
-	}
-
+	
 }

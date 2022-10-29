@@ -21,6 +21,7 @@ private:
 public:
 	inline Bezier();
 	inline Bezier(std::vector<Point>, bool);
+	inline virtual ~Bezier() {};
 	inline void SetCurve(std::vector<Point>);
 	inline void SetCurve(std::vector<Point>, int insert);
 	inline void CurveValue(float t, Point& pFinal);

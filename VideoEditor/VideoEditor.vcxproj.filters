@@ -16,6 +16,12 @@
     <Filter Include="Header Files\Interfaces">
       <UniqueIdentifier>{4cddddda-1309-424a-97bf-5b70ba39ceb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Effects">
+      <UniqueIdentifier>{327d4995-739b-4047-8a6e-cddb42a59814}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Effects">
+      <UniqueIdentifier>{17d046eb-1a68-4fea-b22d-d5da1ddc76f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SourceID.cpp">
@@ -38,6 +44,9 @@
     </ClCompile>
     <ClCompile Include="EffectProperty.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScaleEffect.cpp">
+      <Filter>Source Files\Effects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +85,9 @@
     </ClInclude>
     <ClInclude Include="EffectProperty.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScaleEffect.h">
+      <Filter>Header Files\Effects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

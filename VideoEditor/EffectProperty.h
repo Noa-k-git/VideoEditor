@@ -1,24 +1,29 @@
 #pragma once
-#include <array>
 #include<vector>
-using std::array;
+#include "Bezier.h"
 
 template <typename T>
 struct Keyframe {
 		int frame;
 		T value;
-		array<array<float, 2>, 2> bezierCurve;
+		Bezier transition; // between prev and current
+
+		Keyframe(int frame, T value);
+		Keyframe(int frame, T value, Bezier transition);
 	};
 //TODO: add func for changing keyframe frame, transition
+//TODO: add a func that return the value of the iplimintation number by frame
 
-template <typename T> class EffectProperty
+template <typename T> 
+class EffectProperty
 {
 private:
 	T defualt;
-	vector<Keyframe<T>> keyframes;
+	std::vector<Keyframe<T>> keyframes;
 public:
-	EffectProperty(T);
-	
+	inline EffectProperty(T);
+	inline EffectProperty(const EffectProperty<T>&);
+
 	inline T getDefualt();
 	inline const std::vector<Keyframe<T>>& getKeyframes() const;
 
@@ -40,61 +45,5 @@ private:
 };
 
 // --- inline functions ---
-template<typename T>
-inline T EffectProperty<T>::getDefualt()
-{
-	return this->defualt;
-}
-
-template<typename T>
-inline const std::vector<Keyframe<T>>& EffectProperty<T>::getKeyframes() const
-{
-	return this->keyframes;
-}
-
-template<typename T>
-inline void EffectProperty<T>::newKeyframe()
-{
-	this->keyframes.back().bezierCurve = { {0, 0}, {1, 1} };
-	this->sortKeyframes();
-}
 
 
-template<typename T>
-inline void EffectProperty<T>::newKeyframe(Keyframe<T> kf)
-{
-	this->keyframes.push_back(kf);
-	this->newKeyframe();
-}
-
-template<typename T>
-inline void EffectProperty<T>::newKeyframe(int frame, T value)
-{
-	this->keyframes.push_back({ frame, value });
-	this->newKeyframe();
-}
-
-template<typename T>
-inline void EffectProperty<T>::setKeyframe(T value, int loc)
-{
-	if (loc >= 0 && loc < this->keyframes.size()) {
-		this->keyframes[loc].value = value;
-	}
-}
-
-template<typename T>
-inline void EffectProperty<T>::setKeyframe(Keyframe<T> kf)
-{
-	int loc = binarySearchKeyframe(kf.frame);
-	if (loc >= 0 && loc < this->keyframes.size()) {
-		this->keyframes[loc] = kf;
-	}
-}
-
-template<typename T>
-inline void EffectProperty<T>::sortKeyframes()
-{
-	sort(this->keyframes.begin(), this->keyframes.end(), [](Keyframe a, Keyframe b) {
-		return a.frame < b.frame;
-		});
-}

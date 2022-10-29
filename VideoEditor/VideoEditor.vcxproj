@@ -145,6 +145,7 @@
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="EffectProperty.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="ScaleEffect.cpp" />
     <ClCompile Include="Transition.cpp" />
     <ClCompile Include="SourceID.cpp" />
     <ClCompile Include="VideoSource.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="IPlayable.h" />
     <ClInclude Include="ISource.h" />
     <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="ScaleEffect.h" />
     <ClInclude Include="Transition.h" />
     <ClInclude Include="SourceID.h" />
     <ClInclude Include="VideoSource.h" />
