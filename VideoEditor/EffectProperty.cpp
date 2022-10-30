@@ -25,6 +25,18 @@ inline EffectProperty<T>::EffectProperty(const EffectProperty<T>& origin) {
 }
 
 template<typename T>
+float EffectProperty<T>::GetPropValue(int frame)
+{
+	int prev = binarySearchKeyframe(frame);
+	int next;
+	if (prev == this->keyframes.size() - 1)
+		next = prev;
+	else
+		next = prev + 1;
+
+	return 0.0f;
+}
+template<typename T>
 void EffectProperty<T>::setCloseKeyframe(int currFrame, T oldValue, T value)
 {
 	int loc = binarySearchKeyframe(currFrame);
@@ -77,10 +89,11 @@ int EffectProperty<T>::binarySearchKeyframe(int frame)
 // inline
 
 template<typename T>
-inline T EffectProperty<T>::getDefualt()
+inline T EffectProperty<T>::GetDefualt()
 {
 	return this->defualt;
 }
+
 
 template<typename T>
 inline const std::vector<Keyframe<T>>& EffectProperty<T>::getKeyframes() const

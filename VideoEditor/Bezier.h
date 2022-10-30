@@ -24,8 +24,10 @@ public:
 	inline virtual ~Bezier() {};
 	inline void SetCurve(std::vector<Point>);
 	inline void SetCurve(std::vector<Point>, int insert);
+	inline void GetValue(float t, Point& pFinal);
 	inline void CurveValue(float t, Point& pFinal);
 private:
+	inline void Linear(float, Point&);
 	inline void QuadraticCurve(float, Point&);
 	inline void CubicCurve(float, Point&);
 	//void GenericCurve(float, Point&);

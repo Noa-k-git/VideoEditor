@@ -41,13 +41,19 @@ inline void Bezier::SetCurve(std::vector<Point> values, int insert)
 {
 	if (CurveValuesCheck(values))
 		this->curve.insert(curve.begin() + insert, values.begin(), values.end());
-};
+}
+inline void Bezier::GetValue(float t, Point& pFinal)
+{
+	// Add multiplation of curve value and linear value
+	
+}
+;
 
 inline void Bezier::CurveValue(float t, Point& pFinal)
 {
 	switch (curve.size()) {
 	case 2:
-		pFinal = Point(t, t);
+		Linear(t, pFinal);
 		break;
 	case 3:
 		QuadraticCurve(t, pFinal);
@@ -61,14 +67,22 @@ inline void Bezier::CurveValue(float t, Point& pFinal)
 
 };
 
+inline void Bezier::Linear(float t, Point& pFinal)
+{
+	pFinal.x = abs(this->curve[0].x - this->curve[1].x) * t;
+	pFinal.y = abs(this->curve[0].y - this->curve[1].y) * t;
+}
+
 inline void Bezier::QuadraticCurve(float t, Point& pFinal)
 {
 	float s = 1 - t;
 	// By the formula
-	pFinal.x = pow(s, 2) * curve[0].x +
+	pFinal.x = pFinal.x * // the linear base
+		pow(s, 2) * curve[0].x +
 		s * 2 * t * curve[1].x +
 		t * t * curve[2].x;
-	pFinal.y = pow(s, 2) * curve[0].y +
+	pFinal.y = pFinal.y * // the linear base
+		pow(s, 2) * curve[0].y +
 		s * 2 * t * curve[1].y +
 		t * t * curve[2].y;
 }

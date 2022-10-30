@@ -24,7 +24,8 @@ public:
 	inline EffectProperty(T);
 	inline EffectProperty(const EffectProperty<T>&);
 
-	inline T getDefualt();
+	inline T GetDefualt();
+	float GetPropValue(int frame);
 	inline const std::vector<Keyframe<T>>& getKeyframes() const;
 
 	inline void newKeyframe(Keyframe<T>); // Generate a new keyframe
@@ -38,6 +39,7 @@ public:
 	void setAllKeyframes(T oldValue, T value); // changes all keyframes with the oldValue to the new one
 
 	void deleteAllKeyframes(T value);
+	
 private:
 	inline void sortKeyframes();
 	inline void newKeyframe();
