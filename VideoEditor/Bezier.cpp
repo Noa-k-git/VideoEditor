@@ -37,17 +37,20 @@ inline void Bezier::SetCurve(std::vector<Point> newCurve)
 			this->curve = newCurve;
 };
 
-inline void Bezier::SetCurve(std::vector<Point> values, int insert)
-{
+inline void Bezier::SetCurve(std::vector<Point> values, int insert) {
 	if (CurveValuesCheck(values))
 		this->curve.insert(curve.begin() + insert, values.begin(), values.end());
 }
-inline void Bezier::GetValue(float t, Point& pFinal)
-{
+inline void Bezier::GetValue(float t, Point& pFinal) {
 	// Add multiplation of curve value and linear value
 	
 }
 ;
+template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* >
+void CalculateTransitionValue(float t, Point& pFinal, T start, T end) {
+	Bezier::CurveValue(t, pFinal); // 0.2, 0.4
+	pFinal.y = pFinal.y * t + start;
+}
 
 inline void Bezier::CurveValue(float t, Point& pFinal)
 {
@@ -66,11 +69,15 @@ inline void Bezier::CurveValue(float t, Point& pFinal)
 	}
 
 };
+template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* >
+inline float static Bezier::Linear(float t, T start, T end) {
+	return (start - end) * t + start;
+}
 
 inline void Bezier::Linear(float t, Point& pFinal)
 {
-	pFinal.x = abs(this->curve[0].x - this->curve[1].x) * t;
-	pFinal.y = abs(this->curve[0].y - this->curve[1].y) * t;
+	pFinal.x = Bezier::Linear(t, this->curve[0].x, this->curve[1].x);
+	pFinal.y = Bezier::Linear(t, this->curve[0].y, this->curve[1].y);
 }
 
 inline void Bezier::QuadraticCurve(float t, Point& pFinal)

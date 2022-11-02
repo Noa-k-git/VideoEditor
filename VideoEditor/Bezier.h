@@ -25,12 +25,18 @@ public:
 	inline void SetCurve(std::vector<Point>);
 	inline void SetCurve(std::vector<Point>, int insert);
 	inline void GetValue(float t, Point& pFinal);
+	template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr >
+	void CalculateTransitionValue(float t, Point& pFinal, T start, T end);
 	inline void CurveValue(float t, Point& pFinal);
+
 private:
-	inline void Linear(float, Point&);
+	template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr >
+	inline float static Linear(float, T, T); // find the value by linear function between two end values
+	inline void Linear(float, Point&); // find the point in linear from the curve
 	inline void QuadraticCurve(float, Point&);
 	inline void CubicCurve(float, Point&);
 	//void GenericCurve(float, Point&);
 	inline bool CurveValuesCheck(std::vector<Point>&);
 };
+
 
