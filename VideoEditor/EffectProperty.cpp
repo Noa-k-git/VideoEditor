@@ -34,6 +34,8 @@ float EffectProperty<T>::GetPropValue(int frame)
 	else
 		next = prev + 1;
 
+	float transitionState = next; // float value of y between two frames
+
 	return 0.0f;
 }
 template<typename T>

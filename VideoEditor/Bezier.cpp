@@ -1,4 +1,4 @@
-#include "Bezier.h"
+ #include "Bezier.h"
 
 inline Point::Point() {
 	this->x = 0;

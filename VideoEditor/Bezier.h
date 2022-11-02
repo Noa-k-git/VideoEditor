@@ -6,9 +6,8 @@
 struct Point {
 	float x;
 	float y;
-
 	inline Point();
-	inline Point(float x, float y);
+	inline Point(float x, float y); 
 	Point(std::array<float, 2>);
 	~Point() {};
 };
