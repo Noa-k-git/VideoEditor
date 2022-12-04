@@ -14,7 +14,7 @@ public:
 	Bezier();
 	Bezier(std::array<std::array<float, 2>, 2>);
 	void SetCurve(std::array<std::array<float, 2>, 2> curve);
-	float static cubicCurve(float);
+	float cubicCurve(float);
 private:
 	inline bool CurveValuesCheck(std::array<std::array<float, 2>, 2>&);
 };
