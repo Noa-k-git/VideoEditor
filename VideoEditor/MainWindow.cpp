@@ -16,23 +16,86 @@ MainWindow::MainWindow(wxWindow* parent,
     long style,
     const wxString& name) :
     wxFrame(parent, id, title, pos, size, style, name)
-{
+{   
+    /* 
+    
+    Base architecture
+    
+    --------------------------------|
+    horizontal  |     row   |  1    |
+    --------------------------------|
+    horizontal  |     row   |  2    |
+    --------------------------------|
+    
+    */
+    wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* row1Sizer = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer* row2Sizer = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(row1Sizer);
+    mainSizer->Add(row2Sizer);
+
+    /*
+    
+    Video architecture
+
+    ------------------------------|
+
+    |---------------------------|
+    |                           |
+    |                           |
+    |         video here        |
+    |                           |
+    |___________________________|
+
+        <<   <   ||   >   >>
+
+    ------------------------------|
+    
+    */
+
+    wxBoxSizer* videoBase = new wxBoxSizer(wxVERTICAL);
+    
+    wxPanel* videoPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition);
+    wxBoxSizer* videoCtrlSizer = new wxBoxSizer(wxHORIZONTAL);
+    videoPanel->SetBackgroundColour(wxColor(12, 20, 80));
+
+
+    videoBase->Add(videoPanel, 1, wxEXPAND|wxBOTTOM, 30);
+    videoBase->Add(videoCtrlSizer, 0, wxEXPAND|wxALL);
+
+    wxButton* gotoStart = new wxButton(this, wxID_ANY, "<<", wxDefaultPosition, wxSize(wxDefaultSize.GetX(), wxDefaultSize.GetY()+ 50));
+    wxButton* frameBefore = new wxButton(this, wxID_ANY, "<");
+    wxButton* pausePlay = new wxButton(this, wxID_ANY, "| |");
+    wxButton* frameAfter = new wxButton(this, wxID_ANY, ">");
+    wxButton* gotoEnd = new wxButton(this, wxID_ANY, ">>");
+    videoCtrlSizer->Add(gotoStart, 1, wxEXPAND|wxLEFT|wxRIGHT, 30);
+    videoCtrlSizer->Add(frameBefore,1, wxEXPAND | wxLEFT|wxRIGHT, 30);
+    videoCtrlSizer->Add(pausePlay, 2, wxEXPAND | wxLEFT|wxRIGHT, 30);
+    videoCtrlSizer->Add(frameAfter, 1, wxEXPAND | wxLEFT|wxRIGHT, 30);
+    videoCtrlSizer->Add(gotoEnd, 1, wxEXPAND | wxLEFT|wxRIGHT, 30);
+
+
+    
+
+    //wxBoxSizer* ShowPanel = new wxPanel(this, wxID_ANY,)
     // App Architecture
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
     // Panels
     wxPanel* panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(200, 100));
-    panel->SetBackgroundColour(wxColor(100, 100, 200));
+    panel->SetBackgroundColour(wxColor(100, 0, 0));
     //wxPanel* videoPanel = new wxPanel(this, wxID_ANY);
 
-    wxBoxSizer* s = new wxBoxSizer(wxVERTICAL);
-    wxButton* b = new wxButton(this, wxID_ANY, "he");
-    s->Add(b);
+    //wxBoxSizer* s = new wxBoxSizer(wxVERTICAL);
+    //wxButton* b = new wxButton(this, wxID_ANY, "hello");
+    //panel->AddChild(b);
+    //s->Add(b);
     //panel->SetSizer(s);
 
-    sizer->Add(panel, 1, wxEXPAND | wxALL, 5);
     this->SetSizerAndFit(sizer);
-
+    //sizer->Add(b);
+    sizer->Add(panel, 0, wxEXPAND | wxALL, 5);
+    sizer->Add(videoBase, 1, wxEXPAND|wxALL, 10);
     VideoSource* vd = new VideoSource("D:\\Downloads\\20190612_195422.mp4");
     //vd->Show();
     //delete vd;

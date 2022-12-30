@@ -1,8 +1,8 @@
 #include "App.h"
 #include "id.h"
 #include "MainWindow.h"
-
-IMPLEMENT_APP(App) //Main
+#include <ostream>
+IMPLEMENT_APP(App) //Main function & instsnce of the App class
 
 App::App()
 {
@@ -13,7 +13,9 @@ bool App::OnInit()
 	if (!wxApp::OnInit())
 		return false;
 
-	MainWindow* main = new MainWindow(nullptr, window::id::MAINWINDOW, _("Main Window"));
+	wxDisplay * display = new wxDisplay();
+	MainWindow* main = new MainWindow(nullptr, window::id::MAINWINDOW, _("Main Window"));//, display->GetGeometry().GetPosition(), display->GetGeometry().GetSize());
+	main->SetSize(display->GetClientArea());
 	
 	main->Show();
 	return true;
