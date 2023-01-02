@@ -4,6 +4,8 @@
 	#include <wx/wx.h>
 #endif
 #include <wx/display.h>
+#include <wx/artprov.h>
+#include "VideoSource.h"
 
  class MainWindow: public wxFrame
 {

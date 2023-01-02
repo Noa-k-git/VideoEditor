@@ -1,12 +1,13 @@
 #include "MainWindow.h"
-#include <wx/artprov.h>
-#include "VideoSource.h"
+
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
     //EVT_MENU(wxID_NEW, MainWindow::onNew)
     //EVT_MENU(wxID_EXIT, MainWindow::onQuit)
     //EVT_TOOL(wxID_HELP, MainWindow::onHelp)
     //EVT_CLOSE(MainWindow::onClose)
 END_EVENT_TABLE()
+
+
 
 MainWindow::MainWindow(wxWindow* parent,
     wxWindowID id,

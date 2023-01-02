@@ -54,6 +54,9 @@
     <ClCompile Include="App.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
+    <ClCompile Include="SubWindows.cpp">
+      <Filter>Source Files\Design</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceID.h">
@@ -93,6 +96,9 @@
       <Filter>Header Files\Design</Filter>
     </ClInclude>
     <ClInclude Include="MainWindow.h">
+      <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="SubWindows.h">
       <Filter>Header Files\Design</Filter>
     </ClInclude>
   </ItemGroup>
