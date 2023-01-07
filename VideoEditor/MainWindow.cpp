@@ -8,8 +8,34 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 END_EVENT_TABLE()
 
 
-
 MainWindow::MainWindow(wxWindow* parent,
+    wxWindowID id,
+    const wxString& title,
+    const wxPoint& pos,
+    const wxSize& size,
+    long style,
+    const wxString& name) :
+    wxFrame(parent, id, title, pos, size, style, name) {
+
+    int width = 1080, height = 1920;
+  
+    wxBitmap* frameBitmap = new wxBitmap(width, height);
+    wxMemoryDC* dc = new wxMemoryDC(*frameBitmap);
+    dc->DrawBitmap(frameBitmap, &wxPoint(0, 0));
+    dc->SetBrush(wxBrush((0, 0, 0)));
+    dc->DrawRectangle(0, 0, width, height);
+    dc->Clear();
+
+    wxStaticBitmap* frame = new wxStaticBitmap(this, wxID_ANY, *frameBitmap);
+
+    wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+    sizer->Add(frame);
+    this->SetSizerAndFit(sizer);
+
+}
+
+
+MainWindow::MainWindow(int a, wxWindow* parent,
     wxWindowID id,
     const wxString& title,
     const wxPoint& pos,
@@ -18,6 +44,7 @@ MainWindow::MainWindow(wxWindow* parent,
     const wxString& name) :
     wxFrame(parent, id, title, pos, size, style, name)
 {   
+   
     /* 
     
     Base architecture
@@ -62,8 +89,8 @@ MainWindow::MainWindow(wxWindow* parent,
 
 
     videoBase->Add(videoPanel, 1, wxEXPAND|wxBOTTOM, 30);
-    videoBase->Add(videoCtrlSizer, 0, wxEXPAND|wxALL);
-
+    videoBase->Add(videoCtrlSizer, 1, wxEXPAND|wxALL);
+    /*
     wxButton* gotoStart = new wxButton(this, wxID_ANY, "<<", wxDefaultPosition, wxSize(wxDefaultSize.GetX(), wxDefaultSize.GetY()+ 50));
     wxButton* frameBefore = new wxButton(this, wxID_ANY, "<");
     wxButton* pausePlay = new wxButton(this, wxID_ANY, "| |");
@@ -75,8 +102,10 @@ MainWindow::MainWindow(wxWindow* parent,
     videoCtrlSizer->Add(frameAfter, 1, wxEXPAND | wxLEFT|wxRIGHT, 30);
     videoCtrlSizer->Add(gotoEnd, 1, wxEXPAND | wxLEFT|wxRIGHT, 30);
 
+    */
 
-    
+    VideoWindow* vw = new VideoWindow(this, 0, 1);
+    videoCtrlSizer->Add(vw->main,1 ,wxEXPAND);
 
     //wxBoxSizer* ShowPanel = new wxPanel(this, wxID_ANY,)
     // App Architecture
@@ -85,6 +114,7 @@ MainWindow::MainWindow(wxWindow* parent,
     // Panels
     wxPanel* panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(200, 100));
     panel->SetBackgroundColour(wxColor(100, 0, 0));
+    
     //wxPanel* videoPanel = new wxPanel(this, wxID_ANY);
 
     //wxBoxSizer* s = new wxBoxSizer(wxVERTICAL);
@@ -97,7 +127,7 @@ MainWindow::MainWindow(wxWindow* parent,
     //sizer->Add(b);
     sizer->Add(panel, 0, wxEXPAND | wxALL, 5);
     sizer->Add(videoBase, 1, wxEXPAND|wxALL, 10);
-    VideoSource* vd = new VideoSource("D:\\Downloads\\20190612_195422.mp4");
+    //VideoSource* vd = new VideoSource("D:\\Downloads\\20190612_195422.mp4");
     //vd->Show();
     //delete vd;
 }

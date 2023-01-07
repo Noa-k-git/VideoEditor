@@ -17,16 +17,20 @@ TimeLine::~TimeLine() {
 
 
 
-VideoWindow::VideoWindow(wxWindow* parent) {
+VideoWindow::VideoWindow(wxWindow* parent, int start, int end) {
+	this->parent = parent;
 	main = new wxBoxSizer(wxVERTICAL);
 	handler = new wxBoxSizer(wxHORIZONTAL);
 	// create the frame with temp values
 	int width = 1080, height = 1920;
 	frameBitmap = new wxBitmap(width, height);
 	dc = new wxMemoryDC(*frameBitmap);
-	dc->SetPen(wxPen(wxColour(0, 0, 0), 3));
-	dc->DrawLine(0, 0, width, height);
+	dc->SetBrush(wxBrush((0, 0, 0)));
+	dc->DrawRectangle(0, 0, width, height);
+	//dc->Clear();
 
+	frame = new wxStaticBitmap(parent, wxID_ANY, *frameBitmap);
+	
 	gotoStart = new wxButton(parent, wxID_ANY, "<<", wxDefaultPosition, wxSize(wxDefaultSize.GetX(), wxDefaultSize.GetY() + 50));
 	frameBefore = new wxButton(parent, wxID_ANY, "<");
 	pausePlay = new wxButton(parent, wxID_ANY, "| |");
@@ -39,8 +43,12 @@ VideoWindow::VideoWindow(wxWindow* parent) {
 	handler->Add(frameAfter, 1, wxEXPAND | wxLEFT | wxRIGHT, 30);
 	handler->Add(gotoEnd, 1, wxEXPAND | wxLEFT | wxRIGHT, 30);
 
-	main->Add(main, 1, wxEXPAND | wxALL, 10);
-	main->Add(handler, 1, wxEXPAND | wxLEFT | wxRIGHT, 10);
+	timeline = new TimeLine(parent, start, end);
+
+	main->Add(frame, 0, wxEXPAND | wxALL, 10);
+	main->Add(handler, 0, wxEXPAND | wxLEFT | wxRIGHT, 10);
+	main->Add(timeline->main, 0, 0);
+	
 }
 
 VideoWindow::~VideoWindow() {
@@ -57,9 +65,11 @@ VideoWindow::~VideoWindow() {
 	
 }
 
-void VideoWindow::SetBitmap(wxBitmap * frame, wxMemoryDC * newDC) {
+void VideoWindow::SetBitmap(wxBitmap * newFrame, wxMemoryDC * newDC) {
 	delete frameBitmap;
 	delete dc;
-	frameBitmap = frame;
+	delete frame;
+	frameBitmap = newFrame;
 	dc = newDC;
+	frame = new wxStaticBitmap(parent, wxID_ANY, *frameBitmap);
 }

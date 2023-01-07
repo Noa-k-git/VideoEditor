@@ -5,7 +5,7 @@
 #endif
 #include <wx/display.h>
 
-typedef struct TimeLine{
+struct TimeLine{
     /*
     The timeline will have option to control the proportion
     */
@@ -17,10 +17,11 @@ typedef struct TimeLine{
     TimeLine(wxWindow*, int,int);
 
     virtual ~TimeLine();
-
 };
 
-typedef struct VideoWindow {
+struct VideoWindow {
+    wxWindow* parent;
+
     wxBoxSizer* main; // a vertical box sizer
     wxBoxSizer* handler; // horizontal box sizer. contains play/pause, forward, backwards, to the beggining and to the end
     
@@ -32,11 +33,14 @@ typedef struct VideoWindow {
     
     TimeLine* timeline;
 
-    VideoWindow(wxWindow*);
+    VideoWindow(wxWindow*, int, int);
     virtual ~VideoWindow();
     void SetBitmap(wxBitmap*, wxMemoryDC*);
 protected:
     wxBitmap* frameBitmap; // the bitmap which contains the frame
-    wxMemoryDC * dc;
-
+    wxStaticBitmap* frame; // static bitmap to display the bitmap
+    wxMemoryDC * dc; // data context
+    
 };
+
+
