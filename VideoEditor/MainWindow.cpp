@@ -20,11 +20,15 @@ MainWindow::MainWindow(wxWindow* parent,
     int width = 1080, height = 1920;
   
     wxBitmap* frameBitmap = new wxBitmap(width, height);
-    wxMemoryDC* dc = new wxMemoryDC(*frameBitmap);
-    dc->DrawBitmap(frameBitmap, &wxPoint(0, 0));
-    dc->SetBrush(wxBrush((0, 0, 0)));
+    wxMemoryDC* dc;
+    dc->SelectObject(frameBitmap);
+    //dc->DrawBitmap(frameBitmap, &wxPoint(0, 0));
+    dc->SetBrush(wxBrush(wxColour((0, 0, 0))));
     dc->DrawRectangle(0, 0, width, height);
-    dc->Clear();
+    dc->SelectObject(wxNullBitmap);
+    
+    wxEvtHandler::Bind(wxEVT_PAINT, &MainWindow::OnPaint, this);
+    //dc->Clear();
 
     wxStaticBitmap* frame = new wxStaticBitmap(this, wxID_ANY, *frameBitmap);
 
@@ -34,7 +38,10 @@ MainWindow::MainWindow(wxWindow* parent,
 
 }
 
-
+MainWindow::OnPaint(wxPaintEvent& event) {
+    wxPaintDC dc(this);
+    dc.DrawBitmap(frameBitmap, 0, 0);
+}
 MainWindow::MainWindow(int a, wxWindow* parent,
     wxWindowID id,
     const wxString& title,

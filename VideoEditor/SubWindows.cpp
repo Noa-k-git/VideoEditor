@@ -15,8 +15,6 @@ TimeLine::~TimeLine() {
 	delete handler;
 }
 
-
-
 VideoWindow::VideoWindow(wxWindow* parent, int start, int end) {
 	this->parent = parent;
 	main = new wxBoxSizer(wxVERTICAL);
@@ -48,7 +46,6 @@ VideoWindow::VideoWindow(wxWindow* parent, int start, int end) {
 	main->Add(frame, 0, wxEXPAND | wxALL, 10);
 	main->Add(handler, 0, wxEXPAND | wxLEFT | wxRIGHT, 10);
 	main->Add(timeline->main, 0, 0);
-	
 }
 
 VideoWindow::~VideoWindow() {
@@ -72,4 +69,10 @@ void VideoWindow::SetBitmap(wxBitmap * newFrame, wxMemoryDC * newDC) {
 	frameBitmap = newFrame;
 	dc = newDC;
 	frame = new wxStaticBitmap(parent, wxID_ANY, *frameBitmap);
+}
+
+void VideoWindow::OnPaint(wxPaintEvent& event)
+{
+	wxPaintDC dc(this->parent);
+	dc.DrawBitmap(m_bitmap, 0, 0);
 }

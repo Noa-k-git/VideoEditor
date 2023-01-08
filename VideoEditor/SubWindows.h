@@ -40,7 +40,8 @@ protected:
     wxBitmap* frameBitmap; // the bitmap which contains the frame
     wxStaticBitmap* frame; // static bitmap to display the bitmap
     wxMemoryDC * dc; // data context
-    
+private:
+    void OnPaint(wxPaintEvent& event);
 };
 
 
