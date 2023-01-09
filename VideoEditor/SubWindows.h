@@ -4,6 +4,7 @@
 #include <wx/wx.h>
 #endif
 #include <wx/display.h>
+#include "MainWindow.h"
 
 struct TimeLine{
     /*
@@ -20,10 +21,28 @@ struct TimeLine{
 };
 
 struct VideoWindow {
+    /*
+
+    Video architecture
+
+    ------------------------------|
+
+    |---------------------------|
+    |                           |
+    |                           |
+    |         video here        |
+    |                           |
+    |___________________________|
+
+        <<   <   ||   >   >>
+
+    ------------------------------|
+
+    */
     wxWindow* parent;
 
     wxBoxSizer* main; // a vertical box sizer
-    wxBoxSizer* handler; // horizontal box sizer. contains play/pause, forward, backwards, to the beggining and to the end
+    wxBoxSizer* handlerSizer; // horizontal box sizer. contains play/pause, forward, backwards, to the beggining and to the end
     
     wxButton* pausePlay;
     wxButton* gotoStart;
@@ -39,7 +58,7 @@ struct VideoWindow {
 protected:
     wxBitmap* frameBitmap; // the bitmap which contains the frame
     wxStaticBitmap* frame; // static bitmap to display the bitmap
-    wxMemoryDC * dc; // data context
+    // wxMemoryDC * dc; // data context
 private:
     void OnPaint(wxPaintEvent& event);
 };
