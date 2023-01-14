@@ -34,5 +34,6 @@ public:
     void onHelp(wxCommandEvent& event);
 
     DECLARE_EVENT_TABLE();
+
 };
 

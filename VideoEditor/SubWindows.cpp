@@ -1,5 +1,5 @@
 #include "SubWindows.h"
-
+#include "VideoSource.h"
 TimeLine::TimeLine(wxWindow* parent, int start, int end) {
 	main = new wxBoxSizer(wxVERTICAL);
 	slider = new wxSlider(parent, wxID_ANY, 0, start, end, wxDefaultPosition, wxSize(100, -1));
@@ -24,15 +24,17 @@ VideoWindow::VideoWindow(wxWindow* parent, int start, int end) {
 	main = new wxBoxSizer(wxVERTICAL);
 	handlerSizer = new wxBoxSizer(wxHORIZONTAL);
 	// create the frame with temp values
+	/*
 	int width = 1920, height = 1080;
 	wxImage image(width, height);
-	// TODO: add a ratio porportion
-	float ratio = width / height;
-	image.SetRGB(wxRect(0, 0, (int)(height*ratio), height), 0, 0, 0);
-	wxSize size(parent->GetSize());
-	image.Scale(size.GetWidth(), size.GetHeight(), wxIMAGE_QUALITY_HIGH);
-	frameBitmap = new wxBitmap(image);
-	frame = new wxStaticBitmap(parent, wxID_ANY, *frameBitmap);
+
+	image.SetRGB(wxRect(0, 0, width, height), 0, 0, 0);
+	*/
+	//frameBitmap = new wxBitmap(image);
+
+	wxString path("D:\\Downloads\\WhatsApp Image 2020-12-03 at 10.50.45.jpeg");
+	frameBitmap = new wxBitmap(path, wxBITMAP_TYPE_ANY);
+	//frameDisplay = new wxStaticBitmap(parent, wxID_ANY, *frameBitmap);
 	
 	gotoStart = new wxButton(parent, wxID_ANY, "<<", wxDefaultPosition, wxSize(wxDefaultSize.GetX(), wxDefaultSize.GetY() + 50));
 	frameBefore = new wxButton(parent, wxID_ANY, "<");
@@ -48,14 +50,16 @@ VideoWindow::VideoWindow(wxWindow* parent, int start, int end) {
 
 	timeline = new TimeLine(parent, start, end);
 
-	main->Add(frame, 1, wxEXPAND | wxALL, 10);
+	main->Add(frameDisplay, 1, wxEXPAND | wxALL, 10);
 	main->Add(handlerSizer, 0, wxEXPAND | wxLEFT | wxRIGHT, 10);
 	main->Add(timeline->main, 0);
+
+	parent->Bind(wxEVT_SIZE, &VideoWindow::OnParentSize, this);
 }
 
 VideoWindow::~VideoWindow() {
 	delete main;
-	delete frame;
+	delete frameDisplay;
 	delete frameBitmap;
 	delete handlerSizer;
 	
@@ -71,12 +75,39 @@ VideoWindow::~VideoWindow() {
 void VideoWindow::SetBitmap(wxBitmap * newFrame, wxMemoryDC * newDC) {
 	delete frameBitmap;
 	//delete dc;
-	delete frame;
+	delete frameDisplay;
 	frameBitmap = newFrame;
 	//dc = newDC;
-	frame = new wxStaticBitmap(parent, wxID_ANY, *frameBitmap);
+	frameDisplay = new wxStaticBitmap(parent, wxID_ANY, *frameBitmap);
 }
 
+void VideoWindow::OnParentSize(wxSizeEvent& event) {
+	event.Skip(); // First call the base resize method
+	wxSize newSize = event.GetSize();
+	float width = newSize.GetWidth();
+	float height = newSize.GetHeight();
+	if (width > 0 && height > 0) {
+		int bitmapWidth = frameBitmap->GetWidth();
+		int bitmapHeight = frameBitmap->GetHeight();
+
+		double ratio = bitmapWidth * 1.0 / bitmapHeight;
+		if (width / ratio <= height) {
+			height = width / ratio;
+		}
+		else {
+			width = height * ratio;
+		}
+		wxImage* image = new wxImage(frameBitmap->ConvertToImage());
+		int a = (int)width, u = (int)height;
+		image->Rescale((int)width, (int)height, wxIMAGE_QUALITY_HIGH);
+		delete frameBitmap;
+		frameBitmap = new wxBitmap(*image);
+		delete image;
+		frameDisplay->SetBitmap(*frameBitmap);
+		frameDisplay->Refresh();
+	}
+
+}
 void VideoWindow::OnPaint(wxPaintEvent& event)
 {
 	wxPaintDC dc(this->parent);

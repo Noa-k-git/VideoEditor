@@ -57,10 +57,11 @@ struct VideoWindow {
     void SetBitmap(wxBitmap*, wxMemoryDC*);
 protected:
     wxBitmap* frameBitmap; // the bitmap which contains the frame
-    wxStaticBitmap* frame; // static bitmap to display the bitmap
+    wxStaticBitmap* frameDisplay; // static bitmap to display the bitmap
     // wxMemoryDC * dc; // data context
 private:
     void OnPaint(wxPaintEvent& event);
+    void OnParentSize(wxSizeEvent& event);
 };
 
 
