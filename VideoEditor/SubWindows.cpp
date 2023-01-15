@@ -24,17 +24,18 @@ VideoWindow::VideoWindow(wxWindow* parent, int start, int end) {
 	main = new wxBoxSizer(wxVERTICAL);
 	handlerSizer = new wxBoxSizer(wxHORIZONTAL);
 	// create the frame with temp values
-	/*
+	
 	int width = 1920, height = 1080;
+	ratio = width*1.0/height;
 	wxImage image(width, height);
 
 	image.SetRGB(wxRect(0, 0, width, height), 0, 0, 0);
-	*/
-	//frameBitmap = new wxBitmap(image);
+	
+	frameBitmap = new wxBitmap(image);
+	frameDisplay = new wxStaticBitmap(parent, wxID_ANY, *frameBitmap);
 
-	wxString path("D:\\Downloads\\WhatsApp Image 2020-12-03 at 10.50.45.jpeg");
-	frameBitmap = new wxBitmap(path, wxBITMAP_TYPE_ANY);
-	//frameDisplay = new wxStaticBitmap(parent, wxID_ANY, *frameBitmap);
+	//wxString path("D:\\Downloads\\WhatsApp Image 2020-12-03 at 10.50.45.jpeg");
+	//frameBitmap = new wxBitmap(path, wxBITMAP_TYPE_ANY);
 	
 	gotoStart = new wxButton(parent, wxID_ANY, "<<", wxDefaultPosition, wxSize(wxDefaultSize.GetX(), wxDefaultSize.GetY() + 50));
 	frameBefore = new wxButton(parent, wxID_ANY, "<");
@@ -87,10 +88,12 @@ void VideoWindow::OnParentSize(wxSizeEvent& event) {
 	float width = newSize.GetWidth();
 	float height = newSize.GetHeight();
 	if (width > 0 && height > 0) {
+		/*
 		int bitmapWidth = frameBitmap->GetWidth();
 		int bitmapHeight = frameBitmap->GetHeight();
 
 		double ratio = bitmapWidth * 1.0 / bitmapHeight;
+		*/
 		if (width / ratio <= height) {
 			height = width / ratio;
 		}

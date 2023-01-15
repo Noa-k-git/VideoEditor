@@ -62,6 +62,7 @@ protected:
 private:
     void OnPaint(wxPaintEvent& event);
     void OnParentSize(wxSizeEvent& event);
+    float ratio;
 };
 
 
