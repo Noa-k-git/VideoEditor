@@ -1,7 +1,6 @@
 #pragma once
 #include "IEffect.h"
 #include "EffectProperty.h"
-
 class ScaleEffect :
     public IEffect
 {
