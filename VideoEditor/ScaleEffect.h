@@ -1,7 +1,6 @@
 #pragma once
 #include "IEffect.h"
 #include "EffectProperty.h"
-
 // FFmpeg
 
 extern "C" {
@@ -15,7 +14,6 @@ extern "C" {
     // types
 #include <inttypes.h>
 }
-
 class ScaleEffect :
     public IEffect
 {
