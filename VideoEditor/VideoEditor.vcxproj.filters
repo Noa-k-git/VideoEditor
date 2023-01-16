@@ -48,10 +48,6 @@
     <ClCompile Include="ScaleEffect.cpp">
       <Filter>Source Files\Effects</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="Client.cpp">
-      <Filter>Source Files</Filter>
-=======
     <ClCompile Include="MainWindow.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
@@ -60,7 +56,6 @@
     </ClCompile>
     <ClCompile Include="SubWindows.cpp">
       <Filter>Source Files\Design</Filter>
->>>>>>> 3a8d3033c4dfadba350dff129bfa55241d3d2803
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -96,20 +91,6 @@
     </ClInclude>
     <ClInclude Include="ScaleEffect.h">
       <Filter>Header Files\Effects</Filter>
-    </ClInclude>
-<<<<<<< HEAD
-    <ClInclude Include="Client.h">
-      <Filter>Header Files</Filter>
-=======
-    <ClInclude Include="App.h">
-      <Filter>Header Files\Design</Filter>
-    </ClInclude>
-    <ClInclude Include="MainWindow.h">
-      <Filter>Header Files\Design</Filter>
-    </ClInclude>
-    <ClInclude Include="SubWindows.h">
-      <Filter>Header Files\Design</Filter>
->>>>>>> 3a8d3033c4dfadba350dff129bfa55241d3d2803
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
