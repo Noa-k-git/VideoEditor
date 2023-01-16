@@ -3,3 +3,34 @@
 <1.0>
 *id|file-name|"path\to\file\this.mp4"|layer|startClip?endClip|startFrame|:size<<><><>>:opacity<<>>
 *id|file-name|"path\to\file2\this.mp4"|layer|startClip?endClip|startFrame|:size<<><><>>:opacity<<>>
+
+
+
+windows api for creaing a window
+
+#include <windows.h>
+
+int main()
+{
+    // Create a window
+    HWND hwnd = CreateWindow(
+        "MyWindowClass",    // Class name
+        "My Window",        // Window title
+        WS_OVERLAPPEDWINDOW,// Window style
+        CW_USEDEFAULT,      // Initial x position
+        CW_USEDEFAULT,      // Initial y position
+        640,                // Initial width
+        480,                // Initial height
+        NULL,               // Parent window
+        NULL,               // Menu
+        NULL,               // Instance handle
+        NULL                // Additional application data
+    );
+
+    // Show the window
+    ShowWindow(hwnd, SW_SHOW);
+
+    return 0;
+}
+
+In this example, the "CreateWindow" function is a part of the Windows API that is used to create a new window. The function takes a set of parameters that specify the properties of the window, such as its class name, title, style, and size. The "ShowWindow" function is then used to make the window visible on the screen.

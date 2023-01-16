@@ -1,7 +1,7 @@
 #pragma once
 
 #include <wx/wxprec.h>
-#ifndef WX_PRECOMP
+#ifndef WX_PRECOMP // if the precompiled files aren't available
 	#include <wx/wx.h>
 #endif
 
@@ -13,4 +13,4 @@ public:
 	~App();
 };
 
-DECLARE_APP(App); //wxGetApp();
+DECLARE_APP(App); //wxGetApp(); -> instance of the app class

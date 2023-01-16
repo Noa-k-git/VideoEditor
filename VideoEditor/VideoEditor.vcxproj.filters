@@ -22,6 +22,12 @@
     <Filter Include="Source Files\Effects">
       <UniqueIdentifier>{17d046eb-1a68-4fea-b22d-d5da1ddc76f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Design">
+      <UniqueIdentifier>{ffb8b9e1-804e-4ba6-873f-929ae148f236}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Design">
+      <UniqueIdentifier>{5d4bcf9d-13b7-45db-931f-5c627cf68ca6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SourceID.cpp">
@@ -33,12 +39,6 @@
     <ClCompile Include="Bezier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="App.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MainWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VideoSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,8 +48,19 @@
     <ClCompile Include="ScaleEffect.cpp">
       <Filter>Source Files\Effects</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="Client.cpp">
       <Filter>Source Files</Filter>
+=======
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>Source Files\Design</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>Source Files\Design</Filter>
+    </ClCompile>
+    <ClCompile Include="SubWindows.cpp">
+      <Filter>Source Files\Design</Filter>
+>>>>>>> 3a8d3033c4dfadba350dff129bfa55241d3d2803
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -65,13 +76,7 @@
     <ClInclude Include="Bezier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MainWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="id.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="App.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VideoSource.h">
@@ -92,8 +97,19 @@
     <ClInclude Include="ScaleEffect.h">
       <Filter>Header Files\Effects</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Client.h">
       <Filter>Header Files</Filter>
+=======
+    <ClInclude Include="App.h">
+      <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWindow.h">
+      <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="SubWindows.h">
+      <Filter>Header Files\Design</Filter>
+>>>>>>> 3a8d3033c4dfadba350dff129bfa55241d3d2803
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
