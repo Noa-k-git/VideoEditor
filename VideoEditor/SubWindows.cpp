@@ -108,6 +108,9 @@ void VideoWindow::OnParentSize(wxSizeEvent& event) {
 		delete image;
 		frameDisplay->SetBitmap(*frameBitmap);
 		frameDisplay->Refresh();
+		this->timeline->slider->SetSize(-1,-1, (int)width, -1);
+		this->timeline->main->Layout();
+		this->main->Layout();
 	}
 
 }
