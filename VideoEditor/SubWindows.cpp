@@ -2,12 +2,11 @@
 #include "VideoSource.h"
 TimeLine::TimeLine(wxWindow* parent, int start, int end) {
 	main = new wxBoxSizer(wxVERTICAL);
-	slider = new wxSlider(parent, wxID_ANY, 0, start, end, wxDefaultPosition, wxSize(100, -1));
-	slider->SetThumbLength(50);
+	slider = new wxSlider(parent, wxID_ANY, 0, start, end, wxDefaultPosition, wxSize(-1, -1));
+	//slider->SetThumbLength(50);
 	//slider->SetLineSize(1);
 	handler = new wxBoxSizer(wxHORIZONTAL);
-
-	main->Add(slider);
+	main->Add(slider);//, 1, wxEXPAND | wxSHAPED | wxALL, 10);
 	main->Add(handler);
 }
 
@@ -108,13 +107,15 @@ void VideoWindow::OnParentSize(wxSizeEvent& event) {
 		delete image;
 		frameDisplay->SetBitmap(*frameBitmap);
 		frameDisplay->Refresh();
-		this->timeline->slider->SetSize(-1,-1, (int)width, -1);
+		
+		this->timeline->slider->SetSize((int)width,-1);// , (int)width, -1);
+		
 		this->timeline->main->Layout();
 		this->main->Layout();
 	}
 
 }
-void VideoWindow::OnPaint(wxPaintEvent& event)
+void VideoWindow::OnPaint(wxPaintEvent& event) // not in use
 {
 	wxPaintDC dc(this->parent);
 	dc.DrawBitmap(*frameBitmap, 0, 0);

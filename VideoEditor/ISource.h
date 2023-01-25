@@ -18,8 +18,18 @@ public:
 		this->path = path;
 		std::thread readData(&ISource::ReadSource, this, path);
 		// TODO: handle object getting deleted
+
 		if (readData.joinable())
-			readData.detach();
+			try {
+			readData.join();
+			}
+			catch (const std::exception& e) {
+				std::string z = e.what();
+				//std::cout << "Error: " << e.what() << std::endl;
+				auto a = 1;
+			}
+			//readData.join();
+			//readData.detach();
 	}
 	virtual ~ISource() {}
 private:
