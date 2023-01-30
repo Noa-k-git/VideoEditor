@@ -6,6 +6,16 @@ char x[AV_ERROR_MAX_STRING_SIZE];
 
 VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 {
+}
+
+VideoSource::~VideoSource()
+{
+	this->source.clear();
+	//std::vector<cv::Mat>().swap(source);
+}
+
+void VideoSource::ReadSource(std::string path)
+{
 	cv::VideoCapture vidCapture(path);
 	// prints error message if the stream is invalid
 	if (!vidCapture.isOpened())
@@ -26,23 +36,8 @@ VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 		std::cout << "  Frame count :" << this->length << std::endl;
 	}
 
-	cv::Mat blackImage(this->resolution[0], this->resolution[1], CV_8UC3, cv::Scalar(0, 0, 0));
-	//source = std::vector<cv::Mat>(this->length, blackImage);
 	vidCapture.release(); // closes the file
-	//delete& vidCapture; // deleting object from memory
-    
-	//std::thread readData(&VideoSource::ReadSource, this, path);
-	//readData.join(); - change to detach
-}
 
-VideoSource::~VideoSource()
-{
-	this->source.clear();
-	//std::vector<cv::Mat>().swap(source);
-}
-
-void VideoSource::ReadSource(std::string path)
-{
 	// Open the file using libavformat
 	AVFormatContext* av_format_ctx = avformat_alloc_context();
 	if (!av_format_ctx) {

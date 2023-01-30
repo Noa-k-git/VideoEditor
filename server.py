@@ -1,6 +1,13 @@
 from chatlib import *
 import random
 import select
+
+
+# Mongodb Totorials:
+# https://www.freecodecamp.org/news/learn-mongodb-a4ce205e7739/
+# https://medium.com/@navindu/say-no-to-sql-ab1e49aa7299
+# https://www.mongodb.com/try/download/community
+
 # GLOBALS
 users = {} # dictionary of users with their data
 questions = {} # dictionary of questions
@@ -203,6 +210,22 @@ def print_client_sockets()-> None:
 
 	
 ##### MESSAGE HANDLING
+
+
+def handle_jointeam():
+	pass
+
+
+def handle_leaveteam():
+	pass
+
+
+def handle_addchanges():
+	pass
+
+
+def handle_getfiles():
+	pass
 
 
 def handle_getscore_message(conn:socket.socket, username: str) -> None:

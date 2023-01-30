@@ -1,6 +1,7 @@
 #pragma once
 #include<string>
 #include<thread>
+#include<functional>
 /*
 struct Info {
 	double fps; // clip's frames per seconds
@@ -16,9 +17,10 @@ public:
 	T source;
 	ISource(std::string path) {
 		this->path = path;
-		std::thread readData(&ISource::ReadSource, this, path);
+		std::thread readData(std::bind(&ISource::ReadSource, this, path));
+		readData.detach();
 		// TODO: handle object getting deleted
-
+		/*
 		if (readData.joinable())
 			try {
 			readData.join();
@@ -30,7 +32,9 @@ public:
 			}
 			//readData.join();
 			//readData.detach();
+	*/
 	}
+
 	virtual ~ISource() {}
 private:
 	virtual void ReadSource(std::string) = 0;
