@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
-    EVT_MENU(wxID_NEW, MainWindow::OnImport)
+    //EVT_MENU(wxID_NEW, MainWindow::OnImport)
     //EVT_MENU(wxID_NEW, MainWindow::onNew)
     //EVT_MENU(wxID_EXIT, MainWindow::onQuit)
     //EVT_TOOL(wxID_HELP, MainWindow::onHelp)
@@ -66,6 +66,11 @@ MainWindow::MainWindow(wxWindow* parent,
     mainSizer->Layout();
     vw->timeline->handler->Layout();
     vw->main->Layout();
+    //wxMessageBox(std::to_string(vw->handlerSizer->GetItem(1)->GetId()));
+    //wxMessageBox(std::to_string(vw->handlerSizer->GetItem(1)->IsKindOf(CLASSINFO(wxButton))));
+    //Bind(wxEVT_BUTTON, &MainWindow::OnImport, this, vw->handlerSizer->GetItem(2)->GetId());
+    wxMessageBox(std::to_string(vw->pausePlay->IsKindOf(CLASSINFO(wxButton))));
+    Bind(wxEVT_BUTTON, &MainWindow::OnImport, this, vw->pausePlay->GetId());
 
     //VideoSource* vd = new VideoSource("D:\\Downloads\\20190612_195422.mp4");
     //vd->Show();
@@ -87,6 +92,7 @@ void MainWindow::onNew(wxCommandEvent& WXUNUSED(event))
 
 void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
 {
+    wxMessageBox("Start Import");
     wxFileDialog fileDialog(this, "Open File", "", "", "*.mp4", wxFD_OPEN);
     std::string filePath;
     if (fileDialog.ShowModal() == wxID_OK)
@@ -96,7 +102,9 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
     else
         return;
     //VideoSource* vs = new VideoSource("C:\\Users\\cyber\\source\\repos\\Noa-k-git\\VideoEditor\\video.mp4");
+    wxMessageBox("Processing video");
     VideoSource* vs = new VideoSource(filePath);
+
 }
 
 
