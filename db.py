@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 
+
 def create_connection(db_file):
     """Creates a database connection to the SQLite database specified by db_file
 
@@ -28,6 +29,9 @@ def create_table(conn, create_table_sql):
         c.execute(create_table_sql)
     except Error as e:
         print(e)
+
+def append_to_table(conn, tabel_name, args_lst):
+    sql = f"""INSERT INTO {table} ()"""
 
 database = r"mydb.db"
 
@@ -64,7 +68,7 @@ CREATE TABLE if not EXISTS project_users (
 # Create a database connection
 conn = create_connection(database)
  # create tables
- 
+
 if conn is not None:
     for table in create_tables:
         create_table(conn, create_tables[table])
