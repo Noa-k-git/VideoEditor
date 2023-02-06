@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
+    EVT_MENU(wxID_NEW, MainWindow::OnImport)
     //EVT_MENU(wxID_NEW, MainWindow::onNew)
     //EVT_MENU(wxID_EXIT, MainWindow::onQuit)
     //EVT_TOOL(wxID_HELP, MainWindow::onHelp)
@@ -86,7 +87,16 @@ void MainWindow::onNew(wxCommandEvent& WXUNUSED(event))
 
 void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
 {
-
+    wxFileDialog fileDialog(this, "Open File", "", "", "*.mp4", wxFD_OPEN);
+    std::string filePath;
+    if (fileDialog.ShowModal() == wxID_OK)
+    {
+        filePath = fileDialog.GetPath().ToStdString();
+    }
+    else
+        return;
+    //VideoSource* vs = new VideoSource("C:\\Users\\cyber\\source\\repos\\Noa-k-git\\VideoEditor\\video.mp4");
+    VideoSource* vs = new VideoSource(filePath);
 }
 
 
