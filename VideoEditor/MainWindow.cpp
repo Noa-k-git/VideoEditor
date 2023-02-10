@@ -16,11 +16,7 @@ MainWindow::MainWindow(int, wxWindow* parent,
     const wxSize& size,
     long style,
     const wxString& name) :
-    wxFrame(parent, id, title, pos, size, style, name) {
-
-
-
-}
+    wxFrame(parent, id, title, pos, size, style, name) {}
 
 MainWindow::MainWindow(wxWindow* parent,
     wxWindowID id,
