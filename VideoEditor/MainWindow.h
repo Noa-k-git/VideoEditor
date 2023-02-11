@@ -5,10 +5,15 @@
 #endif
 #include <wx/display.h>
 #include <wx/artprov.h>
+#include <wx/splitter.h>
 #include "VideoSource.h"
 #include "SubWindows.h"
  class MainWindow: public wxFrame
 {
+public:
+    wxBoxSizer* mainSizer;
+    wxBoxSizer* row1Sizer;
+    wxBoxSizer* row2Sizer;
 public:
 	MainWindow(wxWindow* parent,
         wxWindowID id,
@@ -32,7 +37,7 @@ public:
     void onQuit(wxCommandEvent& event);
     void onClose(wxCloseEvent& event);
     void onHelp(wxCommandEvent& event);
-
+    void OnWindowSize(wxSizeEvent& event);
     DECLARE_EVENT_TABLE();
 };
 

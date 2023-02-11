@@ -83,6 +83,10 @@ void VideoWindow::SetBitmap(wxBitmap * newFrame, wxMemoryDC * newDC) {
 
 void VideoWindow::OnParentSize(wxSizeEvent& event) {
 	event.Skip(); // First call the base resize method
+	//main->Layout();
+	/*wxSize newSize = main->GetSize();
+	float width = newSize.GetWidth();
+	float height = newSize.GetHeight();*/
 	wxSize newSize = event.GetSize();
 	float width = newSize.GetWidth();
 	float height = newSize.GetHeight();
