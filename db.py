@@ -1,6 +1,10 @@
 import sqlite3
 from sqlite3 import Error
 
+class Item(dict):
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
 
 def create_connection(db_file):
     """Creates a database connection to the SQLite database specified by db_file
