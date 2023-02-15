@@ -1,38 +1,80 @@
 import sqlite3
 from sqlite3 import Error
+from dataclasses import dataclass
 
-class Item(dict):
-    __getattr__ = dict.get
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
+@dataclass
+class User:
+    id: int
+    name: str
+    password: str
+    email: str
 
-def create_connection(db_file):
-    """Creates a database connection to the SQLite database specified by db_file
+@dataclass
+class Project:
+    id: int
+    name: str
+    project: str
 
-    Args:
-        db_file (str): database file path
-        return: Connection object or None
-    """
-    conn = None
-    try:
-        conn = sqlite3.connect(db_file)
-        return conn
-    except Error as e:
-        print(e)
-    return conn
+@dataclass
+class Video:
+    id: int
+    path: str
 
-def create_table(conn, create_table_sql):
-    """Creates a table from create_table_sql statement
+@dataclass
+class ProjectVideo:
+    project_id: int
+    video_id: int
 
-    Args:
-        conn (sqlite.connect): Connection obejct
-        create_table_sql (str): a CREATE TABLE statement
-    """
-    try:
-        c = conn.cursor()
-        c.execute(create_table_sql)
-    except Error as e:
-        print(e)
+@dataclass
+class ProjectUser:
+    project_id: int
+    user_id: int
+
+
+class DataBase():
+    def __init__(self, db_path):
+        self.db_path = db_path
+        self.conn = None
+    
+    def connect(self):
+        """Creates a database connection to the SQLite database specified by db_file
+
+        Args:
+            db_file (str): database file path
+            return: Connection object or None
+        """
+        conn = None
+        try:
+            self.conn = sqlite3.connect(self.db_path)
+        except Error as e:
+            print(e)
+
+class Table():
+    def __init__(self, name, conn) -> None:
+        self.name = name
+        self.args = None
+        self.conn = conn
+
+    def insert(self, args):
+        pass
+    
+    def create():
+        """Creates a table from create_table_sql statement
+
+        Args:
+            conn (sqlite.connect): Connection obejct
+            create_table_sql (str): a CREATE TABLE statement
+        """
+        try:
+            c = conn.cursor()
+            c.execute(create_table_sql)
+        except Error as e:
+            print(e)
+
+class UsersTable(Table):
+    def __init__(self, conn):
+        self.__super__("users", conn)
+        
 
 def append_to_table(conn, tabel_name, args_lst):
     sql = f"""INSERT INTO {table} ()"""
