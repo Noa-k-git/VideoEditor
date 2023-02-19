@@ -1,9 +1,19 @@
 import sqlite3
 from sqlite3 import Error
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
+import typing
 
 @dataclass
-class User:
+class Item:
+    def get(self):
+        vals = {}
+        for field_name in typing.get_type_hints(self).items():
+            val = getattr(self, field_name)
+            vals[field_name] = val
+        return vals
+
+@dataclass
+class User(Item):
     id: int
     name: str
     password: str
@@ -52,13 +62,16 @@ class DataBase():
 class Table():
     def __init__(self, name, conn) -> None:
         self.name = name
-        self.args = None
         self.conn = conn
 
-    def insert(self, args):
-        pass
+    def insert(self, item):
+        dct = item.get()
+        sql = f'''INSERT INTO {self.name}({", ".join([str(key) for key in dct.keys()])}
+        VALUES ({", ".join([str(val) for val in dct.values()])}'''
+
     
-    def create():
+    def create(create_table_sql):
+        
         """Creates a table from create_table_sql statement
 
         Args:
