@@ -77,8 +77,8 @@ class Table():
         print(sql)
         try:
             self.conn.execute(sql)
-        except sqlite3.IntegrityError:
-            print("error!!")
+        except sqlite3.IntegrityError as e:
+            print("error!!", e)
         self.conn.commit()
     
     def create(self, create_table_sql):
@@ -119,12 +119,12 @@ CREATE TABLE if not EXISTS videos (
 ); """
 create_tables.project_videos = """
 CREATE TABLE if not EXISTS project_videos (
-    project_id integer PRIMARY KEY,
+    project_id integer,
     video_id integer
 ); """
 create_tables.project_users = """
 CREATE TABLE if not EXISTS project_users (
-    project_id integer PRIMARY KEY,
+    project_id integer,
     user_id integer
 ); """
 
@@ -134,5 +134,10 @@ for create in create_tables:
     tables[create] = Table(create, database.conn)
     tables[create].create(create_tables[create])
     
-tables.project_users.insert(ProjectUser(1,1))
-tables.users.insert(User(1, "Noa", "123", "noa@gmail.com"))
+tables.project_users.insert(ProjectUser(1,2))
+tables.project_users.insert(ProjectUser(1,3))
+tables.project_users.insert(ProjectUser(1,4))
+tables.project_users.insert(ProjectUser(2,4))
+tables.project_users.insert(ProjectUser(3,4))
+tables.project_users.insert(ProjectUser(4,4))
+tables.users.insert(User(2, "1", "123", "2"))
