@@ -1,15 +1,22 @@
 import sqlite3
 from sqlite3 import Error
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 import typing
 
+class DotDict(dict):
+    """dot.notation access to dictionary attributes"""
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+    
 @dataclass
 class Item:
     def get(self):
         vals = {}
         for field_name in typing.get_type_hints(self).items():
-            val = getattr(self, field_name)
-            vals[field_name] = val
+            print(field_name)
+            val = getattr(self, field_name[0])
+            vals[field_name[0]] = val
         return vals
 
 @dataclass
@@ -20,23 +27,23 @@ class User(Item):
     email: str
 
 @dataclass
-class Project:
+class Project(Item):
     id: int
     name: str
     project: str
 
 @dataclass
-class Video:
+class Video(Item):
     id: int
     path: str
 
 @dataclass
-class ProjectVideo:
+class ProjectVideo(Item):
     project_id: int
     video_id: int
 
 @dataclass
-class ProjectUser:
+class ProjectUser(Item):
     project_id: int
     user_id: int
 
@@ -53,7 +60,6 @@ class DataBase():
             db_file (str): database file path
             return: Connection object or None
         """
-        conn = None
         try:
             self.conn = sqlite3.connect(self.db_path)
         except Error as e:
@@ -66,71 +72,67 @@ class Table():
 
     def insert(self, item):
         dct = item.get()
-        sql = f'''INSERT INTO {self.name}({", ".join([str(key) for key in dct.keys()])}
-        VALUES ({", ".join([str(val) for val in dct.values()])}'''
-
+        sql = f'''INSERT INTO {self.name}({", ".join([str(key) for key in dct.keys()])})
+        VALUES ({", ".join([str(val) for val in dct.values()])})'''
+        print(sql)
+        try:
+            self.conn.execute(sql)
+        except sqlite3.IntegrityError:
+            print("error!!")
+        self.conn.commit()
     
-    def create(create_table_sql):
+    def create(self, create_table_sql):
         
         """Creates a table from create_table_sql statement
 
         Args:
-            conn (sqlite.connect): Connection obejct
+            conn (sqlite.connect): Connection object
             create_table_sql (str): a CREATE TABLE statement
         """
         try:
-            c = conn.cursor()
-            c.execute(create_table_sql)
+            self.conn.execute(create_table_sql)
         except Error as e:
             print(e)
 
-class UsersTable(Table):
-    def __init__(self, conn):
-        self.__super__("users", conn)
-        
+db_path = r"mydb1.db"
+database = DataBase(db_path)
+database.connect()
 
-def append_to_table(conn, tabel_name, args_lst):
-    sql = f"""INSERT INTO {table} ()"""
-
-database = r"mydb.db"
-
-create_tables = {}
-create_tables["sql_create_users_table"] = """
+create_tables = DotDict()
+create_tables.users = """
 CREATE TABLE if not EXISTS users (
     id integer PRIMARY KEY,
     name text NOT NULL,
     password text NOT NULL,
     email text NOT NULL
 ); """
-create_tables["sql_create_project_table"] = """
+create_tables.projects = """
 CREATE TABLE if not EXISTS projects (
     id integer PRIMARY KEY,
     name text NOT NULL,
     project text
 ); """
-create_tables["sql_create_videos_table"] = """
+create_tables.videos = """
 CREATE TABLE if not EXISTS videos (
     id integer PRIMARY KEY,
     path text NOT NULL
 ); """
-create_tables["sql_create_project_videos_table"] = """
+create_tables.project_videos = """
 CREATE TABLE if not EXISTS project_videos (
     project_id integer PRIMARY KEY,
     video_id integer
 ); """
-create_tables["sql_create_project_users_table"] = """
+create_tables.project_users = """
 CREATE TABLE if not EXISTS project_users (
     project_id integer PRIMARY KEY,
     user_id integer
 ); """
 
-# Create a database connection
-conn = create_connection(database)
- # create tables
+tables = DotDict()
 
-if conn is not None:
-    for table in create_tables:
-        create_table(conn, create_tables[table])
-
-else:
-    print("Error! cannot create the database connection")
+for create in create_tables:
+    tables[create] = Table(create, database.conn)
+    tables[create].create(create_tables[create])
+    
+tables.project_users.insert(ProjectUser(1,1))
+tables.users.insert(User(1, "Noa", "123", "noa@gmail.com"))
