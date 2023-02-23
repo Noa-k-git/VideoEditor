@@ -2,6 +2,13 @@ import sqlite3
 from sqlite3 import Error
 from dataclasses import dataclass
 import typing
+import logging, coloredlogs
+
+# logging.basicConfig(level=logging.INFO)
+coloredlogs.DEFAULT_LEVEL_STYLES['info'] = {'bold' : False, 'color': 'blue'}
+coloredlogs.install(level='INFO',
+                    fmt='%(asctime)s %(levelname)s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
 
 class DotDict(dict):
     """dot.notation access to dictionary attributes"""
@@ -14,7 +21,7 @@ class Item:
     def get(self):
         vals = {}
         for field_name in typing.get_type_hints(self).items():
-            print(field_name)
+            # print(field_name)
             val = getattr(self, field_name[0])
             vals[field_name[0]] = val
         return vals
@@ -70,17 +77,38 @@ class Table():
         self.name = name
         self.conn = conn
 
+    def _get_str_keys(self, dct: dict, between: str):
+        logging.debug(dct)
+        s = between.join([str(key) for key in dct.keys()])
+        # s = s[:-1*len(between)]
+        return s
+    
     def insert(self, item):
         dct = item.get()
-        sql = f'''INSERT INTO {self.name}({", ".join([str(key) for key in dct.keys()])})
-        VALUES ({", ".join([str(val) for val in dct.values()])})'''
-        print(sql)
+        logging.info(f'Table: {self.name} |\tINSERT: {dct}')
+        sql = f'''INSERT INTO {self.name}({self._get_str_keys(dct, ", ")})
+        VALUES (''' + '?, ' * len(dct.keys())
+        
+        sql = sql[:-2] + ')'
+        logging.debug(sql.replace('\n', ' '))
         try:
-            self.conn.execute(sql)
+            self.conn.execute(sql, [str(val) for val in dct.values()])
         except sqlite3.IntegrityError as e:
-            print("error!!", e)
+            logging.error(e)
         self.conn.commit()
-    
+        
+    def select(self, item):
+        dct = item.get()
+        dct = {i:dct[i] for i in dct if dct[i] != None}
+                
+        sql = f'''SELECT * FROM {self.name} WHERE {self._get_str_keys(dct, "=?, ")}=?'''
+        logging.info(sql.replace('\n', ' '))
+        
+        cur = self.conn.cursor()
+        cur.execute(sql, [str(val) for val in dct.values()])
+        rows = cur.fetchall()
+        return rows
+        
     def create(self, create_table_sql):
         
         """Creates a table from create_table_sql statement
@@ -92,9 +120,9 @@ class Table():
         try:
             self.conn.execute(create_table_sql)
         except Error as e:
-            print(e)
+            logging.error(e)
 
-db_path = r"mydb1.db"
+db_path = r"mydb.db"
 database = DataBase(db_path)
 database.connect()
 
@@ -120,24 +148,34 @@ CREATE TABLE if not EXISTS videos (
 create_tables.project_videos = """
 CREATE TABLE if not EXISTS project_videos (
     project_id integer,
-    video_id integer
+    video_id integer,
+    unique (project_id, video_id)
 ); """
 create_tables.project_users = """
 CREATE TABLE if not EXISTS project_users (
     project_id integer,
-    user_id integer
+    user_id integer,
+    unique (project_id, user_id)
 ); """
+
 
 tables = DotDict()
 
 for create in create_tables:
     tables[create] = Table(create, database.conn)
     tables[create].create(create_tables[create])
-    
-tables.project_users.insert(ProjectUser(1,2))
-tables.project_users.insert(ProjectUser(1,3))
-tables.project_users.insert(ProjectUser(1,4))
-tables.project_users.insert(ProjectUser(2,4))
-tables.project_users.insert(ProjectUser(3,4))
-tables.project_users.insert(ProjectUser(4,4))
-tables.users.insert(User(2, "1", "123", "2"))
+
+if __name__ =="__main__":
+    tables.project_users.insert(ProjectUser(1,2))
+    tables.project_users.insert(ProjectUser(1,2))
+    tables.project_users.insert(ProjectUser(1,2))
+    tables.project_users.insert(ProjectUser(3,4))
+    tables.project_users.insert(ProjectUser(4,3))
+    tables.project_users.insert(ProjectUser(4,4))
+    tables.users.insert(User(3, "Noa", "123", "noaklein.email@gmail.com"))
+    tables.users.insert(User(1, "ads", "123", "noaklein.email@gmail.com"))
+    tables.users.insert(User(4, "as", "123", "noaklein.email@gmail.com"))
+    tables.users.insert(User(5, "adsfs", "12f3", "noaklein.email@gmail.com"))
+    print(tables.users.select(User(None, None, "123", None)))
+    print(type(tables.users.select(User(3, None, None, None))))
+    print(tables.users.select(User(3, None, None, None)))

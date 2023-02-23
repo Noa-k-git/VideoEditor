@@ -2,16 +2,13 @@ from chatlib import *
 import random
 import select
 
-
-# Mongodb Totorials:
-# https://www.freecodecamp.org/news/learn-mongodb-a4ce205e7739/
-# https://medium.com/@navindu/say-no-to-sql-ab1e49aa7299
-# https://www.mongodb.com/try/download/community
-
 # GLOBALS
 users = {} # dictionary of users with their data
-questions = {} # dictionary of questions
+
 logged_users = {} # a dictionary of client hostnames to usernames
+
+working_projects = {}
+
 
 ERROR_MSG = "Error! "
 USERS_PATH = 'users.txt'
@@ -73,26 +70,6 @@ def send_waiting_messages(wlist:list)-> None:
 		if current_socket in wlist:     
 			current_socket.send(data)  
 		messages_to_send.remove(message)
-
-# Data Loaders #
-
-def load_questions(filename:str)-> dict:
-	"""
-	Receives the filename of the questions file and loads the questions bank from file.
-	Args:
-		filename (str): the filename of the questions file
-	
-	Returns: the questions from the file (dict)
- 	"""
-
-	with open(filename, 'r') as f: 
-		count = 1
-		for line in f:
-			temp = line.split('|')
-			questions[count] = {'question': temp[0], 'answers':temp[1:-1], 'correct':int(temp[-1])}
-			count += 1
-
-	return questions
 
 
 def load_user_database(filename)->dict:
@@ -211,6 +188,8 @@ def print_client_sockets()-> None:
 	
 ##### MESSAGE HANDLING
 
+def handle_connectproject(conn:socket.socket, username:str, project_id:int):
+    pass
 
 def handle_jointeam():
 	pass
