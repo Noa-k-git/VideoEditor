@@ -118,7 +118,7 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
 void MainWindow::OnWindowSize(wxSizeEvent& event)
 {
     event.Skip();
-    this->SetSizerAndFit(mainSizer);
+    //this->SetSizerAndFit(mainSizer);
     row1Sizer->Layout();
 }
 

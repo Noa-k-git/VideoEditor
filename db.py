@@ -10,12 +10,13 @@ coloredlogs.install(level='INFO',
                     fmt='%(asctime)s %(levelname)s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
 
-class DotDict(dict):
-    """dot.notation access to dictionary attributes"""
-    __getattr__ = dict.get
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
-    
+# class DotDict(dict):
+#     """dot.notation access to dictionary attributes"""
+#     __getattr__ = dict.get
+#     __setattr__ = dict.__setitem__
+#     __delattr__ = dict.__delitem__
+
+        
 @dataclass
 class Item:
     def get(self):
@@ -28,31 +29,31 @@ class Item:
 
 @dataclass
 class User(Item):
-    id: int
-    name: str
-    password: str
-    email: str
+    id: int = None
+    name: str = None
+    password: str = None
+    email: str = None
 
 @dataclass
 class Project(Item):
-    id: int
-    name: str
-    project: str
+    id: int = None
+    name: str = None
+    content: str = None
 
 @dataclass
 class Video(Item):
-    id: int
-    path: str
+    id: int = None
+    path: str = None
 
 @dataclass
 class ProjectVideo(Item):
-    project_id: int
-    video_id: int
+    project_id: int = None
+    video_id: int = None
 
 @dataclass
 class ProjectUser(Item):
-    project_id: int
-    user_id: int
+    project_id: int = None
+    user_id: int = None
 
 
 class DataBase():
@@ -97,11 +98,13 @@ class Table():
             logging.error(e)
         self.conn.commit()
         
-    def select(self, item):
+    def select(self, columns, item):
         dct = item.get()
         dct = {i:dct[i] for i in dct if dct[i] != None}
                 
-        sql = f'''SELECT * FROM {self.name} WHERE {self._get_str_keys(dct, "=?, ")}=?'''
+        sql = f'''SELECT {columns} FROM {self.name}'''
+        if len(dct) != 0:
+            sql += f''' WHERE {self._get_str_keys(dct, "=?, ")}=?'''
         logging.info(sql.replace('\n', ' '))
         
         cur = self.conn.cursor()
@@ -126,32 +129,32 @@ db_path = r"mydb.db"
 database = DataBase(db_path)
 database.connect()
 
-create_tables = DotDict()
-create_tables.users = """
+create_tables = {}
+create_tables["users"] = """
 CREATE TABLE if not EXISTS users (
     id integer PRIMARY KEY,
     name text NOT NULL,
     password text NOT NULL,
     email text NOT NULL
 ); """
-create_tables.projects = """
+create_tables["projects"] = """
 CREATE TABLE if not EXISTS projects (
     id integer PRIMARY KEY,
     name text NOT NULL,
-    project text
+    content text
 ); """
-create_tables.videos = """
+create_tables["videos"] = """
 CREATE TABLE if not EXISTS videos (
     id integer PRIMARY KEY,
     path text NOT NULL
 ); """
-create_tables.project_videos = """
+create_tables["project_videos"] = """
 CREATE TABLE if not EXISTS project_videos (
     project_id integer,
     video_id integer,
     unique (project_id, video_id)
 ); """
-create_tables.project_users = """
+create_tables["project_users"] = """
 CREATE TABLE if not EXISTS project_users (
     project_id integer,
     user_id integer,
@@ -159,23 +162,28 @@ CREATE TABLE if not EXISTS project_users (
 ); """
 
 
-tables = DotDict()
+tables : typing.Dict[str, Table] = {}
 
 for create in create_tables:
     tables[create] = Table(create, database.conn)
     tables[create].create(create_tables[create])
 
 if __name__ =="__main__":
-    tables.project_users.insert(ProjectUser(1,2))
-    tables.project_users.insert(ProjectUser(1,2))
-    tables.project_users.insert(ProjectUser(1,2))
-    tables.project_users.insert(ProjectUser(3,4))
-    tables.project_users.insert(ProjectUser(4,3))
-    tables.project_users.insert(ProjectUser(4,4))
-    tables.users.insert(User(3, "Noa", "123", "noaklein.email@gmail.com"))
-    tables.users.insert(User(1, "ads", "123", "noaklein.email@gmail.com"))
-    tables.users.insert(User(4, "as", "123", "noaklein.email@gmail.com"))
-    tables.users.insert(User(5, "adsfs", "12f3", "noaklein.email@gmail.com"))
-    print(tables.users.select(User(None, None, "123", None)))
-    print(type(tables.users.select(User(3, None, None, None))))
-    print(tables.users.select(User(3, None, None, None)))
+    tables['project_users'].insert(ProjectUser(1,2))
+    tables['project_users'].insert(ProjectUser(1,2))
+    tables['project_users'].insert(ProjectUser(1,2))
+    tables['project_users'].insert(ProjectUser(3,4))
+    tables['project_users'].insert(ProjectUser(4,3))
+    tables['project_users'].insert(ProjectUser(4,4))
+    tables['users'].insert(User(3, "Noa", "123", "noaklein.email@gmail.com"))
+    tables['users'].insert(User(1, "ads", "123", "noaklein.email@gmail.com"))
+    tables['users'].insert(User(4, "as", "123", "noaklein.email@gmail.com"))
+    tables['users'].insert(User(5, "he", "12f3", "noaklein.email@gmail.com"))
+    print(tables['users'].select("*", User(None, None, "123", None)))
+    print(tables['users'].select("name", User(None, None, "123", None)))
+    print(type(tables['users'].select("*", User(3, None, None, None))))
+    print(tables['users'].select("*", User(id=3)))
+    print(tables['users'].select("*", User(None, None, None, None)))
+    print(tables['users'].select("*", User(None, None, None, "aaa")))
+    print(tables['users'].select('MAX(id)', User())[0][0])
+    

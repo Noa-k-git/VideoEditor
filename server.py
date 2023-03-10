@@ -1,4 +1,6 @@
 from chatlib import *
+import db
+import socket
 import random
 import select
 
@@ -44,7 +46,7 @@ def recv_message_and_parse(conn: socket.socket) -> tuple:
 		conn (socket.socket): client's socket object.
 	Returns: 
 		cmd (str) and date (str) of the received message.
-		If error occured, will return None, None
+		If error occurred, will return None, None
 	"""
 
 	data = conn.recv(MAX_MSG_LENGTH).decode()
@@ -57,9 +59,9 @@ def recv_message_and_parse(conn: socket.socket) -> tuple:
  
 def send_waiting_messages(wlist:list)-> None:
 	"""
-	Receives a list of sockets that masseges can be sent to.
+	Receives a list of sockets that messages can be sent to.
 	Args:
-		wlist (list): a list of sockets that masseges can be sent to.
+		wlist (list): a list of sockets that messages can be sent to.
 	
 	Returns: None
 	"""	
@@ -96,7 +98,7 @@ def load_user_database(filename)->dict:
 	return users
 
 # DATA SAVING
-def add_user(filename:str, username:str, password:str) -> None:
+def add_user(filename:str, username:str, password:str, email:str) -> None:
 	"""
  	Receives the file name of the user database, new username and password, and add the user to the user's database.
 	Args:
@@ -106,10 +108,7 @@ def add_user(filename:str, username:str, password:str) -> None:
 	
 	Returns: None
 	"""
-	global users
-	users[username] = {'password': password, 'score': 0, 'questions_asked': []}
-	with open(filename, 'a') as f:
-		f.write('{}|{}|0|\n'.format(username, password))
+	db.tables.users.insert(db.User(db.tables.users.select('MAX(id)', db.User())[0][0]+1, username, password, email))
 
 
 def save_users(filename:str)-> None:
@@ -188,9 +187,17 @@ def print_client_sockets()-> None:
 	
 ##### MESSAGE HANDLING
 
-def handle_connectproject(conn:socket.socket, username:str, project_id:int):
-    pass
+def handle_connectproject(conn:socket.socket, user_id:int, project_id:int):
+    if db.tables['project_users'].select("*", db.ProjectUser(project_id=project_id, user_id=user_id)):
+        project_content = db.tables['projects'].select("content", db.Project(id=project_id))[0]
+        if type(project_content) is str:
+            build_and_send_message(conn, "CONTENT", project_content)
+        else:
+            logging.error('Error in getting content of project')
+    else:
+        build_and_send_message(conn, "Error!", "You are not in the project")
 
+def handle_adduser(conn:socket.socket)
 def handle_jointeam():
 	pass
 
@@ -297,7 +304,7 @@ def handle_signup_message(conn:socket.socket, data:str)-> None:
     
     
 def handle_logout_message(conn : socket.socket) -> None:
-	"""Receives a client socket and removes it from logged_users dictioary
+	"""Receives a client socket and removes it from logged_users dictionary
 	Args:
 		conn (socket.socket): client's socket
   
@@ -374,44 +381,48 @@ def handle_client_message(conn:socket.socket, cmd:str, data:str)-> None:
 	else:
 		send_error(conn, "Command isn't available! Please login first")
 
-
-def main():
-	# Initializes global users and questions dicionaries using load functions
-	global users
-	global questions
-	global messages_to_send
-	open_client_sockets = []
-	print("Welcome to Trivia Server!")
+class Server():
+    def __init__(users):
+        
+    def run():
+		# Initializes global users and questions dictionaries using load functions
+		global users
+		global questions
+		global messages_to_send
+		open_client_sockets = []
+		print("Welcome to Trivia Server!")
+		
+		users = load_user_database(USERS_PATH)
+		questions = load_questions("questions.txt")
+		server_socket = setup_socket()
 	
-	users = load_user_database(USERS_PATH)
-	questions = load_questions("questions.txt")
-	server_socket = setup_socket()
- 
-	# Handling clients
-	while True:
-		rlist, wlist, xlist = select.select([server_socket] + open_client_sockets, open_client_sockets, [])
-		for current_socket in rlist:
-			if current_socket is server_socket:
-				(new_socket, address) = server_socket.accept()
-				print("New socket connected to server: ", new_socket.getpeername())
-				open_client_sockets.append(new_socket)
-			else:
-				try:
-					print ('New data from client {}!'.format(current_socket.getpeername()))
-					data = current_socket.recv(MAX_MSG_LENGTH).decode()
-					cmd, msg = parse_message(data)
-				except ConnectionResetError:
-					data, cmd, msg = '', '', ''
-				p_id = current_socket.getpeername()
-    
-				if data == '' or cmd == PROTOCOL_CLIENT['logout_msg']:
-					open_client_sockets.remove(current_socket)
-					handle_logout_message(current_socket)
-					print (f"Connection with client {p_id} closed.")
+		# Handling clients
+		while True:
+			rlist, wlist, xlist = select.select([server_socket] + open_client_sockets, open_client_sockets, [])
+			for current_socket in rlist:
+				if current_socket is server_socket:
+					(new_socket, address) = server_socket.accept()
+					print("New socket connected to server: ", new_socket.getpeername())
+					open_client_sockets.append(new_socket)
 				else:
-					handle_client_message(current_socket, cmd, msg)
-		send_waiting_messages(wlist)
+					try:
+						print ('New data from client {}!'.format(current_socket.getpeername()))
+						data = current_socket.recv(MAX_MSG_LENGTH).decode()
+						cmd, msg = parse_message(data)
+					except ConnectionResetError:
+						data, cmd, msg = '', '', ''
+					p_id = current_socket.getpeername()
+		
+					if data == '' or cmd == PROTOCOL_CLIENT['logout_msg']:
+						open_client_sockets.remove(current_socket)
+						handle_logout_message(current_socket)
+						print (f"Connection with client {p_id} closed.")
+					else:
+						handle_client_message(current_socket, cmd, msg)
+			send_waiting_messages(wlist)
 
 
 if __name__ == '__main__':
-	main()
+	server = Server()
+	server.run()
+ 
