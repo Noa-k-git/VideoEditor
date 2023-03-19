@@ -63,14 +63,14 @@ class Server(ABC):
                             part = current_socket.recv(1024)
                             # if it is an empty packet then it is the last packet
                             if len(part)==Protocol.NUM_FIELD_LENGTH:
-                                logging.debug(f'new data from client {current_socket.getpeername()}: {data}')
+                                logging.debug(f'new data from client {current_socket.getpeername()}: {parts}')
                                 break
                             try:
-                                parts.append((int(part[:Protocol.NUM_FIELD_LENGTH]), data[Protocol.NUM_FIELD_LENGTH:]))
+                                parts.append((int(part[:Protocol.NUM_FIELD_LENGTH]), part[Protocol.NUM_FIELD_LENGTH:]))
                             except ValueError:
                                 response_parts = Protocol.build_response('NUMERIC', 'error', "Packets number format")   
-                                for part in response_parts:
-                                    self.messages_to_send.put((current_socket, part))
+                                for response in response_parts:
+                                    self.messages_to_send.put((current_socket, response))
                         parts.sort()
                         for part in parts:
                             data += part[1]
@@ -103,4 +103,4 @@ class Server(ABC):
         """ removing client from requests.
         """
         self.open_client_sockets.remove(current_socket)
-        
+        current_socket.close()
