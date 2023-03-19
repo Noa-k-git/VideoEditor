@@ -22,7 +22,7 @@ class Protocol:
     #   3) >    (y, (x,x, (z,z,z)), y) --> y;x*x>z>z>z;y
     SEPARATORS = (';', '*', '>')
 
-    CMD_STATUS = {'ok' : 'OK', 'error' : 'FA'}
+    CMD_STATUS = {True : 'OK', False : 'FA'}
     COMMANDS = ['SIGNUP', 
                 'LOGIN', 
                 'LOGOUT', 
@@ -66,7 +66,7 @@ class Protocol:
             b_message = b'Header format'
 
         
-        return succeed, cmd, b_message
+        return succeed, cmd.strip(), b_message
 
     #def parse_header(header:bytes) -> 
     def parse_message(message:str) -> list:

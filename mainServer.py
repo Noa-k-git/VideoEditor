@@ -23,10 +23,10 @@ class MainServer(Server):
             """
             pass
         
-        def login(info):
+        def login(info) -> Tuple[bool,str]:
             """A login request from the user.
             """
-            pass
+            return True, "Connected!"
             
         def logout(info):
             pass
@@ -56,7 +56,7 @@ class MainServer(Server):
                     'CREATE': create,
                     'ADDUSER': add_user,
                     'REMOVEUSER': remove_user,
-                    'PUSHPROJECT': push_project,
+                    'PUSHPRO JECT': push_project,
                     'PULLPROJECT': pull_project,
                     }
         k, cmd, message = Protocol.parse_data(data) # b for binary    
