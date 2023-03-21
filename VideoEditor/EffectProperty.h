@@ -1,27 +1,32 @@
 #pragma once
-#include "SourceClip.h"
+#include<vector>
+#include "Bezier.h"
 
-#include <array>
-
-using std::array;
 template <typename T>
 struct Keyframe {
 		int frame;
 		T value;
-		array<array<float, 2>, 2> bezierCurve;
+		Bezier transition; // between prev and current
+
+		Keyframe(int frame, T value);
+		Keyframe(int frame, T value, Bezier transition);
 	};
 //TODO: add func for changing keyframe frame, transition
+//TODO: add a func that return the value of the iplimintation number by frame
 
-template <typename T> class EffectProperty
+template <typename T> 
+class EffectProperty
 {
 private:
 	T defualt;
-	vector<Keyframe<T>> keyframes;
+	std::vector<Keyframe<T>> keyframes;
 public:
-	EffectProperty(T);
-	
-	inline T getDefualt();
-	inline const vector<Keyframe<T>>& getKeyframes() const;
+	inline EffectProperty(T);
+	inline EffectProperty(const EffectProperty<T>&);
+
+	inline T GetDefualt();
+	float GetPropValue(int frame);
+	inline const std::vector<Keyframe<T>>& getKeyframes() const;
 
 	inline void newKeyframe(Keyframe<T>); // Generate a new keyframe
 	inline void newKeyframe(int frame, T value); // Generate a new keyframe
@@ -34,8 +39,13 @@ public:
 	void setAllKeyframes(T oldValue, T value); // changes all keyframes with the oldValue to the new one
 
 	void deleteAllKeyframes(T value);
+	
 private:
 	inline void sortKeyframes();
-	int binarySearchKeyframe(int frame);
 	inline void newKeyframe();
+	int binarySearchKeyframe(int frame);
 };
+
+// --- inline functions ---
+
+
