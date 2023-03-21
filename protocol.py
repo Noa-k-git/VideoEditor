@@ -69,14 +69,14 @@ class Protocol:
         return succeed, cmd.strip(), b_message
 
     #def parse_header(header:bytes) -> 
-    def parse_message(message:str) -> list:
+    def parse_message(message:bytes) -> List[str]:
         """Receives the message part of a request from the user and return a list of arguments passed by the user
 
         Args:
-            message (str): the message part of a request from the user
+            message (bytes): the message part of a request from the user
 
         Returns:
-            list: the args in the request in a form of list.
+            List(str): the args in the request in a form of list.
         """
         for separator in Protocol.SEPARATORS:
             if separator in message:
@@ -152,12 +152,14 @@ class Protocol:
         
         full_msg = Protocol.join_response_fields(response_lst)
         parts = []
-        counter = 0
+        counter = 1
         while full_msg:
-            counter += 1
             slicer = min(len(full_msg), Protocol.PART_SIZE-Protocol.NUM_FIELD_LENGTH)
             parts.append((Protocol.pad_field(counter, Protocol.NUM_FIELD_LENGTH, '0') + full_msg[:slicer]).encode())
             full_msg = full_msg[slicer:]
+            counter += 1
+        else:
+            parts.append((Protocol.pad_field(counter, Protocol.NUM_FIELD_LENGTH, '0')).encode())
         #     if len(full_msg) > Protocol.PART_SIZE:
         #         counter+=1
         #         parts.append((Protocol.pad_field(counter, Protocol.NUM_FIELD_LENGTH, '0') + full_msg[:Protocol.PART_SIZE-Protocol.NUM_FIELD_LENGTH]).encode())

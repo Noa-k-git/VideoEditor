@@ -36,7 +36,7 @@ class User(Item):
     id: int = None
     name: str = None
     email: str = None
-    hashed_password: bytes = None
+    password: bytes = None
     
 
 @dataclass
@@ -61,9 +61,9 @@ class ProjectUser(Item):
     user_id: int = None
 
 class Table():
-    def __init__(self, name, conn) -> None:
+    def __init__(self, db_path, name) -> None:
+        self.db_path = db_path
         self.name = name
-        self.conn = conn
         self._id = False # true if has an id column, false otherwise
 
     def _get_str_keys(self, dct: dict, between: str):
@@ -72,6 +72,15 @@ class Table():
         # s = s[:-1*len(between)]
         return s
     
+    def connect(self):
+        """Creates a database connection to the SQLite database specified by self.db_path
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            return conn
+        except Error as e:
+            print(e)
+            
     def create(self, create_table_sql):
         
         """Creates a table from create_table_sql statement
@@ -80,13 +89,15 @@ class Table():
             conn (sqlite.connect): Connection object
             create_table_sql (str): a CREATE TABLE statement
         """
+        conn = self.connect()
         try:
-            self.conn.execute(create_table_sql)
-            # self._id = self.conn.execute(f"""PRAGMA table_info('{self.name}');""").fetchall()[0][1] == 'id'
+            conn.execute(create_table_sql)
+            # self._id = conn.execute(f"""PRAGMA table_info('{self.name}');""").fetchall()[0][1] == 'id'
         except Error as e:
             logging.error(e)
             
     def insert(self, item: Item):
+        conn = self.connect()
         dct = item.get()
         if 'id' in dct.keys():
             print(database.tables['users'].select('MAX(id)', User())[0][0])
@@ -100,21 +111,22 @@ class Table():
         sql = sql[:-2] + ')'
         logging.debug((sql.replace('\n', ' '), dct.values()))
         try:
-            self.conn.execute(sql, [str(val) for val in dct.values()])
+            conn.execute(sql, [str(val) for val in dct.values()])
         except sqlite3.IntegrityError as e:
             logging.error(e)
-        self.conn.commit()
+        conn.commit()
         
-    def select(self, columns, item:Item):
+    def select(self, columns:str, item:Item):
+        conn = self.connect()
         dct = item.get()
         dct = {i:dct[i] for i in dct if dct[i] != None}
                 
         sql = f'''SELECT {columns} FROM {self.name}'''
         if len(dct) != 0:
-            sql += f''' WHERE {self._get_str_keys(dct, "=?, ")}=?'''
+            sql += f''' WHERE {self._get_str_keys(dct, "=? AND ")}=?'''
         logging.info((sql.replace('\n', ' '), dct.values()))
         
-        cur = self.conn.cursor()
+        cur = conn.cursor()
         cur.execute(sql, [str(val) for val in dct.values()])
         rows = cur.fetchall()
         return rows
@@ -122,19 +134,9 @@ class Table():
 class DataBase():
     def __init__(self, db_path):
         self.db_path = db_path
-        self.conn = None
-        self.connect() # changes self.conn
         self.tables = []
         self._create_tables() # add tables to self.tables
-    
-    def connect(self):
-        """Creates a database connection to the SQLite database specified by self.db_path
-        """
-        try:
-            self.conn = sqlite3.connect(self.db_path)
-        except Error as e:
-            print(e)
-            
+        
     def _create_tables(self):
         """Creates the tables for the database
         """
@@ -175,7 +177,7 @@ class DataBase():
         self.tables : typing.Dict[str, Table] = {}
 
         for name in create_tables:
-            self.tables[name] = Table(name, self.conn)
+            self.tables[name] = Table(self.db_path, name)
             self.tables[name].create(create_tables[name])
 
 
@@ -233,10 +235,10 @@ if __name__ =="__main__":
     database.tables['project_users'].insert(ProjectUser(3,4))
     database.tables['project_users'].insert(ProjectUser(4,3))
     database.tables['project_users'].insert(ProjectUser(4,4))
-    database.tables['users'].insert(User(3, "Noa", "123", "noalein.emil@gmail.com"))
-    database.tables['users'].insert(User(1, "ads", "123", "noaklein.mailgmail.cm"))
-    database.tables['users'].insert(User(4, "as", "123", "noklein.email@gmai.com"))
-    database.tables['users'].insert(User(5, "he", "12f3", "noakein.email@mail.co"))
+    database.tables['users'].insert(User(name="Noa", password="123", email="noalein.emil@gmail.com"))
+    database.tables['users'].insert(User(name="ads", password="123", email="noaklein.mailgmail.cm"))
+    database.tables['users'].insert(User(name="as", password="123", email="noklein.email@gmai.com"))
+    database.tables['users'].insert(User(name="he", password="12f3", email="noakein.email@mail.co"))
     print(database.tables['users'].select("*", User(None, None, "123", None)))
     print(database.tables['users'].select("name", User(None, None, "123", None)))
     print(type(database.tables['users'].select("*", User(3, None, None, None))))
@@ -245,4 +247,6 @@ if __name__ =="__main__":
     print(database.tables['users'].select("*", User(None, None, None, "aaa")))
     print(database.tables['users'].select('MAX(id)', User()))
     print(database.tables['users'].select('MAX(id)', User())[0][0])
+    print("--- Undefined ---")
+    print(type(database.tables['users'].select('id', User(email="hhhsss"))))
     
