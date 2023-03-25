@@ -1,41 +1,57 @@
-# import queue, threading
-# def g(q):
-#     while True:
-#         print(q.get())
+from typing import List
+from dataclasses import dataclass
+from abc import ABC
 
+@dataclass
+class Item(ABC):
+    
+    def get_str_keys(self, between: str, before:str = ""):
+        s = between.join([before + key for key in self.keys])
+        # s = s[:-1*len(between)]
+        return s
+    def __iter__(self):
+        for key, _ in self.__annotations__.items():
+            value =getattr(self, key)
+            if value != None:
+                yield key, str(value)
+    # def keys(self):
+    #     return True
+        # return self
+    # def __next__(self):
+    #     self.idx = -1
+    #     return self.__dict__.items()[self.idx]
+    # def __iter__(self):
+    #     # return {k: str(v) for k, v in self.__dict__.items() if v is not None}
+    #     for key, value in self.__dict__.items():
+    #         if value != None:
+    #             yield key, str(value)
+    # def __dict__(self):
+    #     # return {k: str(v) for k, v in self}
+    #     return {k:str(v) for k, v in self.__dict__}
+    # def __getattr__(self, name):
+    #     if name == 'keys' and isinstance(self, Item):
+    #         return [k for k, _ in self]
+    #     if name == 'values' and isinstance(self,Item):
+    #         return [v for _, v in self]
+    #     else:
+    #         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+    @property
+    def properties(self) -> List[str]:
+        return list(dict(self).keys())
+    @property
+    def data(self) -> List[str]:
+        return list(dict(self).values())
+        # return [str(v) for _, v in self.__dict__.items() if v != None]
 
-# a = queue.Queue()
-# a.put(1)
-# a.put(2)
-# t = threading.Thread(target=g, args=(a,))
-# t.start()
+    # def __repr__(self):
+    #     return str(dict(self))
+    
 
-separators = (';', '*', '>')
-def build_message(message_lst):
-    def separator_level(s, idx):
-        return s[:idx].count('[') - s[:idx].count(']') - 1
-    message = str(message_lst)
-    message = message.replace("'", '').replace(', ', ',')
-    for idx in range(len(message)):
-        if message[idx] == ',':
-            message = message[:idx] + separators[separator_level(message, idx)] + message[idx + 1:]
-    return message.replace('[', '').replace(']', '')
+@dataclass
+class User(Item):
+    id: int = None
+    name: str = "kj"
+    email: str = None
+    password: bytes = None
 
-
-def data_info(data):
-    separators = (';', '*', '>')
-    for separator in separators:
-        if separator in data:
-            parts = data.split(separator)
-            if len(parts) == 1:
-                return data
-            else:
-                return [data_info(part) for part in parts]
-    return data
-
-message_lst = ['hello', ['world', 'foo', ['bar', 'baz']], 'qux']
-result = build_message(message_lst)
-print(result)
-info = data_info(result)
-print(message_lst)
-print(info)
+print(dict(User()).keys())

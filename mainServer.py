@@ -98,9 +98,9 @@ class MainServer(Server):
                 code, r_message = commands[cmd](message)
                 response_parts = Protocol.build_response(cmd, code, r_message)
             else:
-                response_parts = Protocol.build_response(cmd,"error", message.decode())
+                response_parts = Protocol.build_response(cmd, False, message.decode())
         except KeyError as e:
-            response_parts = Protocol.build_response(cmd, "error", "Command doesn't exist")
+            response_parts = Protocol.build_response(cmd, False, "Command doesn't exist")
         finally:
             for part in response_parts:
                 self.messages_to_send.put((current_socket, part)) # command that does not exists
