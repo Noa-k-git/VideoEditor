@@ -28,7 +28,7 @@ class Protocol:
                 'LOGOUT', 
                 'PULLINFO',
                 'CREATE',
-                'ADDUSER',
+                'ADDUSERS',
                 'REMOVEUSER',
                 'PUSHPROJECT',
                 'PULLPROJECT'                    
@@ -99,7 +99,11 @@ class Protocol:
         def separator_level(s, idx):
             return s[:idx].count('[') - s[:idx].count(']') - 1
         message = str(message_lst)
+        # if isinstance(message_lst, list):
+        #     message = message[1:-1]
+        message = message.replace('(', '[').replace(')', ']')
         message = message.replace("'", '').replace(', ', ',')
+        
         for idx in range(len(message)):
             if message[idx] == ',':
                 message = message[:idx] + Protocol.SEPARATORS[separator_level(message, idx)] + message[idx + 1:]

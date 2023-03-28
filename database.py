@@ -25,7 +25,6 @@ def convert_to_int(val):
 @dataclass
 class Item(ABC):
     def get_str_keys(self, between: str, before:str = ""):
-        a = self.properties
         s = between.join([before + key for key in self.properties])
         # s = s[:-1*len(between)]
         return s
@@ -43,21 +42,22 @@ class Item(ABC):
 
 @dataclass
 class User(Item):
-    id: int = None
+    id_: int = None
     name: str = None
     email: str = None
     password: bytes = None
-    
+
 
 @dataclass
 class Project(Item):
-    id: int = None
+    id_: int = None
     name: str = None
+    admin_id : int = None
     content: str = None
 
 @dataclass
 class Video(Item):
-    id: int = None
+    id_: int = None
     path: str = None
 
 @dataclass
@@ -67,8 +67,8 @@ class ProjectVideo(Item):
 
 @dataclass
 class ProjectUser(Item):
-    project_id: int = None
     user_id: int = None
+    project_id: int = None
 
 class Table():
     def __init__(self, name, columns=[]) -> None:
@@ -90,21 +90,28 @@ class Table():
         """
         self.columns = columns.keys()
         try:
-            unique = f",\n\tunique ({columns.pop('unique')})"
+            unique = f",\n\tunique({columns.pop('unique')})"
         except KeyError:
             unique = ''
+        try:
+            idx_cols = columns.pop('INDEX')
+            idx_name = f"{self.name}_{idx_cols.replace(' ', '_').replace(',', '_')}_idx"
+            index = f"\nCREATE INDEX {idx_name} ON {self.name} ({idx_cols});"
+        except KeyError:
+            index = ''
         sql = f"""CREATE TABLE if not EXISTS {self.name} (
             {', '.join([f'{key} {value}' for key, value in columns.items()])}{unique}
-        ); """
-        
+        );"""
+        logging.info(sql)
         try:
             conn.execute(sql)
+            conn.execute(index)
         except Error as e:
             logging.error(e)
             
     def insert(self, conn, item: Item):
-        if 'id' in item.properties:
-            item.id = convert_to_int(self.select(conn, 'MAX(id)', User())[0][0]) + 1
+        if 'id_' in item.properties:
+            item.id = convert_to_int(self.select(conn, 'MAX(id_)', User())[0][0]) + 1
             logging.debug(f"the new id for table {self.name} is {item.id} ")
         s=[]
         logging.info(f'Table: {self.name} |\tINSERT: {item}')
@@ -118,6 +125,14 @@ class Table():
         except sqlite3.IntegrityError as e:
             logging.error(e)
         conn.commit()
+    
+    def delete(self, conn, item:Item):
+        sql = f'''DELETE FROM {self.name} 
+        WHERE {item.get_str_keys('=? AND ')}=?'''
+        logging.info((sql.replace('\n', ' '), item.data))
+        
+        cur = conn.cursor()
+        cur.execute(sql, item.data)
     
     def select(self,conn, columns:List[str], item:Item):
         if isinstance(columns, str):
@@ -145,18 +160,20 @@ class DataBase():
         """
         conn = self.connect()
         create_tables = {}
-        create_tables["users"] = {'id':'integer PRIMARY KEY', 
+        create_tables["users"] = {'id_':'integer PRIMARY KEY', 
                                   'name':'text NOT NULL',
                                   'password':'blob NOT NULL',
                                   'email':'text NOT NULL',
                                   'unique':'email'}
+                                #   'INDEX' : 'email'}
 
-        create_tables["projects"] = {'id':'integer PRIMARY KEY',
+        create_tables["projects"] = {'id_':'integer PRIMARY KEY',
                                      'name': 'text NOT NULL ',
+                                     'admin_id': 'int',
                                      'content': 'text',
                                      'approved':'text'}
 
-        create_tables["videos"] = {'id':'integer PRIMARY KEY',
+        create_tables["videos"] = {'id_':'integer PRIMARY KEY',
                                    'path': 'text NOT NULL'}
 
         create_tables["project_videos"] = {'project_id': 'integer',
@@ -165,8 +182,8 @@ class DataBase():
         
         create_tables["project_users"] = {'project_id':'integer',
                                           'user_id':'integer',
-                                          'admin':'integer',
-                                          'unique':'project_id, user_id'}
+                                          'unique':'user_id, project_id'}
+                                        #   'INDEX': 'user_id'}
 
         self.tables : typing.Dict[str, Table] = {}
 
@@ -183,10 +200,14 @@ class DataBase():
         except Error as e:
             print(e)
     
-    def insert(self, table_name:str, item:Item):
+    def insert(self, table:Table, item:Item):
         conn = self.connect()
-        return self.tables[table_name].insert(conn, item)
+        return self.tables[table.name].insert(conn, item)
 
+    def delete(self, table:Table, item:Item):
+        conn = self.connect()
+        return self.tables[table.name].delete(conn, item)
+    
     def select(self, columns:Table, item:Item):
         conn = self.connect()
         return self.tables[columns.name].select(conn, columns.columns, item)
@@ -215,7 +236,7 @@ class DataBase():
         """
         def join_list(source:Table,
                       targets:List[Table]) -> dict[str:str]:
-            """This function receives a table and a list of other table to join to
+            """This function receives a table and a list of other tables to join to
 
             Raises:
                 TypeError: if the number of columns of the source table doesn't match the number of target columns. 
@@ -231,14 +252,19 @@ class DataBase():
             if len(t_cols) == len(source.columns):
                 return list(zip([source.name + '.' + col for col in source.columns], t_cols))
             raise TypeError("Not matching columns")
-        
+        if not isinstance(columns, list):
+            columns = [columns,]
+        if not isinstance(join, list):
+            join = [join]
+        if not isinstance(where, list):
+            where = [where]
         conn = self.connect() # connection to the database
         if func:
             func += ', '
         sql = f'''SELECT {func}{", ".join([f'{table.name}.{column}' for table in columns for column in table.columns])} '''
         
+        sql += f'''FROM {'('*len(join)}{og.name} '''
         if join:
-            sql += f'''FROM {'('*len(join)}{og.name} '''
             for d in join:
                 for source, targets in d.items():
                     sql += f"INNER JOIN {source.name} ON "
@@ -249,9 +275,11 @@ class DataBase():
         vars = []
         if where:
             sql += f'\nWHERE '
-            for where_part in where:
-                sql += f'{where_part[1].get_str_keys("=? AND ", f"{where_part[0].name}.")}=?'
-                vars += where_part[1].data        
+            for idx, where_part in enumerate(where):
+                sql += f'{where_part[1].get_str_keys("=? AND ", f"{where_part[0].name}.")}=? '
+                vars += where_part[1].data
+                if idx != len(where)-1:
+                    sql += ' OR '
         sql += ';'
         
         logging.info((sql.replace('\n', ' ')))
@@ -260,9 +288,10 @@ class DataBase():
         rows = cur.fetchall()
         return rows
         
-
 db_path = r"mydb.db"
-database = DataBase(db_path)
+import os
+os.remove(db_path)
+
 # database.connect()
 
 # create_tables = {}
@@ -306,39 +335,40 @@ database = DataBase(db_path)
 #     tables[create].create(create_tables[create])
 
 if __name__ =="__main__":
-    # # print(Item().get())
-    # database.tables['project_users'].insert(ProjectUser(1,2))
-    # database.tables['project_users'].insert(ProjectUser(1,2))
-    # database.tables['project_users'].insert(ProjectUser(1,2))
-    # database.tables['project_users'].insert(ProjectUser(3,4))
-    # database.tables['project_users'].insert(ProjectUser(4,3))
-    # database.tables['project_users'].insert(ProjectUser(4,4))
-    # database.tables['users'].insert(User(name="Noa", password="123", email="noalein.emil@gmail.com"))
-    # database.tables['users'].insert(User(name="ads", password="123", email="noaklein.mailgmail.cm"))
-    # database.tables['users'].insert(User(name="as", password="123", email="noklein.email@gmai.com"))
-    # database.tables['users'].insert(User(name="he", password="12f3", email="noakein.email@mail.co"))
-    # print(database.tables['users'].select("*", User(None, None, "123", None)))
-    # print(database.tables['users'].select("name", User(None, None, "123", None)))
-    # print(type(database.tables['users'].select("*", User(3, None, None, None))))
-    # print(database.tables['users'].select("*", User(id=3)))
-    # print(database.tables['users'].select("*", User(None, None, None, None)))
-    # print(database.tables['users'].select("*", User(None, None, None, "aaa")))
-    # print(database.tables['users'].select('MAX(id)', User()))
-    # print(database.tables['users'].select('MAX(id)', User())[0][0])
-    # print("--- Undefined ---")
-    # print(type(database.tables['users'].select('id', User(email="hhhsss"))))
-    database.insert('project_users', ProjectUser(project_id=1,user_id=2))
-    database.insert('project_users', ProjectUser(3,2))
-    database.insert('project_users', ProjectUser(2,3))
-    database.insert('users', User(1,'a','a','a'))
-    database.insert('users', User(2,'b','b','b'))
-    database.insert('users', User(3,'c','c','c'))
-    database.insert('projects', Project(1, 'p1', ''))
-    database.insert('projects', Project(2, 'p2', ''))
-    print(database.select(database.tables['users']['id'], User(name='a')))
-    print(database.join_select(og=database.tables['users'], 
-            columns=[database.tables['users']['name', 'password'],
-                                    database.tables['projects']['name']],
-            join=[{database.tables['project_users']['user_id']:[database.tables['users']['id'],],},
-                  {database.tables['projects']['id']:[database.tables['project_users']['project_id'],]}],
-            ))
+    pass
+    database = DataBase(db_path)
+    # database.insert('project_users', ProjectUser(project_id=1,user_id=2))
+    # database.insert('project_users', ProjectUser(project_id=3,user_id=2))
+    # database.insert('project_users', ProjectUser(2,2))
+    # database.insert('project_users', ProjectUser(0, 2))
+    # database.insert('users', User(1,'a','a','a'))
+    # database.insert('users', User(2,'b','b','b'))
+    # database.insert('users', User(3,'c','c','c'))
+    # database.insert('projects', Project(1, 'p1', ''))
+    # database.insert('projects', Project(2, 'p2', ''))
+    # print(database.select(database.tables['users']['id'], User(name='a')))
+    # print(database.join_select(og=database.tables['users'], 
+    #         columns=[database.tables['users']['name', 'password'],
+    #                                 database.tables['projects']['name']],
+    #         join=[{database.tables['project_users']['user_id']:[database.tables['users']['id'],],},
+    #               {database.tables['projects']['id']:[database.tables['project_users']['project_id'],]}],
+    #         ))
+#     conn = database.connect()
+#     sql = """SELECT 
+#   projects.id, 
+#   projects.name AS project_name, 
+#   users.id AS user_id, 
+#   users.name AS user_name, 
+#   users.email AS user_email
+   
+# FROM project_users 
+#   INNER JOIN users ON users.id = project_users.user_id 
+#   INNER JOIN projects ON projects.id = project_users.project_id 
+# WHERE 
+#   project_users.project_id = 1 OR 
+#   project_users.project_id = 2 OR 
+#   project_users.project_id = 3;"""
+#     cur = conn.cursor()
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#     print(rows)
