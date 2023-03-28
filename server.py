@@ -60,7 +60,10 @@ class Server(ABC):
                         data = b''
                         parts = []
                         while True:
-                            part = current_socket.recv(1024)
+                            try:
+                                part = current_socket.recv(1024)
+                            except ConnectionAbortedError:
+                                raise ConnectionResetError
                             # if it is an empty packet then it is the last packet
                             if len(part)==Protocol.NUM_FIELD_LENGTH:
                                 logging.debug(f'new data from client {current_socket.getpeername()}: {parts}')
@@ -68,7 +71,7 @@ class Server(ABC):
                             try:
                                 parts.append((int(part[:Protocol.NUM_FIELD_LENGTH]), part[Protocol.NUM_FIELD_LENGTH:]))
                             except ValueError:
-                                response_parts = Protocol.build_response('NUMERIC', 'error', "Packets number format")   
+                                response_parts = Protocol.build_response('NUMERIC', False, "Packets number format")   
                                 for response in response_parts:
                                     self.messages_to_send.put((current_socket, response))
                         parts.sort()

@@ -28,7 +28,7 @@ class Protocol:
                 'LOGOUT', 
                 'PULLINFO',
                 'CREATE',
-                'ADDUSER',
+                'ADDUSERS',
                 'REMOVEUSER',
                 'PUSHPROJECT',
                 'PULLPROJECT'                    
@@ -99,7 +99,11 @@ class Protocol:
         def separator_level(s, idx):
             return s[:idx].count('[') - s[:idx].count(']') - 1
         message = str(message_lst)
+        # if isinstance(message_lst, list):
+        #     message = message[1:-1]
+        message = message.replace('(', '[').replace(')', ']')
         message = message.replace("'", '').replace(', ', ',')
+        
         for idx in range(len(message)):
             if message[idx] == ',':
                 message = message[:idx] + Protocol.SEPARATORS[separator_level(message, idx)] + message[idx + 1:]
@@ -118,12 +122,12 @@ class Protocol:
             return  buffer + str(field)
         return str(field) + buffer
         
-    def build_response(cmd:str, code:str, message:str) -> List[str]:
+    def build_response(cmd:str, code:bool, message:str) -> List[str]:
         """Receives command name, the status code of the cmd and a message and build a list for response
 
         Args:
             cmd (str): command
-            code (str): whether the command was successful or not
+            code (bool): whether the command was successful or not
             message (str): the message to the user
 
         Returns:
@@ -135,21 +139,20 @@ class Protocol:
         response_lst.append(Protocol.pad_field(cmd, Protocol.CMD_FIELD_LENGTH, ' '))
         # response_lst.append(cmd)
         # response_lst[0] = response_lst[0] + ' ' * (Protocol.CMD_FIELD_LENGTH - len(response_lst[0]))
-        length = len(str(message))
-        if length <= Protocol.MAX_DATA_LENGTH:
-            response_lst.append(Protocol.pad_field(length, Protocol.SIZE_FIELD_LENGTH))
-            # response_lst.append('0' * (Protocol.SIZE_FIELD_LENGTH - len(str(length))) + str(length))
-        else:
-            response_lst.append(None)
         if code in Protocol.CMD_STATUS:
             response_lst.append(Protocol.CMD_STATUS[code])
         else:
             response_lst.append(code)
-        response_lst.append(message)
-        for i in response_lst:
-            if i == None:
-                return None   
         
+        length = len(str(message))
+        if length > Protocol.MAX_DATA_LENGTH:
+            message = "Message is too big"
+            length = len(message)
+        
+        response_lst.append(Protocol.pad_field(length, Protocol.SIZE_FIELD_LENGTH))
+        response_lst.append(message)
+        # response_lst.append('0' * (Protocol.SIZE_FIELD_LENGTH - len(str(length))) + str(length))
+
         full_msg = Protocol.join_response_fields(response_lst)
         parts = []
         counter = 1
