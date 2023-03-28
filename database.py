@@ -54,6 +54,7 @@ class Project(Item):
     name: str = None
     admin_id : int = None
     content: str = None
+    approved: str = None
 
 @dataclass
 class Video(Item):
@@ -108,7 +109,12 @@ class Table():
             conn.execute(index)
         except Error as e:
             logging.error(e)
-            
+    
+    def _where_item(self, item: Item):
+        if len(dict(item)) != 0:
+            return f"WHERE {item.get_str_keys('=? AND ')}=?"
+        return ''
+    
     def insert(self, conn, item: Item):
         if 'id_' in item.properties:
             item.id = convert_to_int(self.select(conn, 'MAX(id_)', User())[0][0]) + 1
@@ -128,19 +134,25 @@ class Table():
     
     def delete(self, conn, item:Item):
         sql = f'''DELETE FROM {self.name} 
-        WHERE {item.get_str_keys('=? AND ')}=?'''
+        {self._where_item(item)}'''
         logging.info((sql.replace('\n', ' '), item.data))
         
         cur = conn.cursor()
         cur.execute(sql, item.data)
-    
+        
+    def update(self, conn, new_item:Item, where_item):
+        sql = f''' UPDATE {self.name} SET 
+        {new_item.get_str_keys('=?, ')}=?
+        {self._where_item(where_item)}'''
+        logging.info((sql.replace('\n', ' '), new_item.data, where_item.data))
+        cur = conn.cursor()
+        cur.execute(sql, new_item.data+ where_item.data)
+        
     def select(self,conn, columns:List[str], item:Item):
         if isinstance(columns, str):
             columns = [columns]
                 
-        sql = f'''SELECT {', '.join(columns)} FROM {self.name}'''
-        if len(dict(item)) != 0:
-            sql += f''' WHERE {item.get_str_keys("=? AND ")}=?'''
+        sql = f'''SELECT {', '.join(columns)} FROM {self.name} {self._where_item(item)}'''
         logging.info((sql.replace('\n', ' '), item.data))
         
         cur = conn.cursor()
@@ -204,9 +216,16 @@ class DataBase():
         conn = self.connect()
         return self.tables[table.name].insert(conn, item)
 
+    def update(self, table:Table, new_item:Item, where_item:Item):
+        conn = self.connect()
+        self.tables[table.name].update(conn, new_item, where_item)
+        conn.commit()
+        conn.close()
+    
     def delete(self, table:Table, item:Item):
         conn = self.connect()
-        return self.tables[table.name].delete(conn, item)
+        self.tables[table.name].delete(conn, item)
+        conn.commit()
     
     def select(self, columns:Table, item:Item):
         conn = self.connect()
@@ -335,8 +354,12 @@ os.remove(db_path)
 #     tables[create].create(create_tables[create])
 
 if __name__ =="__main__":
-    pass
     database = DataBase(db_path)
+    conn = database.connect()
+    sql = 'DELETE FROM project_users          WHERE user_id=? AND project_id=?'
+    cur = conn.cursor()
+    cur.execute(sql, (2,2))
+    conn.commit()
     # database.insert('project_users', ProjectUser(project_id=1,user_id=2))
     # database.insert('project_users', ProjectUser(project_id=3,user_id=2))
     # database.insert('project_users', ProjectUser(2,2))

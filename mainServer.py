@@ -135,10 +135,34 @@ class MainServer(Server):
             return True, ''
         
         def remove_user(info:bytes) -> Tuple[bool, str]:
-            pass
+            u_id, p_id, email = "", "", ""
+            try:
+                u_id, p_id, email = Protocol.parse_message(info.decode())
+            except ValueError:
+                return False, 'Message arguments'
+            remove_user_id = self.db.select(self.db.tables['users']['id_'], database.User(email=email))[0][0]
+            admin_id = self.db.select(self.db.tables['projects']['admin_id'], database.Project(id_=p_id))[0][0]
+            int_u_id = int(u_id)
+            if (remove_user_id == int_u_id or int_u_id == admin_id) and remove_user_id != admin_id:
+                self.db.delete(self.db.tables['project_users'], database.ProjectUser(user_id=remove_user_id, project_id=int(p_id)))
+            else: 
+                return False, 'Permission'
+            return True, ''   
         
         def push_project(info:bytes) -> Tuple[bool, str]:
-            pass
+            u_id, p_id, content = "", "", ""
+            try:
+                u_id, p_id, content = Protocol.parse_message(info.decode())
+            except ValueError:
+                return False, 'Message arguments'
+            admin_id = self.db.select(self.db.tables['projects']['admin_id'], database.Project(id_=p_id))[0][0]
+            approved = None
+            if int(u_id) == admin_id:
+                approved = content
+            
+            self.db.update(self.db.tables['projects'], database.Project(content=content, approved=approved),
+                           database.Project(id_=int(p_id)))
+            return True, ''
         
         def pull_project(info:bytes) -> Tuple[bool, str]:
             pass
