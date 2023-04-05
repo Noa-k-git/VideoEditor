@@ -1,4 +1,5 @@
 #pragma once
+#include "globals.h"
 #include "ISource.h"
 #include "IImg.h"
 #include "IPlayable.h"
@@ -13,7 +14,7 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-#include <libavutil/avutil.h>
+#include <libavutil/avutil.h> // contains the utility API, used for memory management, logging, and mathematical operations
 #include <libavutil/pixdesc.h>
 #include <libswscale/swscale.h>
 
@@ -22,6 +23,9 @@ extern "C" {
     // types
 #include <inttypes.h>
 }
+
+
+
 // OpenCV
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>

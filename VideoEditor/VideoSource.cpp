@@ -1,4 +1,5 @@
 #include "VideoSource.h"
+
 #undef av_err2str(errnum)
 char x[AV_ERROR_MAX_STRING_SIZE];
 #define av_err2str(errnum) \

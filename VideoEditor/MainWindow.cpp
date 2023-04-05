@@ -9,14 +9,14 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 END_EVENT_TABLE()
 
 
-MainWindow::MainWindow(int, wxWindow* parent,
-    wxWindowID id,
-    const wxString& title,
-    const wxPoint& pos,
-    const wxSize& size,
-    long style,
-    const wxString& name) :
-    wxFrame(parent, id, title, pos, size, style, name) {}
+//MainWindow::MainWindow(int, wxWindow* parent,
+//    wxWindowID id,
+//    const wxString& title,
+//    const wxPoint& pos,
+//    const wxSize& size,
+//    long style,
+//    const wxString& name) :
+//    wxFrame(parent, id, title, pos, size, style, name) {}
 
 MainWindow::MainWindow(wxWindow* parent,
     wxWindowID id,
@@ -39,9 +39,9 @@ MainWindow::MainWindow(wxWindow* parent,
     --------------------------------|
     
     */
-    mainSizer = new wxBoxSizer(wxVERTICAL);
-    row1Sizer = new wxBoxSizer(wxHORIZONTAL);
-    row2Sizer = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer * mainSizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer * row1Sizer = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer * row2Sizer = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(row1Sizer,1, wxEXPAND);
     mainSizer->Add(row2Sizer,1, wxEXPAND);
 
@@ -80,7 +80,7 @@ MainWindow::MainWindow(wxWindow* parent,
     row1Sizer->Layout();
     ogVideoWindowPanel->SetSizer(ogVideoWindow->main);
     finalVideoWindowPanel->SetSizer(finalVideoWindow->main);
-    this->Bind(wxEVT_SIZE, &MainWindow::OnWindowSize, this);
+    //this->Bind(wxEVT_SIZE, &MainWindow::OnWindowSize, this);
 
     //finalVideoWindowPanel->Fit();
 }
@@ -112,14 +112,16 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
     //VideoSource* vs = new VideoSource("C:\\Users\\cyber\\source\\repos\\Noa-k-git\\VideoEditor\\video.mp4");
     wxMessageBox("Processing video");
     VideoSource* vs = new VideoSource(filePath);
+    VideoClip* vc = new VideoClip(vs);
+    Sequence* s = new Sequence();
 
 }
 
-void MainWindow::OnWindowSize(wxSizeEvent& event)
-{
-    event.Skip();
-    //this->SetSizerAndFit(mainSizer);
-    row1Sizer->Layout();
-}
+//void MainWindow::OnWindowSize(wxSizeEvent& event)
+//{
+//    event.Skip();
+//    //this->SetSizerAndFit(mainSizer);
+//    row1Sizer->Layout();
+//}
 
 

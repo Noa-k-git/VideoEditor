@@ -147,9 +147,11 @@
     <ClCompile Include="EffectProperty.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="ScaleEffect.cpp" />
+    <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="SubWindows.cpp" />
     <ClCompile Include="Transition.cpp" />
     <ClCompile Include="SourceID.cpp" />
+    <ClCompile Include="VideoClip.cpp" />
     <ClCompile Include="VideoSource.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +159,7 @@
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="EffectProperty.h" />
+    <ClInclude Include="globals.h" />
     <ClInclude Include="id.h" />
     <ClInclude Include="IEffect.h" />
     <ClInclude Include="IImg.h" />
@@ -164,9 +167,11 @@
     <ClInclude Include="ISource.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="ScaleEffect.h" />
+    <ClInclude Include="Sequence.h" />
     <ClInclude Include="SubWindows.h" />
     <ClInclude Include="Transition.h" />
     <ClInclude Include="SourceID.h" />
+    <ClInclude Include="VideoClip.h" />
     <ClInclude Include="VideoSource.h" />
   </ItemGroup>
   <ItemGroup>
