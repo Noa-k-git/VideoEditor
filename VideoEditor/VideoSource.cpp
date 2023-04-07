@@ -7,20 +7,44 @@ char x[AV_ERROR_MAX_STRING_SIZE];
 
 VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 {
+	std::vector<std::string> filePath;
+	std::stringstream ss(path);
+	std::string part;
+
+	while (std::getline(ss, part, '\\')) {
+		filePath.push_back(part);
+	}
+	this->name = filePath.back();
+}
+
+VideoSource::VideoSource(std::string path, std::string name) : VideoSource::VideoSource(path)
+{
+	this->name = name;
 }
 
 VideoSource::~VideoSource()
 {
-	this->source.clear();
+	for (auto& element : source_) {
+		av_frame_free(&element);
+		av_frame_unref(element);
+		//av_freep(element);
+	}
+	this->source_.clear();
 	//std::vector<cv::Mat>().swap(source);
 }
 
-void VideoSource::ReadSource(std::string path)
+void VideoSource::ReadSource()
 {
+	auto lock = this->LockSource();
+	std::vector<AVFrame*> newSource;
+
 	cv::VideoCapture vidCapture(path);
 	// prints error message if the stream is invalid
 	if (!vidCapture.isOpened())
-		std::cout << "Error opening video stream of file" << std::endl;
+	{
+		wxMessageBox("Error openning video stream of file with OpenCV");
+		return;
+	}
 	else
 	{
 		// Obtain fps and frame count by get() method and print
@@ -42,11 +66,11 @@ void VideoSource::ReadSource(std::string path)
 	// Open the file using libavformat
 	AVFormatContext* av_format_ctx = avformat_alloc_context();
 	if (!av_format_ctx) {
-		printf("Couldn't create AVFormatContext\n");
+		wxMessageBox("Couldn't create AVFormatContext\n");
 		return; 
 	}
 	if (avformat_open_input(&av_format_ctx, path.c_str(), NULL, NULL) != 0) {
-		printf("Couldn't open video file\n");
+		wxMessageBox("Couldn't open video file\n");
 		return;
 	}
 
@@ -69,35 +93,35 @@ void VideoSource::ReadSource(std::string path)
 	}
 
 	if (video_stream_index == -1) {
-		printf("Couldn't find valid video stream inside file\n");
+		wxMessageBox("Couldn't find valid video stream inside file\n");
 		return;
 	}
 
 	// Set up a codec context for the decoder
 	AVCodecContext* av_codec_ctx = avcodec_alloc_context3(av_codec);
 	if (!av_codec_ctx) {
-		printf("Couldn't create AVCpdecContext\n");
+		wxMessageBox("Couldn't create AVCpdecContext\n");
 		return;
 	}
 
 	if (avcodec_parameters_to_context(av_codec_ctx, av_codec_params) < 0)
 	{
-		printf("Couldn't initialize AVCodecContext\n");
+		wxMessageBox("Couldn't initialize AVCodecContext\n");
 		return;
 	}
 	if (avcodec_open2(av_codec_ctx, av_codec, NULL) < 0) {
-		printf("Couldn't open codec\n");
+		wxMessageBox("Couldn't open codec\n");
 		return;
 	}
 
 	AVFrame* av_frame = av_frame_alloc();
 	if (!av_frame) {
-		printf("Couldn't allocate AVFrame\n");
+		wxMessageBox("Couldn't allocate AVFrame\n");
 		return;
 	}
 	AVPacket* av_packet = av_packet_alloc();
 	if (!av_packet) {
-		printf("Couldn't allocate AVPacket\n");
+		wxMessageBox("Couldn't allocate AVPacket\n");
 		return;
 	}
 	int response;
@@ -109,7 +133,7 @@ void VideoSource::ReadSource(std::string path)
 		}
 		response = avcodec_send_packet(av_codec_ctx, av_packet);
 		if (response < 0) {
-			printf("Failed to decode packet: %s\n", av_err2str(response));
+			wxMessageBox("Failed to decode packet: %s\n", av_err2str(response));
 			return;
 		}
 		response = avcodec_receive_frame(av_codec_ctx, av_frame);
@@ -118,7 +142,7 @@ void VideoSource::ReadSource(std::string path)
 			continue;
 		}
 		else if (response < 0) {
-			printf("Failed to decode frame: %s\n", av_err2str(response));
+			wxMessageBox("Failed to decode frame: %s\n", av_err2str(response));
 			return;
 		}
 		av_packet_unref(av_packet);
@@ -134,9 +158,8 @@ void VideoSource::ReadSource(std::string path)
 		//bool isEqual = (cv::sum(Avframe2Cvmat(av_frame) != Avframe2Cvmat(&source[0])) == cv::Scalar(0, 0, 0, 0));
 		//bool isEqual = (cv::sum(im != source[0]) == cv::Scalar(0, 0, 0, 0));
 		//im.release();
-
-		source.push_back(*new AVFrame);
-		source.back() = *av_frame_clone(av_frame);
+		newSource.push_back(new AVFrame);
+		newSource.back() = av_frame_clone(av_frame);
 		/*
 		if (int iRet = av_frame_copy(&source.back(), av_frame) == 0) {
 			av_log(NULL, AV_LOG_INFO, "Ok");
@@ -153,6 +176,8 @@ void VideoSource::ReadSource(std::string path)
 	av_frame_free(&av_frame);
 	av_packet_free(&av_packet);
 	avcodec_free_context(&av_codec_ctx);
+	//this->LockSource();
+	source_.swap(newSource);
 }
 
 cv::Mat VideoSource::Avframe2Cvmat(const AVFrame* av_frame)
@@ -226,7 +251,7 @@ void VideoSource::Play()
 	auto start = std::chrono::high_resolution_clock::now();
 	// Read the frames to the last frame
 	auto sec_delay = std::chrono::milliseconds(long long(float(1 / this->fps) * 1e3));
-	for (int frame = 0; frame < source.size(); frame++)
+	for (int frame = 0; frame < source_.size(); frame++)
 	{
 		//display frames
 		//cv::imshow("Frame", source[frame]);

@@ -5,11 +5,16 @@
 #include "Sequence.h"
 #include <wx/wxprec.h>
 #include <wx/splitter.h>
+
+#include <map>
  #ifndef WX_PRECOMP
 	#include <wx/wx.h>
 #endif
  class MainWindow: public wxFrame
 {
+private:
+    std::map<std::string, VideoSource> videoSources;
+    std::map<std::string, Sequence> sequences;
 public:
 	MainWindow(wxWindow* parent,
         wxWindowID id,

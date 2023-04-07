@@ -12,13 +12,18 @@ extern "C" {
 class VideoClip
 {
 private:
-	const VideoSource* videoSource;
+	VideoSource* videoSource;
 	int edges[2];
 	std::vector<IEffect> effects;
+	std::vector<AVFrame*>* clip;
 	bool updated;
 public:
 	VideoClip(VideoSource*);
-	void ApplyEffects(std::vector<AVFrame>*);
+	virtual ~VideoClip();
+	bool SetStart(int);
+	bool SetEnd(int);
+	void ApplyEffects();
+	vector<AVFrame*>& GetClip();
 	//void AddEffect(IEffect); // changes the updated to false
 };
 

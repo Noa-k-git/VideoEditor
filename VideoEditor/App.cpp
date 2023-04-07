@@ -17,7 +17,7 @@ bool App::OnInit()
 	if (!wxApp::OnInit())
 		return false;
 
-	VideoSource* vs = new VideoSource("C:\\Users\\cyber\\source\\repos\\Noa-k-git\\VideoEditor\\video.mp4");
+	//VideoSource* vs = new VideoSource("C:\\Users\\cyber\\source\\repos\\Noa-k-git\\VideoEditor\\video.mp4");
 	wxDisplay * display = new wxDisplay();
 	
 	MainWindow* main = new MainWindow(nullptr, window::id::MAINWINDOW, _("Main Window"));//, display->GetGeometry().GetPosition(), display->GetGeometry().GetSize());
@@ -29,4 +29,8 @@ bool App::OnInit()
 
 App::~App()
 {
+	for (auto& thread : *ISource<std::vector<AVFrame>>::readingThreads) {
+		if (thread.joinable())
+			thread.join();
+	}
 }

@@ -100,7 +100,7 @@ void MainWindow::onNew(wxCommandEvent& WXUNUSED(event))
 
 void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
 {
-    wxMessageBox("Start Import");
+    //wxMessageBox("Start Import");
     wxFileDialog fileDialog(this, "Open File", "", "", "*.mp4", wxFD_OPEN);
     std::string filePath;
     if (fileDialog.ShowModal() == wxID_OK)
@@ -112,8 +112,19 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
     //VideoSource* vs = new VideoSource("C:\\Users\\cyber\\source\\repos\\Noa-k-git\\VideoEditor\\video.mp4");
     wxMessageBox("Processing video");
     VideoSource* vs = new VideoSource(filePath);
+    for (auto& thread : *ISource<std::vector<AVFrame*>>::readingThreads) {
+        if (thread.joinable())
+            thread.join();
+    }
     VideoClip* vc = new VideoClip(vs);
+    
     Sequence* s = new Sequence();
+    s->AddClip(*vc);
+    std::string fname = "firstattempt.mp4";
+    s->SaveVideo(fname);
+    delete s;
+    //delete vc;
+    delete vs;
 
 }
 

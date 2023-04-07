@@ -4,6 +4,7 @@
 #include "IImg.h"
 #include "IPlayable.h"
 
+#include <string>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -24,7 +25,7 @@ extern "C" {
 #include <inttypes.h>
 }
 
-
+#include<wx/msgdlg.h>
 
 // OpenCV
 #include <opencv2/opencv.hpp>
@@ -33,16 +34,17 @@ extern "C" {
 
 class VideoSource :
     //public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
-    public ISource<std::vector<AVFrame>>, public IImg, public IPlayable
+    public ISource<std::vector<AVFrame*>>, public IImg, public IPlayable
 {
 public:
     VideoSource(std::string);
+    VideoSource(std::string, std::string);
     virtual ~VideoSource();
     void Show() override;
     void Play() override;
 private:
-    void ReadSource(std::string) override;
-
+    std::string name;
+    void ReadSource() override;
     cv::Mat Avframe2Cvmat(const AVFrame*);
     //AVFrame* CopyFrame(const AVFrame*);
     //AVFrame* Cvmat2Avframe(cv::Mat* image, AVFrame* frame);
