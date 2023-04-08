@@ -5,7 +5,15 @@
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
-Sequence::Sequence()
+Map<std::string, Sequence*> Sequence::sequences;
+
+Sequence::Sequence(std::string name)
+{
+    // This causes an error
+    //Sequence::sequences.insert(std::pair<std::string, Sequence*>(name, this));
+}
+
+Sequence::Sequence() : Sequence("My Sequence")
 {
 }
 
@@ -18,9 +26,6 @@ Sequence::~Sequence()
 
 void Sequence::SaveVideo(std::string& output_filename)
 {
-    // Initialize FFmpeg
-    avformat_network_init();
-
     // Open the output file context
     AVFormatContext* format_ctx = nullptr;
     int ret = avformat_alloc_output_context2(&format_ctx, nullptr, nullptr, output_filename.c_str());
@@ -299,16 +304,16 @@ void Sequence::SaveVideo(std::string& output_filename)
     avformat_free_context(format_ctx);
 }
 
-void Sequence::AddClip(VideoClip& videoClip, int idx)
+void Sequence::AddClip(VideoClip* videoClip, int idx)
 {
     if (idx < 0 || idx > video.size()) {
         idx = video.size();
     }
-    video.insert(video.begin() + idx, &videoClip);
+    video.insert(video.begin() + idx, videoClip);
 
 }
 
-void Sequence::AddClip(VideoClip& videoClip)
+void Sequence::AddClip(VideoClip* videoClip)
 {
     AddClip(videoClip, -1);
 }

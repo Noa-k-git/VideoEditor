@@ -119,12 +119,25 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
     VideoClip* vc = new VideoClip(vs);
     
     Sequence* s = new Sequence();
-    s->AddClip(*vc);
-    std::string fname = "firstattempt.mp4";
+    s->AddClip(vc);
+    std::string fname = "withhelp.mp4";
     s->SaveVideo(fname);
     delete s;
     //delete vc;
     delete vs;
+
+    //wxMessageBox("Processing video");
+    //new VideoSource(filePath);
+    //for (auto& thread : *ISource<std::vector<AVFrame*>>::readingThreads) {
+    //    if (thread.joinable())
+    //        thread.join();
+    //}
+    ////new VideoClip()
+    //new Sequence();
+    //Sequence::sequences.myMap.find("My Sequence")->second->AddClip(new VideoClip(VideoSource::videoSources.myMap.find("")->second));
+    //std::string fname = "firstattempt.mp4";
+    //Sequence::sequences.myMap.find("My Sequence")->second->SaveVideo(fname);
+
 
 }
 

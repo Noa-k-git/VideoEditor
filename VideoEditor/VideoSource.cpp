@@ -5,21 +5,15 @@ char x[AV_ERROR_MAX_STRING_SIZE];
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
-VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
-{
-	std::vector<std::string> filePath;
-	std::stringstream ss(path);
-	std::string part;
+Map<std::string, VideoSource*> VideoSource::videoSources;
 
-	while (std::getline(ss, part, '\\')) {
-		filePath.push_back(part);
-	}
-	this->name = filePath.back();
+VideoSource::VideoSource(std::string path, std::string name) : ISource(path), IImg(), IPlayable()
+{
+	//VideoSource::videoSources.insert(std::pair<std::string, VideoSource*>(name, this));
 }
 
-VideoSource::VideoSource(std::string path, std::string name) : VideoSource::VideoSource(path)
+VideoSource::VideoSource(std::string path) : VideoSource(path, ExtractName(path))
 {
-	this->name = name;
 }
 
 VideoSource::~VideoSource()
@@ -31,6 +25,18 @@ VideoSource::~VideoSource()
 	}
 	this->source_.clear();
 	//std::vector<cv::Mat>().swap(source);
+}
+
+std::string VideoSource::ExtractName(std::string path)
+{
+	std::vector<std::string> filePath;
+	std::istringstream ss(path);
+	std::string part;
+
+	while (std::getline(ss, part, '\\')) {
+		filePath.push_back(part);
+	}
+	return filePath.back();
 }
 
 void VideoSource::ReadSource()

@@ -32,21 +32,23 @@ extern "C" {
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 
+#include "Map.h"
 class VideoSource :
     //public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
     public ISource<std::vector<AVFrame*>>, public IImg, public IPlayable
 {
 public:
-    VideoSource(std::string);
+    static Map<std::string, VideoSource*> videoSources;
     VideoSource(std::string, std::string);
+    VideoSource(std::string);
     virtual ~VideoSource();
     void Show() override;
     void Play() override;
 private:
-    std::string name;
+    std::string ExtractName(std::string);
     void ReadSource() override;
     cv::Mat Avframe2Cvmat(const AVFrame*);
     //AVFrame* CopyFrame(const AVFrame*);
     //AVFrame* Cvmat2Avframe(cv::Mat* image, AVFrame* frame);
 };
-
+extern Map<std::string, VideoSource*> videoSources;

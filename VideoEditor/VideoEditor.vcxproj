@@ -145,7 +145,9 @@
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="EffectProperty.cpp" />
+    <ClCompile Include="InputDialog.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="ScaleEffect.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="SubWindows.cpp" />
@@ -163,9 +165,11 @@
     <ClInclude Include="id.h" />
     <ClInclude Include="IEffect.h" />
     <ClInclude Include="IImg.h" />
+    <ClInclude Include="InputDialog.h" />
     <ClInclude Include="IPlayable.h" />
     <ClInclude Include="ISource.h" />
     <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="Map.h" />
     <ClInclude Include="ScaleEffect.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="SubWindows.h" />
