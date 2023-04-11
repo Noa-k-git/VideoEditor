@@ -78,6 +78,9 @@
     <ClCompile Include="UniqueName.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VideoSourcePanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceID.h">
@@ -144,6 +147,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UniqueName.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoSourcePanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

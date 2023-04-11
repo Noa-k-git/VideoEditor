@@ -39,6 +39,16 @@ MainWindow::MainWindow(wxWindow* parent,
     --------------------------------|
     
     */
+    //wxSplitterWindow* mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_BORDER| wxSP_LIVE_UPDATE);
+    //mainSplitter->SetMinimumPaneSize(25);
+    //
+    //wxSplitterWindow* upperSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_BORDER | wxSP_LIVE_UPDATE);
+    //wxSplitterWindow* bottomSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_BORDER | wxSP_LIVE_UPDATE);
+
+    //mainSplitter->SplitVertically(upperSplitter, bottomSplitter);
+    //wxPanel* sourcesPanel = new wxPanel(upperSplitter, wxID_ANY);
+
+
     wxBoxSizer * mainSizer = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer * row1Sizer = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer * row2Sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -69,10 +79,12 @@ MainWindow::MainWindow(wxWindow* parent,
     finalVideoWindow->timeline->handler->Layout();
     finalVideoWindow->main->Layout();
     Bind(wxEVT_BUTTON, &MainWindow::OnImport, this, ogVideoWindow->pausePlay->GetId());
+    test = "Hello World";
+    wxStaticText* staticText = new wxStaticText(ogVideoWindowPanel, wxID_ANY, test, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
     
-
     row1Sizer->Add(ogVideoWindowPanel, 1, wxEXPAND | wxALL, 10);
     row1Sizer->Add(finalVideoWindowPanel, 1, wxEXPAND | wxALL, 10);
+
     //ogVideoWindowPanel->SetSizer(row1Sizer);
     //finalVideoWindowPanel->SetSizer(row1Sizer);
     
@@ -100,6 +112,7 @@ void MainWindow::onNew(wxCommandEvent& WXUNUSED(event))
 
 void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
 {
+    this->test = "a;sdllsfk";
     //wxMessageBox("Start Import");
     wxFileDialog fileDialog(this, "Open File", "", "", "*.*", wxFD_OPEN);
     std::string filePath;
@@ -134,11 +147,9 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
     }
     //new VideoClip()
     new Sequence("a");
-    Sequence::sequences.myMap.find("a")->second->AddClip(new VideoClip(VideoSource::videoSources.myMap.find("v")->second));
-    std::string fname = "firstattempt.mp4";
-    Sequence::sequences.myMap.find("a")->second->SaveVideo(fname);
-
-
+    (*Sequence::sequences.Contains("a").first)->AddClip(new VideoClip(*VideoSource::videoSources.Contains("v").first));
+    std::string fname = "RecordVideo.mp4";
+    (*Sequence::sequences.Contains("a").first)->SaveVideo(fname);
 }
 
 //void MainWindow::OnWindowSize(wxSizeEvent& event)

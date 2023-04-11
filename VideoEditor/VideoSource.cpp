@@ -5,12 +5,11 @@ char x[AV_ERROR_MAX_STRING_SIZE];
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
-Map<VideoSource*> VideoSource::videoSources;
+Records<VideoSource*> VideoSource::videoSources;
 
 VideoSource::VideoSource(std::string path, std::string name) : ISource(path, name), IImg(), IPlayable()
 {
-	std::pair<std::string, VideoSource*> myPair = std::make_pair(name, this);
-	VideoSource::videoSources.Insert(std::make_pair(name, this));
+	VideoSource::videoSources.AddRecord(this);
 }
 
 VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()

@@ -157,6 +157,7 @@
     <ClCompile Include="UniqueName.cpp" />
     <ClCompile Include="VideoClip.cpp" />
     <ClCompile Include="VideoSource.cpp" />
+    <ClCompile Include="VideoSourcePanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="UniqueName.h" />
     <ClInclude Include="VideoClip.h" />
     <ClInclude Include="VideoSource.h" />
+    <ClInclude Include="VideoSourcePanel.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\functions.png" />

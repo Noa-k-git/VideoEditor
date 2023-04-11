@@ -3,13 +3,13 @@
 #include "ISource.h"
 #include "IImg.h"
 #include "IPlayable.h"
-
+#include "Records.h"
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include<chrono>
-
+#include <wx/splitter.h>
 // FFmpeg
 
 extern "C" {
@@ -38,7 +38,7 @@ class VideoSource :
     public ISource<std::vector<AVFrame*>>, public IImg, public IPlayable
 {
 public:
-    static Map<VideoSource*> videoSources;
+    static Records<VideoSource*> videoSources;
     VideoSource(std::string, std::string);
     VideoSource(std::string);
     virtual ~VideoSource();
@@ -50,4 +50,4 @@ private:
     //AVFrame* CopyFrame(const AVFrame*);
     //AVFrame* Cvmat2Avframe(cv::Mat* image, AVFrame* frame);
 };
-extern Map<VideoSource*> videoSources;
+extern Records<VideoSource*> videoSources;

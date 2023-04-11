@@ -5,11 +5,11 @@
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
-Map<Sequence*> Sequence::sequences;
+Records<Sequence*> Sequence::sequences;
 
-Sequence::Sequence(std::string name)
+Sequence::Sequence(std::string name) : UniqueName(name)
 {
-    Sequence::sequences.Insert(std::make_pair(name, this));
+    Sequence::sequences.AddRecord(this);
 }
 
 Sequence::Sequence() : Sequence("My Sequence")

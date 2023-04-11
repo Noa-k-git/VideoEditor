@@ -13,6 +13,7 @@
  class MainWindow: public wxFrame
 {
 public:
+    std::string test;
 	MainWindow(wxWindow* parent,
         wxWindowID id,
         const wxString& title,

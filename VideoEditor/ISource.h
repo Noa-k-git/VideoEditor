@@ -13,9 +13,10 @@ struct Info {
 	std::string type;
 };*/
 template <typename T>
-class ISource : UniqueName{
+class ISource : public UniqueName{
 public:
 	static std::vector<std::thread>* readingThreads;
+
 private:
 	std::string ExtractName(std::string path);
 protected:
