@@ -46,8 +46,8 @@ inline void Bezier::GetValue(float t, Point& pFinal) {
 	
 }
 ;
-template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* >
-void CalculateTransitionValue(float t, Point& pFinal, T start, T end) {
+template<typename Tvalue, typename std::enable_if<std::is_arithmetic<Tvalue>::value>::type* >
+void CalculateTransitionValue(float t, Point& pFinal, Tvalue start, Tvalue end) {
 	Bezier::CurveValue(t, pFinal); // 0.2, 0.4
 	pFinal.y = pFinal.y * t + start;
 }
@@ -69,8 +69,8 @@ inline void Bezier::CurveValue(float t, Point& pFinal)
 	}
 
 };
-template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* >
-inline float static Bezier::Linear(float t, T start, T end) {
+template<typename Tvalue, typename std::enable_if<std::is_arithmetic<Tvalue>::value>::type* >
+inline float static Bezier::Linear(float t, Tvalue start, Tvalue end) {
 	return (start - end) * t + start;
 }
 

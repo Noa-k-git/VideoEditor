@@ -46,9 +46,12 @@ void VideoClip::ApplyEffects()
 {
 	if (updated)
 		return;
+	clip->clear();
 	auto lock = videoSource->LockSource();
 	const std::vector<AVFrame*>& sourceFrames = videoSource->GetSource();
+	auto a = sourceFrames.begin();
 	for (auto i = sourceFrames.begin() + edges[0]; i < sourceFrames.begin() + edges[1]; i++) {
+		auto b = a + edges[1];
 		clip->push_back(new AVFrame(**i));
 	}
 	//std::vector<AVFrame*> framesCopy(sourceFrames.begin()+edges[0], sourceFrames.begin()+edges[1]);
@@ -56,6 +59,7 @@ void VideoClip::ApplyEffects()
 	for (auto& effect : effects) {
 		effect.Apply(clip);
 	}
+	updated = true;
 	//// Copy the modified frames to the result
 	//std::vector<AVFrame*>& clipRef = *clip;
 	//clipRef.swap(framesCopy);

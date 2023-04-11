@@ -1,31 +1,31 @@
 #include "EffectProperty.h"
 
-template<typename T>
-Keyframe<T>::Keyframe(int frame, T value) {
+template<typename Tvalue>
+Keyframe<Tvalue>::Keyframe(int frame, Tvalue value) {
 	this->frame = frame;
 	this->value = value;
 }
 
-template<typename T>
-Keyframe<T>::Keyframe(int frame, T value, Bezier transition) : Keyframe<T>::Keyframe(frame, value) {
+template<typename Tvalue>
+Keyframe<Tvalue>::Keyframe(int frame, Tvalue value, Bezier transition) : Keyframe<Tvalue>::Keyframe(frame, value) {
 	this->transition = transition;
 }
 
 
-template<typename T>
-inline EffectProperty<T>::EffectProperty(T value)
+template<typename Tvalue>
+inline EffectProperty<Tvalue>::EffectProperty(Tvalue value)
 {
 	this->defualt = value;
 }
 
-template<typename T>
-inline EffectProperty<T>::EffectProperty(const EffectProperty<T>& origin) {
+template<typename Tvalue>
+inline EffectProperty<Tvalue>::EffectProperty(const EffectProperty<Tvalue>& origin) {
 	this->defualt = origin.defualt;
 	this->keyframes = origin.keyframes;
 }
 
-template<typename T>
-float EffectProperty<T>::GetPropValue(int frame)
+template<typename Tvalue>
+float EffectProperty<Tvalue>::GetPropValue(int frame)
 {
 	int prev = binarySearchKeyframe(frame);
 	int next;
@@ -38,8 +38,8 @@ float EffectProperty<T>::GetPropValue(int frame)
 
 	return 0.0f;
 }
-template<typename T>
-void EffectProperty<T>::setCloseKeyframe(int currFrame, T oldValue, T value)
+template<typename Tvalue>
+void EffectProperty<Tvalue>::setCloseKeyframe(int currFrame, Tvalue oldValue, Tvalue value)
 {
 	int loc = binarySearchKeyframe(currFrame);
 	int i = loc;
@@ -53,8 +53,8 @@ void EffectProperty<T>::setCloseKeyframe(int currFrame, T oldValue, T value)
 	}
 }
 
-template<typename T>
-void EffectProperty<T>::setAllKeyframes(T oldValue, T value)
+template<typename Tvalue>
+void EffectProperty<Tvalue>::setAllKeyframes(Tvalue oldValue, Tvalue value)
 {
 	int loc = 0;
 	while (loc < this->keyframes.size())
@@ -64,15 +64,15 @@ void EffectProperty<T>::setAllKeyframes(T oldValue, T value)
 	}
 }
 
-template<typename T>
-void EffectProperty<T>::deleteAllKeyframes(T value)
+template<typename Tvalue>
+void EffectProperty<Tvalue>::deleteAllKeyframes(Tvalue value)
 {
 	this->defualt = value;
 	this->keyframes.clear();
 }
 
-template<typename T>
-int EffectProperty<T>::binarySearchKeyframe(int frame)
+template<typename Tvalue>
+int EffectProperty<Tvalue>::binarySearchKeyframe(int frame)
 { // if the frame doesnt exist, returns the prev one.
 	// if returns -1, there is no previous one.
 	int start = 0;
@@ -90,51 +90,51 @@ int EffectProperty<T>::binarySearchKeyframe(int frame)
 
 // inline
 
-template<typename T>
-inline T EffectProperty<T>::GetDefualt()
+template<typename Tvalue>
+inline Tvalue EffectProperty<Tvalue>::GetDefualt()
 {
 	return this->defualt;
 }
 
 
-template<typename T>
-inline const std::vector<Keyframe<T>>& EffectProperty<T>::getKeyframes() const
+template<typename Tvalue>
+inline const std::vector<Keyframe<Tvalue>>& EffectProperty<Tvalue>::getKeyframes() const
 {
 	return this->keyframes;
 }
 
-template<typename T>
-inline void EffectProperty<T>::newKeyframe()
+template<typename Tvalue>
+inline void EffectProperty<Tvalue>::newKeyframe()
 {
 	this->keyframes.back().transition = { {0, 0}, {1, 1} };
 	this->sortKeyframes();
 }
 
 
-template<typename T>
-inline void EffectProperty<T>::newKeyframe(Keyframe<T> kf)
+template<typename Tvalue>
+inline void EffectProperty<Tvalue>::newKeyframe(Keyframe<Tvalue> kf)
 {
 	this->keyframes.push_back(kf);
 	this->newKeyframe();
 }
 
-template<typename T>
-inline void EffectProperty<T>::newKeyframe(int frame, T value)
+template<typename Tvalue>
+inline void EffectProperty<Tvalue>::newKeyframe(int frame, Tvalue value)
 {
 	this->keyframes.push_back({ frame, value });
 	this->newKeyframe();
 }
 
-template<typename T>
-inline void EffectProperty<T>::setKeyframe(T value, int loc)
+template<typename Tvalue>
+inline void EffectProperty<Tvalue>::setKeyframe(Tvalue value, int loc)
 {
 	if (loc >= 0 && loc < this->keyframes.size()) {
 		this->keyframes[loc].value = value;
 	}
 }
 
-template<typename T>
-inline void EffectProperty<T>::setKeyframe(Keyframe<T> kf)
+template<typename Tvalue>
+inline void EffectProperty<Tvalue>::setKeyframe(Keyframe<Tvalue> kf)
 {
 	int loc = binarySearchKeyframe(kf.frame);
 	if (loc >= 0 && loc < this->keyframes.size()) {
@@ -142,8 +142,8 @@ inline void EffectProperty<T>::setKeyframe(Keyframe<T> kf)
 	}
 }
 
-template<typename T>
-inline void EffectProperty<T>::sortKeyframes()
+template<typename Tvalue>
+inline void EffectProperty<Tvalue>::sortKeyframes()
 {
 	sort(this->keyframes.begin(), this->keyframes.end(), [](Keyframe a, Keyframe b) {
 		return a.frame < b.frame;

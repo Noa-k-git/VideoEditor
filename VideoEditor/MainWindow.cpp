@@ -101,7 +101,7 @@ void MainWindow::onNew(wxCommandEvent& WXUNUSED(event))
 void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
 {
     //wxMessageBox("Start Import");
-    wxFileDialog fileDialog(this, "Open File", "", "", "*.mp4", wxFD_OPEN);
+    wxFileDialog fileDialog(this, "Open File", "", "", "*.*", wxFD_OPEN);
     std::string filePath;
     if (fileDialog.ShowModal() == wxID_OK)
     {
@@ -110,33 +110,33 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
     else
         return;
     //VideoSource* vs = new VideoSource("C:\\Users\\cyber\\source\\repos\\Noa-k-git\\VideoEditor\\video.mp4");
-    wxMessageBox("Processing video");
-    VideoSource* vs = new VideoSource(filePath);
-    for (auto& thread : *ISource<std::vector<AVFrame*>>::readingThreads) {
-        if (thread.joinable())
-            thread.join();
-    }
-    VideoClip* vc = new VideoClip(vs);
-    
-    Sequence* s = new Sequence();
-    s->AddClip(vc);
-    std::string fname = "withhelp.mp4";
-    s->SaveVideo(fname);
-    delete s;
-    //delete vc;
-    delete vs;
-
     //wxMessageBox("Processing video");
-    //new VideoSource(filePath);
+    //VideoSource* vs = new VideoSource(filePath);
     //for (auto& thread : *ISource<std::vector<AVFrame*>>::readingThreads) {
     //    if (thread.joinable())
     //        thread.join();
     //}
-    ////new VideoClip()
-    //new Sequence();
-    //Sequence::sequences.myMap.find("My Sequence")->second->AddClip(new VideoClip(VideoSource::videoSources.myMap.find("")->second));
-    //std::string fname = "firstattempt.mp4";
-    //Sequence::sequences.myMap.find("My Sequence")->second->SaveVideo(fname);
+    //VideoClip* vc = new VideoClip(vs);
+    //
+    //Sequence* s = new Sequence();
+    //s->AddClip(vc);
+    //std::string fname = "withhelp.mp4";
+    //s->SaveVideo(fname);
+    //delete s;
+    ////delete vc;
+    //delete vs;
+
+    wxMessageBox("Processing video");
+    new VideoSource(filePath, "v");
+    for (auto& thread : *ISource<std::vector<AVFrame*>>::readingThreads) {
+        if (thread.joinable())
+            thread.join();
+    }
+    //new VideoClip()
+    new Sequence("a");
+    Sequence::sequences.myMap.find("a")->second->AddClip(new VideoClip(VideoSource::videoSources.myMap.find("v")->second));
+    std::string fname = "firstattempt.mp4";
+    Sequence::sequences.myMap.find("a")->second->SaveVideo(fname);
 
 
 }

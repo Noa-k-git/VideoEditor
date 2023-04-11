@@ -38,17 +38,16 @@ class VideoSource :
     public ISource<std::vector<AVFrame*>>, public IImg, public IPlayable
 {
 public:
-    static Map<std::string, VideoSource*> videoSources;
+    static Map<VideoSource*> videoSources;
     VideoSource(std::string, std::string);
     VideoSource(std::string);
     virtual ~VideoSource();
     void Show() override;
     void Play() override;
 private:
-    std::string ExtractName(std::string);
     void ReadSource() override;
     cv::Mat Avframe2Cvmat(const AVFrame*);
     //AVFrame* CopyFrame(const AVFrame*);
     //AVFrame* Cvmat2Avframe(cv::Mat* image, AVFrame* frame);
 };
-extern Map<std::string, VideoSource*> videoSources;
+extern Map<VideoSource*> videoSources;

@@ -5,14 +5,15 @@ char x[AV_ERROR_MAX_STRING_SIZE];
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
-Map<std::string, VideoSource*> VideoSource::videoSources;
+Map<VideoSource*> VideoSource::videoSources;
 
-VideoSource::VideoSource(std::string path, std::string name) : ISource(path), IImg(), IPlayable()
+VideoSource::VideoSource(std::string path, std::string name) : ISource(path, name), IImg(), IPlayable()
 {
-	//VideoSource::videoSources.insert(std::pair<std::string, VideoSource*>(name, this));
+	std::pair<std::string, VideoSource*> myPair = std::make_pair(name, this);
+	VideoSource::videoSources.Insert(std::make_pair(name, this));
 }
 
-VideoSource::VideoSource(std::string path) : VideoSource(path, ExtractName(path))
+VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 {
 }
 
@@ -25,18 +26,6 @@ VideoSource::~VideoSource()
 	}
 	this->source_.clear();
 	//std::vector<cv::Mat>().swap(source);
-}
-
-std::string VideoSource::ExtractName(std::string path)
-{
-	std::vector<std::string> filePath;
-	std::istringstream ss(path);
-	std::string part;
-
-	while (std::getline(ss, part, '\\')) {
-		filePath.push_back(part);
-	}
-	return filePath.back();
 }
 
 void VideoSource::ReadSource()
@@ -131,8 +120,8 @@ void VideoSource::ReadSource()
 		return;
 	}
 	int response;
-
-	while (av_read_frame(av_format_ctx, av_packet) >= 0) {
+	int counter = 0;
+	while (av_read_frame(av_format_ctx, av_packet) >= 0 && counter < 100000) {
 		if (av_packet->stream_index != video_stream_index) {
 			av_packet_unref(av_packet);
 			continue;
@@ -151,6 +140,7 @@ void VideoSource::ReadSource()
 			wxMessageBox("Failed to decode frame: %s\n", av_err2str(response));
 			return;
 		}
+		counter++;
 		av_packet_unref(av_packet);
 
 		av_packet = av_packet_alloc();
@@ -184,6 +174,26 @@ void VideoSource::ReadSource()
 	avcodec_free_context(&av_codec_ctx);
 	//this->LockSource();
 	source_.swap(newSource);
+
+	//FILE* f = fopen(path.c_str(), "rb");
+	//for (int i = 0; i < 200; i++)
+	//{
+	//	AVFrame* pRGBFrame = av_frame_alloc();
+
+	//	pRGBFrame->format = AV_PIX_FMT_RGB24;
+	//	pRGBFrame->width = 192;
+	//	pRGBFrame->height = 108;
+	//	int sts = av_frame_get_buffer(pRGBFrame, 0);
+
+	//	assert(sts == 0);
+	//	assert((pRGBFrame->linesize[0] == 192 * 3));  //Make sure buffers are continuous in memory.
+
+	//	fread(pRGBFrame->data[0], 1, 192 * 108 * 3, f);   //Read RGB
+
+	//	source_.push_back(pRGBFrame);
+	//}
+	//fclose(f);
+
 }
 
 cv::Mat VideoSource::Avframe2Cvmat(const AVFrame* av_frame)

@@ -14,7 +14,7 @@ private:
 	std::vector<VideoClip*> video;
 	//std::vector<std::vector<AVFrame>> results;
 public:
-	static Map<std::string, Sequence*> sequences;
+	static Map<Sequence*> sequences;
 	Sequence(std::string);
 	Sequence();
 	virtual ~Sequence();
@@ -22,4 +22,4 @@ public:
 	void AddClip(VideoClip*, int);
 	void AddClip(VideoClip*);
 };
-extern Map<std::string, Sequence*> sequences;
+extern Map<Sequence*> sequences;

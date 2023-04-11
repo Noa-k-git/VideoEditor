@@ -24,6 +24,9 @@ public:
 	bool SetEnd(int);
 	void ApplyEffects();
 	vector<AVFrame*>& GetClip();
+	std::string ToString() const {
+		
+	}
 	//void AddEffect(IEffect); // changes the updated to false
 };
 

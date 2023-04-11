@@ -5,12 +5,11 @@
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
-Map<std::string, Sequence*> Sequence::sequences;
+Map<Sequence*> Sequence::sequences;
 
 Sequence::Sequence(std::string name)
 {
-    // This causes an error
-    //Sequence::sequences.insert(std::pair<std::string, Sequence*>(name, this));
+    Sequence::sequences.Insert(std::make_pair(name, this));
 }
 
 Sequence::Sequence() : Sequence("My Sequence")
@@ -60,34 +59,47 @@ void Sequence::SaveVideo(std::string& output_filename)
     settings.length = video.front()->GetClip().size();
     settings.resolution[0] = video.front()->GetClip()[0]->width;
     settings.resolution[1] = video.front()->GetClip()[0]->height;
-    // Set the stream parameters
-    stream->codecpar->codec_id = AV_CODEC_ID_H264;
-    stream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
-    stream->codecpar->width = settings.resolution[0]; // 270
-    stream->codecpar->height = settings.resolution[1]; // 480
-    stream->codecpar->format = AV_PIX_FMT_YUV420P;
-    stream->codecpar->bit_rate = 16000;
-    AVRational framerate = { 1, 30};
-    stream->time_base = av_inv_q(framerate);
+    //// Set the stream parameters
+    //stream->codecpar->codec_id = AV_CODEC_ID_H264;
+    //stream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
+    //stream->codecpar->width = settings.resolution[0]; // 270
+    //stream->codecpar->height = settings.resolution[1]; // 480
+    //stream->codecpar->format = AV_PIX_FMT_YUV420P;
+    //stream->codecpar->bit_rate = 16000;
+    //AVRational framerate = { 1, 30};
+    //stream->time_base = av_inv_q(framerate);
 
     // Open the codec context
     AVCodecContext* codec_ctx = avcodec_alloc_context3(codec);
-    codec_ctx->codec_tag = 0;
-    codec_ctx->time_base = stream->time_base;
-    codec_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-    if (!codec_ctx) {
-        std::cout << "Error allocating codec context" << std::endl;
-        avformat_free_context(format_ctx);
-        return;
-    }
+    //codec_ctx->codec_tag = 0;
+    //codec_ctx->time_base = stream->time_base;
+    //codec_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    //if (!codec_ctx) {
+    //    std::cout << "Error allocating codec context" << std::endl;
+    //    avformat_free_context(format_ctx);
+    //    return;
+    //}
 
-    ret = avcodec_parameters_to_context(codec_ctx, stream->codecpar);
-    if (ret < 0) {
-        std::cout << "Error setting codec context parameters: " << av_err2str(ret) << std::endl;
-        avcodec_free_context(&codec_ctx);
-        avformat_free_context(format_ctx);
-        return;
-    }
+    //ret = avcodec_parameters_to_context(codec_ctx, stream->codecpar);
+    //if (ret < 0) {
+    //    std::cout << "Error setting codec context parameters: " << av_err2str(ret) << std::endl;
+    //    avcodec_free_context(&codec_ctx);
+    //    avformat_free_context(format_ctx);
+    //    return;
+    //}
+    codec_ctx->codec_id = AV_CODEC_ID_H264;
+    codec_ctx->codec_type = AVMEDIA_TYPE_VIDEO;
+    codec_ctx->width = settings.resolution[0];
+    codec_ctx->height = settings.resolution[1];
+    codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
+    codec_ctx->bit_rate = 400000;
+    AVRational framerate = { 30, 1 };
+    //AVRational framerate = { 1, 30 };
+    codec_ctx->time_base = av_inv_q(framerate);
+    codec_ctx->codec_tag = 0;
+    codec_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    stream->time_base = codec_ctx->time_base;
+
     AVDictionary* opt = NULL;
     ret = avcodec_open2(codec_ctx, codec, &opt);
     if (ret < 0) {
@@ -97,7 +109,8 @@ void Sequence::SaveVideo(std::string& output_filename)
         avformat_free_context(format_ctx);
         return;
     }
-
+    avcodec_parameters_from_context(stream->codecpar, codec_ctx);
+    stream->time_base = codec_ctx->time_base;
     // Allocate a buffer for the frame data
     AVFrame* frame = av_frame_alloc();
     if (!frame) {
@@ -161,6 +174,8 @@ void Sequence::SaveVideo(std::string& output_filename)
 
     // Write the header to the output file
     ret = avformat_write_header(format_ctx, nullptr);
+    //stream->time_base = codec_ctx->time_base;
+
     if (ret < 0) {
         std::cerr << "Error writing header to output file: " << av_err2str(ret) << std::endl;
         av_frame_free(&frame);
@@ -173,6 +188,7 @@ void Sequence::SaveVideo(std::string& output_filename)
 
     // Iterate over the frames and write them to the output file
     int frame_count = 0;
+    double pts = 0;
     for (auto& clip : video) {
         for (auto& srcFrame : clip->GetClip()) {
             // Convert the frame to the output format
@@ -182,7 +198,9 @@ void Sequence::SaveVideo(std::string& output_filename)
             );
 
             // Set the frame properties
-            converted_frame->pts = av_rescale_q(frame_count, stream->time_base, codec_ctx->time_base);
+            //converted_frame->pts = av_rescale_q(frame_count, stream->time_base, codec_ctx->time_base);
+            converted_frame->pts = pts;
+            pts += av_rescale_q(1, codec_ctx->time_base, stream->time_base);
             frame_count++;
             //converted_frame->time_base.den = codec_ctx->time_base.den;
             //converted_frame->time_base.num = codec_ctx->time_base.num;
@@ -222,12 +240,14 @@ void Sequence::SaveVideo(std::string& output_filename)
                 }
 
                 // Write the packet to the output file
-                av_packet_rescale_ts(pkt, codec_ctx->time_base, stream->time_base);
+                //av_packet_rescale_ts(pkt, codec_ctx->time_base, stream->time_base);
                 pkt->stream_index = stream->index;
+                
+                pkt->duration = av_rescale_q(1, codec_ctx->time_base, stream->time_base);
                 ret = av_interleaved_write_frame(format_ctx, pkt);
-                av_packet_unref(pkt);
                 if (ret < 0) {
                     std::cerr << "Error writing packet to output file: " << av_err2str(ret) << std::endl;
+                    auto a = av_err2str(ret);
                     av_frame_free(&frame);
                     av_frame_free(&converted_frame);
                     sws_freeContext(converter);
@@ -235,6 +255,7 @@ void Sequence::SaveVideo(std::string& output_filename)
                     avformat_free_context(format_ctx);
                     return;
                 }
+                av_packet_unref(pkt);
             }
         }
     }
@@ -258,35 +279,39 @@ void Sequence::SaveVideo(std::string& output_filename)
             return;
         }
         ret = avcodec_receive_packet(codec_ctx, pkt);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-            wxMessageBox("Error recieving packet");
-            wxMessageBox(av_err2str(ret));
-            break;
-        }
-        else if (ret < 0) {
-            std::cerr << "Error during encoding: " << av_err2str(ret) << std::endl;
-            av_packet_unref(pkt);
-            av_frame_free(&frame);
-            av_frame_free(&converted_frame);
-            sws_freeContext(converter);
-            avcodec_free_context(&codec_ctx);
-            avformat_free_context(format_ctx);
-            return;
-        }
+        //if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+        //    wxMessageBox("Error recieving packet");
+        //    wxMessageBox(av_err2str(ret));
+        //    break;
+        //}
+        //else if (ret < 0) {
+        //    std::cerr << "Error during encoding: " << av_err2str(ret) << std::endl;
+        //    av_packet_unref(pkt);
+        //    av_frame_free(&frame);
+        //    av_frame_free(&converted_frame);
+        //    sws_freeContext(converter);
+        //    avcodec_free_context(&codec_ctx);
+        //    avformat_free_context(format_ctx);
+        //    return;
+        //}
 
         // Write the packet to the output file
-        av_packet_rescale_ts(pkt, codec_ctx->time_base, stream->time_base);
-        pkt->stream_index = stream->index;
-        ret = av_interleaved_write_frame(format_ctx, pkt);
-        av_packet_unref(pkt);
-        if (ret < 0) {
-            std::cerr << "Error writing packet to output file: " << av_err2str(ret) << std::endl;
-            av_frame_free(&frame);
-            av_frame_free(&converted_frame);
-            sws_freeContext(converter);
-            avcodec_free_context(&codec_ctx);
-            avformat_free_context(format_ctx);
-            return;
+        //av_packet_rescale_ts(pkt, codec_ctx->time_base, stream->time_base);
+        if (ret == 0)
+        {
+            pkt->stream_index = stream->index;
+            pkt->duration = av_rescale_q(1, codec_ctx->time_base, stream->time_base);
+            ret = av_interleaved_write_frame(format_ctx, pkt);
+            av_packet_unref(pkt);
+            if (ret < 0) {
+                std::cerr << "Error writing packet to output file: " << av_err2str(ret) << std::endl;
+                av_frame_free(&frame);
+                av_frame_free(&converted_frame);
+                sws_freeContext(converter);
+                avcodec_free_context(&codec_ctx);
+                avformat_free_context(format_ctx);
+                return;
+            }
         }
     }
 

@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/input.rgb24
+/video_new.mp4
+/20211002_001104_01.mp4
+/VideoEditor/withhelp.mp4

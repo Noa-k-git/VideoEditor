@@ -4,6 +4,7 @@
 #include<mutex>
 #include<functional>
 #include<wx/msgdlg.h>
+#include"UniqueName.h"
 /*
 struct Info {
 	double fps; // clip's frames per seconds
@@ -12,9 +13,11 @@ struct Info {
 	std::string type;
 };*/
 template <typename T>
-class ISource {
+class ISource : UniqueName{
 public:
 	static std::vector<std::thread>* readingThreads;
+private:
+	std::string ExtractName(std::string path);
 protected:
 	std::string path;
 	T source_;
@@ -23,23 +26,8 @@ protected:
 
 public:
 	//Info info; // struct that contains all the clips configurations
-	ISource(std::string path) {
-		this->path = path;
-		//std::thread readData(std::bind(&ISource::ReadSource, this, path));
-		//std::thread readData(&ISource::ReadSource, this, path);
-		std::thread readData([&]() {
-			try {
-				// Call the ReadSource function
-				this->ReadSource();
-			}
-			catch (const std::exception& e) {
-				// Handle the exception
-				wxMessageBox(std::string("Exception caught in readData thread: ") + std::string(e.what()));
-			}
-			});
-		ISource::readingThreads->push_back(std::move(readData));
-		// TODO: handle object getting deleted
-	}
+	ISource(std::string, std::string);
+	ISource(std::string);
 	virtual ~ISource() {}
 	inline const T& GetSource() const {
 		return source_;
@@ -52,3 +40,42 @@ public:
 // Initializing the static member
 template <typename T>
 std::vector<std::thread> * ISource<T>::readingThreads = new std::vector<std::thread>();
+
+// Implementation of none pure virtual mehtods
+
+template <typename T>
+ISource<T>::ISource(std::string path, std::string name) : UniqueName(name) {
+	this->path = path;
+	//std::thread readData(std::bind(&ISource::ReadSource, this, path));
+	//std::thread readData(&ISource::ReadSource, this, path);
+	std::thread readData([&]() {
+		try {
+			// Call the ReadSource function
+			this->ReadSource();
+		}
+		catch (const std::exception& e) {
+			// Handle the exception
+			wxMessageBox(std::string("Exception caught in readData thread: ") + std::string(e.what()));
+		}
+		});
+	ISource::readingThreads->push_back(std::move(readData));
+	// TODO: handle object getting deleted
+}
+template <typename T>
+ISource<T>::ISource(std::string path) : ISource(path, ExtractName(path)) {
+
+}
+
+
+template<typename T>
+inline std::string ISource<T>::ExtractName(std::string path)
+{
+	std::vector<std::string> filePath;
+	std::istringstream ss(path);
+	std::string part;
+
+	while (std::getline(ss, part, '\\')) {
+		filePath.push_back(part);
+	}
+	return filePath.back();
+}
