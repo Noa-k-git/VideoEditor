@@ -211,6 +211,10 @@ cv::Mat VideoSource::Avframe2Cvmat(const AVFrame* av_frame)
 	return image;
 }
 
+const AVFrame* VideoSource::getFirstFrame(){
+	auto lock = this->LockSource();
+	return source_.front();
+}
 /*
 void VideoSource::ReadSource(std::string path) 
 {

@@ -78,10 +78,8 @@ template <typename T>
 void Records<T>::RemoveRecord(std::string name) {
     auto result = Contains(name);
 
-    if (result.second) {
-        delete result.first;
+    if (result.second)
         records->erase(result.first);
-    }
 }
 
 template <typename T>

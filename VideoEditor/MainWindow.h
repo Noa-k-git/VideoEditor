@@ -1,10 +1,12 @@
 #pragma once
 #include "SubWindows.h"
+#include "VideoSourcePanel.h"
 #include "VideoSource.h"
 #include "VideoClip.h"
 #include "Sequence.h"
 #include <wx/wxprec.h>
 #include <wx/splitter.h>
+#include <wx/wrapsizer.h>
 #include "Map.h"
 
  #ifndef WX_PRECOMP
@@ -13,7 +15,6 @@
  class MainWindow: public wxFrame
 {
 public:
-    std::string test;
 	MainWindow(wxWindow* parent,
         wxWindowID id,
         const wxString& title,
@@ -31,5 +32,8 @@ public:
     void onHelp(wxCommandEvent& event);
 
     DECLARE_EVENT_TABLE();
+private:
+    wxPanel* sourcesPanel;
+    wxWrapSizer* m_sourcesSizer;
 };
 

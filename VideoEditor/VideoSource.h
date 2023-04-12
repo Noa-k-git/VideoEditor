@@ -44,6 +44,8 @@ public:
     virtual ~VideoSource();
     void Show() override;
     void Play() override;
+
+    const AVFrame* getFirstFrame();
 private:
     void ReadSource() override;
     cv::Mat Avframe2Cvmat(const AVFrame*);

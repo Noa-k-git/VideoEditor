@@ -186,6 +186,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\functions.png" />
+    <Image Include="blackAdd.png" />
+    <Image Include="blackDelete.png" />
+    <Image Include="blackEdit.png" />
+    <Image Include="whiteAdd.png" />
+    <Image Include="whiteDelete.png" />
+    <Image Include="whiteEdit.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="vidEd.txt" />

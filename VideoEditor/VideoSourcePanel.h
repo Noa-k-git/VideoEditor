@@ -9,12 +9,18 @@ public:
     ~VideoSourcePanel();
 private:
     VideoSource* m_videoSource; // The video source object to be represented
-    wxStaticBitmap* m_thumbnaeil; // the first avframe in the video source
+    wxBoxSizer* m_mainSizer;
+    wxStaticBitmap* m_thumbnail; // the first avframe in the video source
     wxStaticText* m_videoName; // the name of the video source
-    wxButton* m_addButton; // add the video source to the sequence
-    wxButton* m_editButton; // change the video source name
-    wxButton* m_deleteButton; // deletes the video source (removes it from the video source list
+    wxBitmapButton* m_addButton; // add the video source to the sequence
+    wxBitmapButton* m_editButton; // change the video source name
+    wxBitmapButton* m_deleteButton; // deletes the video source (removes it from the video source list
     
-
+    void rescaleBitmap(wxBitmap&, const wxSize&);
+    void onMouseLeftDown(wxMouseEvent& event);
+    void onMouseLeftDoubleClick(wxMouseEvent& event);
+    void onAddButtonClicked(wxCommandEvent& event);
+    void onEditButtonClicked(wxCommandEvent& event);
+    void onDeleteButtonClicked(wxCommandEvent& event);
 };
 

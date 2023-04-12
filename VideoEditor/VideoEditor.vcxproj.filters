@@ -79,7 +79,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VideoSourcePanel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Design</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -150,11 +150,29 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VideoSourcePanel.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Design</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\functions.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="whiteDelete.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="whiteEdit.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="blackAdd.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="blackDelete.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="blackEdit.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="whiteAdd.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
