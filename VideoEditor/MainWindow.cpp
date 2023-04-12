@@ -94,6 +94,8 @@ MainWindow::MainWindow(wxWindow* parent,
     row1Sizer->Layout();
     ogVideoWindowPanel->SetSizer(ogVideoWindow->main);
     finalVideoWindowPanel->SetSizer(finalVideoWindow->main);
+    statusBar = CreateStatusBar();
+    statusBar->SetStatusText(_("Ready!"));
 }
 
 MainWindow::~MainWindow()
@@ -137,17 +139,21 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
     //delete s;
     ////delete vc;
     //delete vs;
-
-    wxMessageBox("Processing video");
+    //wxMessageBox("Processing video");
     auto v = new VideoSource(filePath);
+    statusBar->PushStatusText(_("Processing Video: " + v->GetName()));
+    wxMessageOutputDebug().Printf("Processing Video...");
     for (auto& thread : *ISource<std::vector<AVFrame*>>::readingThreads) {
         if (thread.joinable())
             thread.join();
     }
     auto vsPanel = new VideoSourcePanel(sourcesPanel, v);
+    //statusBar->SetStatusText(_("Finished"));
+
     m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
 
     m_sourcesSizer->Layout();
+    statusBar->PopStatusText();
     //for (auto vs : *VideoSource::videoSources.GetRecords()) {
     //    auto x = new VideoSourcePanel(sourcesPanel, vs);
     //    m_sourcesSizer->Add(x);

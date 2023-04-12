@@ -53,7 +53,7 @@ VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource) :
 	wxBitmap bitmap(finalImg);
 
 	// display the wxBitmap in the wxStaticBitmap control
-	m_thumbnail = new wxStaticBitmap(this, wxID_ANY, bitmap);
+	m_thumbnailButton = new wxBitmapButton(this, wxID_ANY, bitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW|wxBORDER_NONE);
 
 	// Create video name label
 	m_videoName = new wxStaticText(this, wxID_ANY, m_videoSource->GetName(), wxDefaultPosition, wxSize(thumbnailSize.GetWidth(), -1));
@@ -85,8 +85,9 @@ VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource) :
 	m_deleteButton->SetBackgroundColour(bColor);
 
 	// Set up event handlers
-	Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(VideoSourcePanel::onMouseLeftDown));
-	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(VideoSourcePanel::onMouseLeftDoubleClick));
+	//m_thumbnailButton->Bind(wxEVT_LEFT_DCLICK, &VideoSourcePanel::onMouseLeftDoubleClick, this);
+	m_thumbnailButton->Bind(wxEVT_LEFT_DOWN, wxMouseEventHandler(VideoSourcePanel::onMouseLeftDown), this);
+	m_thumbnailButton->Bind(wxEVT_LEFT_DCLICK, wxMouseEventHandler(VideoSourcePanel::onMouseLeftDoubleClick), this);
 	m_addButton->Bind(wxEVT_BUTTON, &VideoSourcePanel::onAddButtonClicked, this);
 	m_editButton->Bind(wxEVT_BUTTON, &VideoSourcePanel::onEditButtonClicked, this);
 	m_deleteButton->Bind(wxEVT_BUTTON, &VideoSourcePanel::onDeleteButtonClicked, this);
@@ -97,7 +98,7 @@ VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource) :
 	buttonsSizer_->Add(m_deleteButton, 0, wxLEFT, 5);
 
 	m_mainSizer = new wxBoxSizer(wxVERTICAL);
-	m_mainSizer->Add(m_thumbnail, 0, wxALL, 10);
+	m_mainSizer->Add(m_thumbnailButton, 0, wxALL, 10);
 	m_mainSizer->Add(m_videoName, 0, wxLEFT|wxRIGHT, 10);
 	m_mainSizer->Add(buttonsSizer_, 0, wxALL, 10);
 	m_mainSizer->Layout();
@@ -126,8 +127,6 @@ void VideoSourcePanel::rescaleBitmap(wxBitmap& bitmap, const wxSize& size)
 
 void VideoSourcePanel::onMouseLeftDown(wxMouseEvent& event)
 {
-
-	
 }
 
 void VideoSourcePanel::onMouseLeftDoubleClick(wxMouseEvent& event)

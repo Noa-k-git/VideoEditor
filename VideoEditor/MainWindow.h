@@ -33,6 +33,7 @@ public:
 
     DECLARE_EVENT_TABLE();
 private:
+    wxStatusBar* statusBar;
     wxPanel* sourcesPanel;
     wxWrapSizer* m_sourcesSizer;
 };

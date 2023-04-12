@@ -10,7 +10,7 @@ public:
 private:
     VideoSource* m_videoSource; // The video source object to be represented
     wxBoxSizer* m_mainSizer;
-    wxStaticBitmap* m_thumbnail; // the first avframe in the video source
+    wxBitmapButton* m_thumbnailButton; // the first avframe in the video source
     wxStaticText* m_videoName; // the name of the video source
     wxBitmapButton* m_addButton; // add the video source to the sequence
     wxBitmapButton* m_editButton; // change the video source name
