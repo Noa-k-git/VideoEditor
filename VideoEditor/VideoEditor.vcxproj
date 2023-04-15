@@ -151,6 +151,8 @@
     <ClCompile Include="Records.cpp" />
     <ClCompile Include="ScaleEffect.cpp" />
     <ClCompile Include="Sequence.cpp" />
+    <ClCompile Include="ShowVideoEvent.cpp" />
+    <ClCompile Include="ShowVideoPanel.cpp" />
     <ClCompile Include="SubWindows.cpp" />
     <ClCompile Include="Transition.cpp" />
     <ClCompile Include="SourceID.cpp" />
@@ -176,6 +178,8 @@
     <ClInclude Include="Records.h" />
     <ClInclude Include="ScaleEffect.h" />
     <ClInclude Include="Sequence.h" />
+    <ClInclude Include="ShowVideoEvent.h" />
+    <ClInclude Include="ShowVideoPanel.h" />
     <ClInclude Include="SubWindows.h" />
     <ClInclude Include="Transition.h" />
     <ClInclude Include="SourceID.h" />

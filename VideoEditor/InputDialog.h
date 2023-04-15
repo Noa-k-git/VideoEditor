@@ -8,5 +8,6 @@ public:
 	wxString GetValue() const;
 private:
 	wxTextCtrl* input_;
+	void OnCharHooK(wxKeyEvent& event);
 };
 

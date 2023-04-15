@@ -21,8 +21,30 @@ InputDialog::InputDialog(wxWindow* parent, const wxString& title, const wxString
 
 	SetSizer(vbox);
 	Center();
+
+	Bind(wxEVT_CHAR_HOOK, &InputDialog::OnCharHooK, this);
 }
 
 wxString InputDialog::GetValue() const {
 	return input_->GetValue();
+}
+
+void InputDialog::OnCharHooK(wxKeyEvent& event)
+{
+	if (event.GetKeyCode() == WXK_RETURN)
+	{
+		wxCommandEvent okEvent(wxEVT_BUTTON, wxID_OK);
+		okEvent.SetInt(wxID_OK);
+		GetEventHandler()->ProcessEvent(okEvent);
+	}
+	else if (event.GetKeyCode() == WXK_ESCAPE)
+	{
+		wxCommandEvent cancelEvent(wxEVT_BUTTON, wxID_CANCEL);
+		cancelEvent.SetInt(wxID_CANCEL);
+		GetEventHandler()->ProcessEvent(cancelEvent);
+	}
+	else
+	{
+		event.Skip();
+	}
 }

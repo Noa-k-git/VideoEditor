@@ -14,6 +14,7 @@ VideoSource::VideoSource(std::string path, std::string name) : ISource(path, nam
 
 VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 {
+	VideoSource::videoSources.AddRecord(this);
 }
 
 VideoSource::~VideoSource()

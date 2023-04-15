@@ -42,35 +42,42 @@ std::pair<typename std::vector<T>::iterator, bool> Records<T>::AddRecord(T recor
         records->push_back(record);
     return result;
 }
+
 template <typename T>
 std::pair<typename std::vector<T>::iterator, bool> Records<T>::UpdateName(std::string oldName)
 {
-    auto result = Contains(oldName);
-    if (result.second)
+    auto old = Contains(oldName);
+    if (old.second)
     {
         std::string input = "";
-        result = NameInput(input);
+        auto result = NameInput(input);
+        old.second = result.second;
         if (!result.second)
         {
-            (*result.first)->SetName(input);
+            (*old.first)->SetName(input);
         }
     }
-
-    return result;
+     
+    return old;
 }
 
 template <typename T>
 std::pair<typename std::vector<T>::iterator, bool> Records<T>::NameInput(std::string& newName) {
     std::pair<typename std::vector<T>::iterator, bool> result; 
     result.second = true;
+    int endModal = 0;
     InputDialog* dlg = nullptr;
     do {
         if (dlg != nullptr)
             delete dlg;
         dlg = new InputDialog(NULL, wxT("Change Name"), wxT("Please enter new name for this object: "));
+        endModal = dlg->ShowModal();
         newName = dlg->GetValue().ToStdString();
         result = Contains(newName);
-    } while (result.second && dlg->ShowModal() == wxID_OK);
+    } while (result.second && endModal == wxID_OK);
+    if (endModal != wxID_OK) {
+        result.second = true;
+    }
     return result;
 }
 

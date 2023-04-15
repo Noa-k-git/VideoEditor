@@ -139,6 +139,10 @@ void VideoSourcePanel::onAddButtonClicked(wxCommandEvent& event)
 
 void VideoSourcePanel::onEditButtonClicked(wxCommandEvent& event)
 {
+	VideoSource::videoSources.UpdateName(m_videoSource->GetName());
+	m_videoName->SetLabelText(m_videoSource->GetName());
+	m_mainSizer->Layout();
+	SetSizerAndFit(m_mainSizer);
 }
 
 void VideoSourcePanel::onDeleteButtonClicked(wxCommandEvent& event)
