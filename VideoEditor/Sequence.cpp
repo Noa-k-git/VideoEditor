@@ -57,8 +57,8 @@ void Sequence::SaveVideo(std::string& output_filename)
         return;
     }
     settings.length = video.front()->GetClip().size();
-    settings.resolution[0] = video.front()->GetClip()[0]->width;
-    settings.resolution[1] = video.front()->GetClip()[0]->height;
+    settings.resolution[0] = video.front()->GetClip()[0].GetObject()->width;
+    settings.resolution[1] = video.front()->GetClip()[0].GetObject()->height;
     //// Set the stream parameters
     //stream->codecpar->codec_id = AV_CODEC_ID_H264;
     //stream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
@@ -190,7 +190,8 @@ void Sequence::SaveVideo(std::string& output_filename)
     int frame_count = 0;
     double pts = 0;
     for (auto& clip : video) {
-        for (auto& srcFrame : clip->GetClip()) {
+        for (auto& srcSyncFrame : clip->GetClip()) {
+            auto srcFrame = srcSyncFrame.GetObject();
             // Convert the frame to the output format
             sws_scale(converter,
                 srcFrame->data, srcFrame->linesize, 0, srcFrame->height,

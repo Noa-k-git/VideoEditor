@@ -81,10 +81,13 @@
     <ClCompile Include="InputDialog.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
-    <ClCompile Include="ShowVideoEvent.cpp">
+    <ClCompile Include="ShowVideoPanel.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
-    <ClCompile Include="ShowVideoPanel.cpp">
+    <ClCompile Include="SyncObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferedBitmap.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
   </ItemGroup>
@@ -161,7 +164,10 @@
     <ClInclude Include="ShowVideoPanel.h">
       <Filter>Header Files\Design</Filter>
     </ClInclude>
-    <ClInclude Include="ShowVideoEvent.h">
+    <ClInclude Include="SyncObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferedBitmap.h">
       <Filter>Header Files\Design</Filter>
     </ClInclude>
   </ItemGroup>

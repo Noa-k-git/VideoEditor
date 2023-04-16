@@ -2,6 +2,7 @@
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
 #include "VideoSource.h"
+#include "BufferedBitmap.h"
 
 class ShowVideoPanel : public wxPanel
 {
@@ -10,22 +11,26 @@ public:
 	~ShowVideoPanel() {};
 	void SetVideo(std::vector<AVFrame*>);
 private:
-	wxScrolledWindow* m_videoScrolledWindow; // the video window
-	wxStaticBitmap* m_frameBitmap;
-	double ratio;
+	BufferedBitmap* m_frameBufferedBitmap; // the video window
+	
 	//Sizers
-	wxBoxSizer* m_mainSizer;
-	wxBoxSizer* m_mediaControlSizer;
+	wxBoxSizer* m_mainSizer; // The main sizer
+	wxBoxSizer* m_frameControlSizer; // The sizer with frame display controllers (zoom-in/out)
+	wxBoxSizer* m_mediaControlSizer; // The sizer of media controls
 
-	// media controlls
-	wxButton* m_pausePlay;
-	wxButton* m_gotoStart;
-	wxButton* m_gotoEnd;
-	wxButton* m_prevFrame;
-	wxButton* m_nextFrame;
+	// frame display controllers
+
+	wxButton* m_zoomInButton;
+	wxButton* m_zoomOutButton;
+
+	// media controls
+	wxButton* m_pausePlay; // pause - play button
+	wxButton* m_gotoStart; // goto start button
+	wxButton* m_gotoEnd; // goto end button
+	wxButton* m_prevFrame; // previous frame button
+	wxButton* m_nextFrame; // next frame button
 
 	wxSlider* timeline;
 
-	void OnParentSize(wxSizeEvent&);
 };
 

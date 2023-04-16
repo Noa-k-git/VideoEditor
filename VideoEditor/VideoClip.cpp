@@ -7,7 +7,7 @@ VideoClip::VideoClip(VideoSource* videoSource)
 	this->edges[0] = 0;
 	this->edges[1] = videoSource->GetSource().size() - 1;
 	updated = false;
-	this->clip = new std::vector<AVFrame*>();
+	this->clip = new std::vector<SyncObject<AVFrame*>>();
 }
 
 VideoClip::~VideoClip()
@@ -48,17 +48,15 @@ void VideoClip::ApplyEffects()
 		return;
 	clip->clear();
 	auto lock = videoSource->LockSource();
-	const std::vector<AVFrame*>& sourceFrames = videoSource->GetSource();
-	auto a = sourceFrames.begin();
+	std::vector<SyncObject<AVFrame*>> sourceFrames = videoSource->GetSource();
 	for (auto i = sourceFrames.begin() + edges[0]; i < sourceFrames.begin() + edges[1]; i++) {
-		auto b = a + edges[1];
-		clip->push_back(new AVFrame(**i));
+		clip->push_back(SyncObject<AVFrame*>(av_frame_clone(i->GetObject())));
 	}
 	//std::vector<AVFrame*> framesCopy(sourceFrames.begin()+edges[0], sourceFrames.begin()+edges[1]);
 	// Apply effects to framesCopy
-	for (auto& effect : effects) {
-		effect.Apply(clip);
-	}
+	//for (auto& effect : effects) {
+	//	effect.Apply(clip);
+	//}
 	updated = true;
 	//// Copy the modified frames to the result
 	//std::vector<AVFrame*>& clipRef = *clip;
@@ -66,7 +64,7 @@ void VideoClip::ApplyEffects()
 	//this->updated = true;
 }
 
-vector<AVFrame*>& VideoClip::GetClip()
+vector<SyncObject<AVFrame*>>& VideoClip::GetClip()
 {
 	this->ApplyEffects();
 	return *clip;

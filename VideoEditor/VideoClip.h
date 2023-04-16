@@ -15,7 +15,7 @@ private:
 	VideoSource* videoSource;
 	int edges[2];
 	std::vector<IEffect> effects;
-	std::vector<AVFrame*>* clip;
+	std::vector<SyncObject<AVFrame*>>* clip;
 	bool updated;
 public:
 	VideoClip(VideoSource*);
@@ -23,7 +23,7 @@ public:
 	bool SetStart(int);
 	bool SetEnd(int);
 	void ApplyEffects();
-	vector<AVFrame*>& GetClip();
+	vector<SyncObject<AVFrame*>>& GetClip();
 	std::string ToString() const {
 		
 	}

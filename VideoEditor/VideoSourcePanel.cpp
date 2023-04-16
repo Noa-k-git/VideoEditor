@@ -5,6 +5,8 @@
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
+wxDEFINE_EVENT(SHOW_VIDEO_EVENT, wxCommandEvent);
+
 VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource) : wxPanel(parent, wxID_ANY), m_videoSource(videoSource)
 {
 	const AVFrame* frame = m_videoSource->getFirstFrame();
@@ -110,7 +112,7 @@ VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource) :
 VideoSourcePanel::~VideoSourcePanel()
 {
 	VideoSource::videoSources.RemoveRecord(m_videoSource->GetName());
-	delete m_mainSizer;
+	//delete m_mainSizer;
 	delete m_videoSource;
 	//delete m_thumbnail;
 	//delete m_addButton;
@@ -127,6 +129,10 @@ void VideoSourcePanel::rescaleBitmap(wxBitmap& bitmap, const wxSize& size)
 
 void VideoSourcePanel::onMouseLeftDown(wxMouseEvent& event)
 {
+	wxCommandEvent event_(SHOW_VIDEO_EVENT, GetId());
+	event_.SetEventObject(this);
+	event_.SetString(this->GetName());
+	ProcessWindowEvent(event_);
 }
 
 void VideoSourcePanel::onMouseLeftDoubleClick(wxMouseEvent& event)

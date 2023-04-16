@@ -30,7 +30,7 @@ public:
 	ISource(std::string, std::string);
 	ISource(std::string);
 	virtual ~ISource() {}
-	inline const T& GetSource() const {
+	inline const T& GetSource() {
 		return source_;
 	}
 	inline std::unique_lock<std::mutex> LockSource() {

@@ -4,6 +4,7 @@
 #include "IImg.h"
 #include "IPlayable.h"
 #include "Records.h"
+#include "SyncObject.h"
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -35,7 +36,7 @@ extern "C" {
 #include "Map.h"
 class VideoSource :
     //public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
-    public ISource<std::vector<AVFrame*>>, public IImg, public IPlayable
+    public ISource<std::vector<SyncObject<AVFrame*>>>, public IImg, public IPlayable
 {
 public:
     static Records<VideoSource*> videoSources;

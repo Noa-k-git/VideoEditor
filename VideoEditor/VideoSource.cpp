@@ -19,9 +19,11 @@ VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 
 VideoSource::~VideoSource()
 {
+	VideoSource::videoSources.RemoveRecord(GetName());
 	for (auto& element : source_) {
-		av_frame_free(&element);
-		av_frame_unref(element);
+		auto syncPair = element.GetObjectForUpdate();
+		av_frame_free(&syncPair.second);
+		av_frame_unref(syncPair.second);
 		//av_freep(element);
 	}
 	this->source_.clear();
@@ -31,7 +33,7 @@ VideoSource::~VideoSource()
 void VideoSource::ReadSource()
 {
 	auto lock = this->LockSource();
-	std::vector<AVFrame*> newSource;
+	std::vector<SyncObject<AVFrame*>> newSource;
 
 	cv::VideoCapture vidCapture(path);
 	// prints error message if the stream is invalid
@@ -154,8 +156,8 @@ void VideoSource::ReadSource()
 		//bool isEqual = (cv::sum(Avframe2Cvmat(av_frame) != Avframe2Cvmat(&source[0])) == cv::Scalar(0, 0, 0, 0));
 		//bool isEqual = (cv::sum(im != source[0]) == cv::Scalar(0, 0, 0, 0));
 		//im.release();
-		newSource.push_back(new AVFrame);
-		newSource.back() = av_frame_clone(av_frame);
+		newSource.push_back(SyncObject<AVFrame*>(av_frame_clone(av_frame)));
+
 		/*
 		if (int iRet = av_frame_copy(&source.back(), av_frame) == 0) {
 			av_log(NULL, AV_LOG_INFO, "Ok");
@@ -214,7 +216,7 @@ cv::Mat VideoSource::Avframe2Cvmat(const AVFrame* av_frame)
 
 const AVFrame* VideoSource::getFirstFrame(){
 	auto lock = this->LockSource();
-	return source_.front();
+	return source_.front().GetObject();
 }
 /*
 void VideoSource::ReadSource(std::string path) 
