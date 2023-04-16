@@ -4,6 +4,7 @@
 #include "VideoSource.h"
 #include "VideoClip.h"
 #include "Sequence.h"
+#include "ShowVideoPanel.h"
 #include <wx/wxprec.h>
 #include <wx/splitter.h>
 #include <wx/wrapsizer.h>

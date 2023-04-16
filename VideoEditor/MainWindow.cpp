@@ -71,28 +71,29 @@ MainWindow::MainWindow(wxWindow* parent,
     Bind(wxEVT_BUTTON, &MainWindow::OnImport, this, finalVideoWindow->pausePlay->GetId());
 
     // Setting the video panel for raw videos
-    wxPanel* ogVideoWindowPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition);
-    ogVideoWindowPanel->SetBackgroundColour(wxColor(80, 40, 80));
-    VideoWindow* ogVideoWindow = new VideoWindow(ogVideoWindowPanel, 0, 100);
+    //wxPanel* ogVideoWindowPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition);
+    //ogVideoWindowPanel->SetBackgroundColour(wxColor(80, 40, 80));
+    ShowVideoPanel* ogShowVideoWindowPanel = new ShowVideoPanel(this);
+    //VideoWindow* ogVideoWindow = new VideoWindow(ogVideoWindowPanel, 0, 100);
 
-    ogVideoWindow->timeline->slider->SetSize(wxSize(ogVideoWindow->main->GetSize().GetWidth(), -1));
+    //ogVideoWindow->timeline->slider->SetSize(wxSize(ogVideoWindow->main->GetSize().GetWidth(), -1));
     
     // Configurations
     mainSizer->Layout();
-    ogVideoWindow->timeline->handler->Layout();
-    ogVideoWindow->main->Layout();
+    //ogVideoWindow->timeline->handler->Layout();
+    //ogVideoWindow->main->Layout();
     finalVideoWindow->timeline->handler->Layout();
     finalVideoWindow->main->Layout();
-    Bind(wxEVT_BUTTON, &MainWindow::OnImport, this, ogVideoWindow->pausePlay->GetId());
+    //Bind(wxEVT_BUTTON, &MainWindow::OnImport, this, ogVideoWindow->pausePlay->GetId());
 
     row1Sizer->Add(sourcesPanel, 3, wxEXPAND | wxALL, 10);
-    row1Sizer->Add(ogVideoWindowPanel, 1, wxEXPAND | wxALL, 10);
+    row1Sizer->Add(ogShowVideoWindowPanel, 1, wxEXPAND | wxALL, 10);
     row1Sizer->Add(finalVideoWindowPanel, 1, wxEXPAND | wxALL, 10);
 
     
     this->SetSizerAndFit(mainSizer);
     row1Sizer->Layout();
-    ogVideoWindowPanel->SetSizer(ogVideoWindow->main);
+    //ogVideoWindowPanel->SetSizer(ogVideoWindow->main);
     finalVideoWindowPanel->SetSizer(finalVideoWindow->main);
     statusBar = CreateStatusBar();
     statusBar->SetStatusText(_("Ready!"));
