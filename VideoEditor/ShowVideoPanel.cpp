@@ -47,7 +47,18 @@ ShowVideoPanel::ShowVideoPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
 	SetSizerAndFit(m_mainSizer);
 	//parent->Bind(wxEVT_SIZE, &ShowVideoPanel::OnParentSize, this);
 
+	Bind(SHOW_VIDEO_EVENT, &ShowVideoPanel::SetVideo, this);
 }
-void ShowVideoPanel::SetVideo(std::vector<AVFrame*>)
+
+void ShowVideoPanel::SetVideo(wxCommandEvent& event)
 {
+	auto find = VideoSource::videoSources.Contains(event.GetString().ToStdString());
+	if (find.second) {
+		std::thread t(&ShowVideoPanel::ShowVideo, this, (* find.first)->GetSource());
+	}
+}
+
+void ShowVideoPanel::ShowVideo(std::vector<SyncObject<AVFrame*>> syncFrames)
+{
+
 }

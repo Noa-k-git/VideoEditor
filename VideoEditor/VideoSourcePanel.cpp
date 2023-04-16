@@ -112,8 +112,8 @@ VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource) :
 VideoSourcePanel::~VideoSourcePanel()
 {
 	VideoSource::videoSources.RemoveRecord(m_videoSource->GetName());
-	//delete m_mainSizer;
 	delete m_videoSource;
+	//delete m_mainSizer; // deleted automatically so calling a delete will cause error while exiting
 	//delete m_thumbnail;
 	//delete m_addButton;
 	//delete m_editButton;

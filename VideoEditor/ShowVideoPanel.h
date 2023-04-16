@@ -1,7 +1,7 @@
 #pragma once
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
-#include "VideoSource.h"
+#include "VideoSourcePanel.h"
 #include "BufferedBitmap.h"
 
 class ShowVideoPanel : public wxPanel
@@ -9,7 +9,6 @@ class ShowVideoPanel : public wxPanel
 public:
 	ShowVideoPanel(wxWindow* parent);
 	~ShowVideoPanel() {};
-	void SetVideo(std::vector<AVFrame*>);
 private:
 	BufferedBitmap* m_frameBufferedBitmap; // the video window
 	
@@ -31,6 +30,9 @@ private:
 	wxButton* m_nextFrame; // next frame button
 
 	wxSlider* timeline;
+
+	void SetVideo(wxCommandEvent& event);
+	void ShowVideo(std::vector<SyncObject<AVFrame*>>);
 
 };
 
