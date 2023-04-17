@@ -153,6 +153,7 @@
     <ClCompile Include="ScaleEffect.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="ShowVideoPanel.cpp" />
+    <ClCompile Include="SmallBitmapButton.cpp" />
     <ClCompile Include="SubWindows.cpp" />
     <ClCompile Include="SyncObject.cpp" />
     <ClCompile Include="Transition.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="ScaleEffect.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="ShowVideoPanel.h" />
+    <ClInclude Include="SmallBitmapButton.h" />
     <ClInclude Include="SubWindows.h" />
     <ClInclude Include="SyncObject.h" />
     <ClInclude Include="Transition.h" />

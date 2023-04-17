@@ -16,12 +16,12 @@ bool App::OnInit()
 	CreateConnection();
 	if (!wxApp::OnInit())
 		return false;
-
+	wxImage::AddHandler(new wxPNGHandler);
 	//VideoSource* vs = new VideoSource("C:\\Users\\cyber\\source\\repos\\Noa-k-git\\VideoEditor\\video.mp4");
 	wxDisplay * display = new wxDisplay();
 	
-	MainWindow* main = new MainWindow(nullptr, window::id::MAINWINDOW, _("Main Window"));//, display->GetGeometry().GetPosition(), display->GetGeometry().GetSize());
-	main->SetSize(display->GetClientArea());
+	MainWindow* main = new MainWindow(nullptr, window::id::MAINWINDOW, _("Main Window"), wxPoint(1,1), display->GetClientArea().GetSize());//, display->GetGeometry().GetPosition(), display->GetGeometry().GetSize());
+	//main->SetSize(display->GetClientArea());
 	
 	main->Show();
 	return true;

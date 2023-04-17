@@ -30,14 +30,14 @@ void BufferedBitmap::OnPaint(wxPaintEvent& evt)
 
         double x = (drawSize.GetWidth() - w) / 2;
         double y = (drawSize.GetHeight() - h) / 2;
-
+        
         gc->DrawBitmap(m_bitmap, gc->FromDIP(x), gc->FromDIP(y), gc->FromDIP(w), gc->FromDIP(h));
 
         delete gc;
     }
 }
 
-void BufferedBitmap::SetBitmap(const wxBitmap& bitmap)
+void BufferedBitmap::SetBitmap(const wxBitmap bitmap)
 {
     this->m_bitmap = bitmap;
 

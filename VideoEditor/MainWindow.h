@@ -13,6 +13,7 @@
  #ifndef WX_PRECOMP
 	#include <wx/wx.h>
 #endif
+
  class MainWindow: public wxFrame
 {
 public:
@@ -35,7 +36,8 @@ public:
     DECLARE_EVENT_TABLE();
 private:
     wxStatusBar* statusBar;
-    wxPanel* sourcesPanel;
+    ShowVideoPanel* ogShowVideoPanel;
+    wxScrolledWindow* m_sourcesWindow;
     wxWrapSizer* m_sourcesSizer;
 };
 

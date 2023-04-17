@@ -1,8 +1,15 @@
 #pragma once
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
+#include <chrono>
+#include<atomic>
+#include "App.h"
 #include "VideoSourcePanel.h"
 #include "BufferedBitmap.h"
+#include "Sequence.h"
+
+template <typename T>
+using duration = std::chrono::duration<T>;
 
 class ShowVideoPanel : public wxPanel
 {
@@ -31,8 +38,15 @@ private:
 
 	wxSlider* timeline;
 
+	//wxTimer* refreshTimer;
+
+	std::atomic<bool> paused;
+	std::vector<SyncObject<AVFrame*>>* syncFrames;
+
 	void SetVideo(wxCommandEvent& event);
-	void ShowVideo(std::vector<SyncObject<AVFrame*>>);
-
+	void ShowVideo();
+	void OnZoomIn(wxCommandEvent& event);
+	void OnZoomOut(wxCommandEvent& event);
+	void OnPausePlay(wxCommandEvent& event);
+	void OnTimelineScroll(wxCommandEvent& event);
 };
-

@@ -9,7 +9,7 @@ class BufferedBitmap : public wxScrolledWindow
 public:
 	BufferedBitmap(wxWindow* parent, const wxBitmap& bitmap);
 	void OnPaint(wxPaintEvent& evt);
-	void SetBitmap(const wxBitmap& bitmap);
+	void SetBitmap(const wxBitmap bitmap);
 	const wxBitmap& GetBitmap() const;
 	double GetZoomMultiplier() const;
 	double GetZoomPercentage() const;

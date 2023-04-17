@@ -7,8 +7,9 @@
 
 wxDEFINE_EVENT(SHOW_VIDEO_EVENT, wxCommandEvent);
 
-VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource) : wxPanel(parent, wxID_ANY), m_videoSource(videoSource)
+VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource, wxWindowID showWindow) : wxPanel(parent, wxID_ANY), m_videoSource(videoSource)
 {
+	m_showWindowID = showWindow;
 	const AVFrame* frame = m_videoSource->getFirstFrame();
 	AVFrame* rgbFrame = av_frame_alloc(); // a copy frame of the first frame in the videoSource
 	 // set the properties of the copy to match the og frame
@@ -30,7 +31,8 @@ VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource) :
 	);
 
 	// Convert the frame from YUV to RGB
-	sws_scale(swsContext, frame->data, frame->linesize, 0, frame->height, rgbFrame->data, rgbFrame->linesize);
+	sws_scale(swsContext, frame->data, frame->linesize, 0,
+		frame->height, rgbFrame->data, rgbFrame->linesize);
 	// Clean up
 	sws_freeContext(swsContext);
 
@@ -61,30 +63,19 @@ VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource) :
 	m_videoName = new wxStaticText(this, wxID_ANY, m_videoSource->GetName(), wxDefaultPosition, wxSize(thumbnailSize.GetWidth(), -1));
 	m_videoName->SetForegroundColour(wxColor(240, 240, 240));
 
-	wxImage::AddHandler(new wxPNGHandler);
-	wxSize iconSize(20, 20);
-	wxSize bSize(30, 30);
-	wxColour bColor(80, 80, 80);
-	// Create add button
 	std::string iconColor = "white";
 	wxBitmap addIcon(iconColor + (std::string)"Add.png", wxBITMAP_TYPE_PNG);
-	rescaleBitmap(addIcon, iconSize);
-	m_addButton = new wxBitmapButton(this, wxID_ANY, addIcon, wxDefaultPosition, bSize, wxBU_AUTODRAW|wxBORDER_NONE);
+	m_addButton = new SmallBitmapButton(this, wxID_ANY, addIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW|wxBORDER_NONE);
 	m_addButton->SetToolTip(new wxToolTip("Add to sequence"));
-	m_addButton->SetBackgroundColour(bColor);
 	// Create edit button with pencil icon
 	wxBitmap editIcon(iconColor + (std::string)"Edit.png", wxBITMAP_TYPE_PNG);
-	rescaleBitmap(editIcon, iconSize);
-	m_editButton = new wxBitmapButton(this, wxID_ANY, editIcon, wxDefaultPosition, bSize, wxBU_AUTODRAW| wxBORDER_NONE);
+	m_editButton = new SmallBitmapButton(this, wxID_ANY, editIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW| wxBORDER_NONE);
 	m_editButton->SetToolTip(new wxToolTip("Change name"));
-	m_editButton->SetBackgroundColour(bColor);
 
 	// Create delete button with trashcan icon
 	wxBitmap deleteIcon(iconColor + (std::string)"Delete.png", wxBITMAP_TYPE_PNG);
-	rescaleBitmap(deleteIcon, iconSize);
-	m_deleteButton = new wxBitmapButton(this, wxID_ANY, deleteIcon, wxDefaultPosition, bSize, wxBU_AUTODRAW|wxBORDER_NONE);
+	m_deleteButton = new SmallBitmapButton(this, wxID_ANY, deleteIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW|wxBORDER_NONE);
 	m_deleteButton->SetToolTip(new wxToolTip("Delete source"));
-	m_deleteButton->SetBackgroundColour(bColor);
 
 	// Set up event handlers
 	//m_thumbnailButton->Bind(wxEVT_LEFT_DCLICK, &VideoSourcePanel::onMouseLeftDoubleClick, this);
@@ -131,8 +122,13 @@ void VideoSourcePanel::onMouseLeftDown(wxMouseEvent& event)
 {
 	wxCommandEvent event_(SHOW_VIDEO_EVENT, GetId());
 	event_.SetEventObject(this);
-	event_.SetString(this->GetName());
-	ProcessWindowEvent(event_);
+	event_.SetString(m_videoSource->GetName());
+	
+	wxWindow* window = FindWindowById(m_showWindowID);
+	if (window != nullptr) {
+		wxPostEvent(window, event_);
+	}
+	
 }
 
 void VideoSourcePanel::onMouseLeftDoubleClick(wxMouseEvent& event)

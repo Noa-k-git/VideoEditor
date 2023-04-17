@@ -90,6 +90,9 @@
     <ClCompile Include="BufferedBitmap.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
+    <ClCompile Include="SmallBitmapButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceID.h">
@@ -169,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="BufferedBitmap.h">
       <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="SmallBitmapButton.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -39,62 +39,62 @@ MainWindow::MainWindow(wxWindow* parent,
     --------------------------------|
     
     */
-    //wxSplitterWindow* mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_BORDER| wxSP_LIVE_UPDATE);
-    //mainSplitter->SetMinimumPaneSize(25);
-    //
-    //wxSplitterWindow* upperSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_BORDER | wxSP_LIVE_UPDATE);
-    //wxSplitterWindow* bottomSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_BORDER | wxSP_LIVE_UPDATE);
 
-    //mainSplitter->SplitVertically(upperSplitter, bottomSplitter);
-    //wxPanel* sourcesPanel = new wxPanel(upperSplitter, wxID_ANY);
+    wxSplitterWindow* mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+        wxSP_LIVE_UPDATE);
+    mainSplitter->SetBackgroundColour(wxColor(200, 100, 100));
 
+    wxSplitterWindow* topSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+        wxSP_BORDER | wxSP_LIVE_UPDATE);
+    //topSplitter->SetBackgroundColour(wxColor(200, 100, 200));
 
-    wxBoxSizer * mainSizer = new wxBoxSizer(wxVERTICAL);
-    wxBoxSizer * row1Sizer = new wxBoxSizer(wxHORIZONTAL);
-    wxBoxSizer * row2Sizer = new wxBoxSizer(wxHORIZONTAL);
-    mainSizer->Add(row1Sizer,1, wxEXPAND);
-    mainSizer->Add(row2Sizer,1, wxEXPAND);
+    wxSplitterWindow* videoWindowSplitter= new wxSplitterWindow(topSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+        wxSP_BORDER | wxSP_LIVE_UPDATE);
+    videoWindowSplitter->SetBackgroundColour(wxColor(100, 200, 100));
+
+    wxSplitterWindow* bottomSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+        wxSP_BORDER | wxSP_LIVE_UPDATE);
+    bottomSplitter->SetBackgroundColour(wxColor(100, 0, 100));
     
-    sourcesPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition);
-    sourcesPanel->SetBackgroundColour(wxColor(230, 230, 100));
+    wxPanel* sourcesPanel_ = new wxPanel(topSplitter, wxID_ANY);
 
+    m_sourcesWindow = new wxScrolledWindow(sourcesPanel_, wxID_ANY, wxDefaultPosition);
+    m_sourcesWindow->SetBackgroundColour(wxColor(230, 230, 100));
+
+    wxBoxSizer* sourcesLayoutBoxSizer_ = new wxBoxSizer(wxVERTICAL);
+    wxStaticText* sourcesTitle_ = new wxStaticText(sourcesPanel_, wxID_ANY, "Sources");
+    sourcesTitle_->SetForegroundColour(wxColor(240, 240, 240));
+    std::string iconColor = "white";
+    wxBitmap addIcon(iconColor + (std::string)"Add.png", wxBITMAP_TYPE_PNG);
+    SmallBitmapButton* importVideoButton = new SmallBitmapButton(sourcesPanel_, wxID_ANY, addIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | wxBORDER_NONE);
+    importVideoButton->SetToolTip(new wxToolTip("Import Video"));
+    importVideoButton->Bind(wxEVT_BUTTON, &MainWindow::OnImport, this);
+
+    sourcesLayoutBoxSizer_->Add(sourcesTitle_, 0, wxALL, 10);
+    sourcesLayoutBoxSizer_->Add(m_sourcesWindow, 1, wxEXPAND);
+    sourcesLayoutBoxSizer_->Add(importVideoButton, 0, wxEXPAND);
+    sourcesPanel_->SetSizer(sourcesLayoutBoxSizer_);
+    
     m_sourcesSizer = new wxWrapSizer(wxHORIZONTAL);
-    sourcesPanel->SetSizer(m_sourcesSizer);
-    
+    m_sourcesWindow->SetSizer(m_sourcesSizer);
+    m_sourcesWindow->SetScrollRate(FromDIP(5), FromDIP(5));
     // Setting the video panel for the final version
-    wxPanel* finalVideoWindowPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition);
-    finalVideoWindowPanel->SetBackgroundColour(wxColor(50, 50, 80));
-    VideoWindow* finalVideoWindow = new VideoWindow(finalVideoWindowPanel, 0, 100);
+    ShowVideoPanel* finalVideoPanel = new ShowVideoPanel(videoWindowSplitter);
+    ogShowVideoPanel = new ShowVideoPanel(videoWindowSplitter);
 
-    finalVideoWindow->timeline->slider->SetSize(wxSize(finalVideoWindow->main->GetSize().GetWidth(), -1));
-    
-    Bind(wxEVT_BUTTON, &MainWindow::OnImport, this, finalVideoWindow->pausePlay->GetId());
+    finalVideoPanel->SetBackgroundColour(wxColor(50, 50, 80));
 
-    // Setting the video panel for raw videos
-    //wxPanel* ogVideoWindowPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition);
-    //ogVideoWindowPanel->SetBackgroundColour(wxColor(80, 40, 80));
-    ShowVideoPanel* ogShowVideoWindowPanel = new ShowVideoPanel(this);
-    //VideoWindow* ogVideoWindow = new VideoWindow(ogVideoWindowPanel, 0, 100);
 
-    //ogVideoWindow->timeline->slider->SetSize(wxSize(ogVideoWindow->main->GetSize().GetWidth(), -1));
-    
-    // Configurations
-    mainSizer->Layout();
-    //ogVideoWindow->timeline->handler->Layout();
-    //ogVideoWindow->main->Layout();
-    finalVideoWindow->timeline->handler->Layout();
-    finalVideoWindow->main->Layout();
-    //Bind(wxEVT_BUTTON, &MainWindow::OnImport, this, ogVideoWindow->pausePlay->GetId());
+    wxPanel* fake = new wxPanel(bottomSplitter);
+    fake->SetBackgroundColour(wxColor(5, 203, 32));
+    wxPanel* fake1 = new wxPanel(bottomSplitter);
+    fake1->SetBackgroundColour(wxColor(82, 34, 234));
 
-    row1Sizer->Add(sourcesPanel, 3, wxEXPAND | wxALL, 10);
-    row1Sizer->Add(ogShowVideoWindowPanel, 1, wxEXPAND | wxALL, 10);
-    row1Sizer->Add(finalVideoWindowPanel, 1, wxEXPAND | wxALL, 10);
+    videoWindowSplitter->SplitVertically(ogShowVideoPanel, finalVideoPanel, 0.5);
+    topSplitter->SplitVertically(sourcesPanel_, videoWindowSplitter, 0.5);
+    bottomSplitter->SplitVertically(fake, fake1,0.5);
+    mainSplitter->SplitHorizontally(topSplitter, bottomSplitter, 0.5);
 
-    
-    this->SetSizerAndFit(mainSizer);
-    row1Sizer->Layout();
-    //ogVideoWindowPanel->SetSizer(ogVideoWindow->main);
-    finalVideoWindowPanel->SetSizer(finalVideoWindow->main);
     statusBar = CreateStatusBar();
     statusBar->SetStatusText(_("Ready!"));
 }
@@ -148,7 +148,7 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
         if (thread.joinable())
             thread.join();
     }
-    auto vsPanel = new VideoSourcePanel(sourcesPanel, v);
+    auto vsPanel = new VideoSourcePanel(m_sourcesWindow, v, ogShowVideoPanel->GetId());
     //statusBar->SetStatusText(_("Finished"));
 
     m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
