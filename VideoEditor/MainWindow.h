@@ -32,6 +32,7 @@ public:
     void onQuit(wxCommandEvent& event);
     void onClose(wxCloseEvent& event);
     void onHelp(wxCommandEvent& event);
+    inline void OnRefresh(wxCommandEvent& event_);
 
     DECLARE_EVENT_TABLE();
 private:

@@ -97,6 +97,8 @@ MainWindow::MainWindow(wxWindow* parent,
 
     statusBar = CreateStatusBar();
     statusBar->SetStatusText(_("Ready!"));
+    this->Bind(WIDGET_DELETED_EVENT, &MainWindow::OnRefresh, this);
+
 }
 
 MainWindow::~MainWindow()
@@ -141,20 +143,44 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
     ////delete vc;
     //delete vs;
     //wxMessageBox("Processing video");
-    auto v = new VideoSource(filePath);
-    statusBar->PushStatusText(_("Processing Video: " + v->GetName()));
-    wxMessageOutputDebug().Printf("Processing Video...");
-    for (auto& thread : *ISource<std::vector<AVFrame*>>::readingThreads) {
-        if (thread.joinable())
-            thread.join();
-    }
-    auto vsPanel = new VideoSourcePanel(m_sourcesWindow, v, ogShowVideoPanel->GetId());
-    //statusBar->SetStatusText(_("Finished"));
+    //auto processVideoLambda = 
+    std::thread t([this, filePath]() {
+        VideoSource* v = new VideoSource(filePath);
+        wxGetApp().CallAfter([this]() {
+            statusBar->PushStatusText(_("Processing Video..."));
+            wxMessageOutputDebug().Printf("Processing Video...");
+            });
+        if (v->GetCreated())
+        {
+            wxGetApp().CallAfter([this]() {
 
-    m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
+                });
+            for (auto& thread : *ISource<std::vector<SyncObject<AVFrame*>>>::readingThreads) {
+                if (thread.joinable())
+                {
+                    thread.join();
+                }
+            }
+            wxGetApp().CallAfter([this, v]() {
+                auto vsPanel = new VideoSourcePanel(m_sourcesWindow, v, ogShowVideoPanel->GetId());
+                //statusBar->SetStatusText(_("Finished"));
+                m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
+                m_sourcesSizer->Layout();
+                });
+        }
+        else {
+            delete v;
+            wxGetApp().CallAfter([&]() {
+                wxMessageBox(_("Video is already defined... If not try first to change the video name"), _("Error in importing video"));
+                });
+        }
+        wxGetApp().CallAfter([&]() {
+            statusBar->PopStatusText();
+            });
+        });
 
-    m_sourcesSizer->Layout();
-    statusBar->PopStatusText();
+    t.detach();
+
     //for (auto vs : *VideoSource::videoSources.GetRecords()) {
     //    auto x = new VideoSourcePanel(sourcesPanel, vs);
     //    m_sourcesSizer->Add(x);
@@ -164,6 +190,11 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
     //(*Sequence::sequences.Contains("a").first)->AddClip(new VideoClip(*VideoSource::videoSources.Contains("v").first));
     //std::string fname = "RecordVideo.mp4";
     //(*Sequence::sequences.Contains("a").first)->SaveVideo(fname);
+}
+
+void MainWindow::OnRefresh(wxCommandEvent& event_)
+{
+    this->m_sourcesWindow->Layout();
 }
 
 //void MainWindow::OnWindowSize(wxSizeEvent& event)

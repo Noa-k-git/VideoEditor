@@ -6,7 +6,7 @@
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
 wxDEFINE_EVENT(SHOW_VIDEO_EVENT, wxCommandEvent);
-
+wxDEFINE_EVENT(WIDGET_DELETED_EVENT, wxCommandEvent);
 VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource, wxWindowID showWindow) : wxPanel(parent, wxID_ANY), m_videoSource(videoSource)
 {
 	m_showWindowID = showWindow;
@@ -149,6 +149,10 @@ void VideoSourcePanel::onEditButtonClicked(wxCommandEvent& event)
 
 void VideoSourcePanel::onDeleteButtonClicked(wxCommandEvent& event)
 {
-	wxMessageBox("delete");
+	wxWindow* topLevelParent = wxGetTopLevelParent(this);
+	wxCommandEvent event_(WIDGET_DELETED_EVENT, GetId());
+	event_.SetEventObject(this);
+	Destroy();
+	wxPostEvent(topLevelParent, event_);
 }
 

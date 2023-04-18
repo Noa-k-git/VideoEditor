@@ -9,27 +9,47 @@ Records<VideoSource*> VideoSource::videoSources;
 
 VideoSource::VideoSource(std::string path, std::string name) : ISource(path, name), IImg(), IPlayable()
 {
-	VideoSource::videoSources.AddRecord(this);
+	if (!VideoSource::videoSources.AddRecord(this).second) {
+		created = false;
+	}
+	else {
+		std::thread readData(&VideoSource::ReadSource, this);
+		readingThreads->push_back(std::move(readData));
+		created = true;
+	}
 }
 
 VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 {
-	VideoSource::videoSources.AddRecord(this);
+	if (!VideoSource::videoSources.AddRecord(this).second)
+	{
+		created = false;
+	}
+	else {
+		std::thread readData(&VideoSource::ReadSource, this);
+		readingThreads->push_back(std::move(readData));
+		created = true;
+	}
 }
 
 VideoSource::~VideoSource()
 {
-	VideoSource::videoSources.RemoveRecord(GetName());
-	for (auto& element : source_) {
-		auto syncPair = element.GetObjectForUpdate();
-		av_frame_free(&syncPair.second);
-		av_frame_unref(syncPair.second);
-		//av_freep(element);
+	if (created) {
+		VideoSource::videoSources.RemoveRecord(GetName());
+		for (auto& element : source_) {
+			auto syncPair = element.GetObjectForUpdate();
+			av_frame_free(&syncPair.second);
+			av_frame_unref(syncPair.second);
+			//av_freep(element);
+		}
+		this->source_.clear();
 	}
-	this->source_.clear();
 	//std::vector<cv::Mat>().swap(source);
 }
-
+bool VideoSource::GetCreated()
+{
+	return created;
+}
 void VideoSource::ReadSource()
 {
 	auto lock = this->LockSource();

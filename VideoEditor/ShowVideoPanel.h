@@ -48,5 +48,9 @@ private:
 	void OnZoomIn(wxCommandEvent& event);
 	void OnZoomOut(wxCommandEvent& event);
 	void OnPausePlay(wxCommandEvent& event);
+	void OnGotoStart(wxCommandEvent& event_);
+	void OnGotoEnd(wxCommandEvent& event_);
+	void OnPrevFrame(wxCommandEvent& event_);
+	void OnNextFrame(wxCommandEvent& event_);
 	void OnTimelineScroll(wxCommandEvent& event);
 };

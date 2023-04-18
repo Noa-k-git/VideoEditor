@@ -49,17 +49,7 @@ ISource<T>::ISource(std::string path, std::string name) : UniqueName(name) {
 	this->path = path;
 	//std::thread readData(std::bind(&ISource::ReadSource, this, path));
 	//std::thread readData(&ISource::ReadSource, this, path);
-	std::thread readData([&]() {
-		try {
-			// Call the ReadSource function
-			this->ReadSource();
-		}
-		catch (const std::exception& e) {
-			// Handle the exception
-			wxMessageBox(std::string("Exception caught in readData thread: ") + std::string(e.what()));
-		}
-		});
-	ISource::readingThreads->push_back(std::move(readData));
+
 	// TODO: handle object getting deleted
 }
 template <typename T>

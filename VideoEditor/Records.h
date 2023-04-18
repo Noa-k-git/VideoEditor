@@ -33,13 +33,14 @@ template <typename T>
 std::pair<typename std::vector<T>::iterator, bool> Records<T>::AddRecord(T record) {
     auto result = Contains(record->GetName());
     if (result.second) {
-        InputDialog* dlg = nullptr;
-        std::string input = "";
-        result = NameInput(input);
-        record->SetName(input);
+        //InputDialog* dlg = nullptr;
+        //std::string input = "";
+        //result = NameInput(input);
+        //record->SetName(input);
     }
     if (!result.second)
         records->push_back(record);
+    result.second = !result.second;
     return result;
 }
 

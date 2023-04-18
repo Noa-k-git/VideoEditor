@@ -5,6 +5,7 @@
 
 
 wxDECLARE_EVENT(SHOW_VIDEO_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(WIDGET_DELETED_EVENT, wxCommandEvent);
 
 class VideoSourcePanel :
     public wxPanel

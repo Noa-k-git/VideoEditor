@@ -29,18 +29,28 @@ ShowVideoPanel::ShowVideoPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
 	m_frameControlSizer->Add(m_zoomOutButton, 0, wxLEFT, FromDIP(5));
 
 	m_gotoStart = new wxButton(this, wxID_ANY, "<<", wxDefaultPosition);
+	m_gotoStart->SetToolTip(new wxToolTip(_("Goto Start")));
+
 	m_prevFrame = new wxButton(this, wxID_ANY, "<");
+	m_prevFrame->SetToolTip(new wxToolTip(_("Previous Frame")));
+
 	m_pausePlay = new wxButton(this, wxID_ANY, "| |");
+	m_pausePlay->SetToolTip(new wxToolTip(_("Play/Pause")));
+
 	m_nextFrame = new wxButton(this, wxID_ANY, ">");
+	m_nextFrame->SetToolTip(new wxToolTip(_("Next Frame")));
+
 	m_gotoEnd = new wxButton(this, wxID_ANY, ">>");
+	m_gotoEnd->SetToolTip(new wxToolTip(_("Goto End")));
+
 	timeline = new wxSlider(this, wxID_ANY, 0, 0, 1, wxDefaultPosition);
 
 	wxBoxSizer* hMediabuttonSizer_ = new wxBoxSizer(wxHORIZONTAL);
-	hMediabuttonSizer_->Add(m_gotoStart, 1, wxEXPAND | wxLEFT | wxRIGHT, 5);
-	hMediabuttonSizer_->Add(m_prevFrame, 1, wxEXPAND | wxLEFT | wxRIGHT, 5);
-	hMediabuttonSizer_->Add(m_pausePlay, 2, wxEXPAND | wxLEFT | wxRIGHT, 5);
-	hMediabuttonSizer_->Add(m_nextFrame, 1, wxEXPAND | wxLEFT | wxRIGHT, 5);
-	hMediabuttonSizer_->Add(m_gotoEnd, 1, wxEXPAND | wxLEFT | wxRIGHT, 5);
+	hMediabuttonSizer_->Add(m_gotoStart, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBU_EXACTFIT, 5);
+	hMediabuttonSizer_->Add(m_prevFrame, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBU_EXACTFIT, 5);
+	hMediabuttonSizer_->Add(m_pausePlay, 2, wxEXPAND | wxLEFT | wxRIGHT | wxBU_EXACTFIT, 5);
+	hMediabuttonSizer_->Add(m_nextFrame, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBU_EXACTFIT, 5);
+	hMediabuttonSizer_->Add(m_gotoEnd, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBU_EXACTFIT, 5);
 	
 	m_mediaControlSizer = new wxBoxSizer(wxVERTICAL);
 	m_mediaControlSizer->Add(hMediabuttonSizer_, 0, wxEXPAND);
@@ -58,6 +68,11 @@ ShowVideoPanel::ShowVideoPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
 	m_zoomInButton->Bind(wxEVT_BUTTON, &ShowVideoPanel::OnZoomIn, this);
 	m_zoomOutButton->Bind(wxEVT_BUTTON, &ShowVideoPanel::OnZoomOut, this);
 	m_pausePlay->Bind(wxEVT_BUTTON, &ShowVideoPanel::OnPausePlay, this);
+	m_gotoStart->Bind(wxEVT_BUTTON, &ShowVideoPanel::OnGotoStart, this);
+	m_gotoEnd->Bind(wxEVT_BUTTON, &ShowVideoPanel::OnGotoEnd, this);
+	m_prevFrame->Bind(wxEVT_BUTTON, &ShowVideoPanel::OnPrevFrame, this);
+	m_nextFrame->Bind(wxEVT_BUTTON, &ShowVideoPanel::OnNextFrame, this);
+	
 	timeline->Bind(wxEVT_SLIDER, &ShowVideoPanel::OnTimelineScroll, this);
 	//refreshTimer = new wxTimer(this, wxID_ANY);
 	//this->Bind(wxEVT_TIMER, [this](wxTimerEvent&) { 
@@ -73,7 +88,7 @@ void ShowVideoPanel::SetVideo(wxCommandEvent& event_)
 	if (findVid.second) {
 		syncFrames = &(*findVid.first)->GetSource();
 		timeline->SetValue(0);
-		timeline->SetMax(syncFrames->size());
+		timeline->SetMax(syncFrames->size()-1);
 		std::thread t(&ShowVideoPanel::ShowVideo, this);
 		t.detach();
 	} else {
@@ -93,7 +108,8 @@ void ShowVideoPanel::ShowVideo()
 	//int pos = timeline->GetValue();
 	int pos = timeline->GetValue();
 	auto startTime = std::chrono::steady_clock::now();
-	const int fps = 30;
+	//const int fps = 30;
+	const double fps = 30;
 	auto timeInterval = duration<double>(1.0 / fps);
 	//const int sleep_time_us = 1000000 / fps;  // sleep time in microseconds
 
@@ -117,12 +133,18 @@ void ShowVideoPanel::ShowVideo()
 		SWS_BILINEAR, NULL, NULL, NULL
 	);
 	constexpr std::chrono::duration<double> minSleepDuration(0);
-	while (pos < videoLength) {
+	while (pos < videoLength-1) {
 		pos = timeline->GetValue();
+		videoLength = syncFrames->size();
+		if (syncFrames == nullptr || videoLength==0)
+			break;
 		auto& syncframe = syncFrames->at(pos);
 		pos++;
 
 		timeline->SetValue(pos);
+
+		if (std::addressof(syncframe) == nullptr)
+			break;
 		auto frame = syncframe.GetObject();
 
 
@@ -144,7 +166,7 @@ void ShowVideoPanel::ShowVideo()
 			m_frameBufferedBitmap->SetBitmap(bitmap);
 			});
 		if (paused.load())
-			return;
+			break;
 	} 
 	// Clean up
 	sws_freeContext(swsContext);
@@ -176,4 +198,27 @@ void ShowVideoPanel::OnTimelineScroll(wxCommandEvent& event)
 	this->paused.store(true);
 	std::thread t(&ShowVideoPanel::ShowVideo, this);
 	t.detach();
+}
+
+void ShowVideoPanel::OnGotoStart(wxCommandEvent& event_) {
+	this->paused.store(true);
+	this->timeline->SetValue(0);
+	ShowVideo();
+}
+
+void ShowVideoPanel::OnGotoEnd(wxCommandEvent& event_) {
+	this->paused.store(true);
+	this->timeline->SetValue(timeline->GetMax()-1);
+	ShowVideo();
+}
+
+void ShowVideoPanel::OnPrevFrame(wxCommandEvent& event_) {
+	this->paused.store(true);
+	this->timeline->SetValue(timeline->GetValue() - 2); // this is also solves range errors
+	ShowVideo();
+}
+
+void ShowVideoPanel::OnNextFrame(wxCommandEvent& event_) {
+	this->paused.store(true);
+	ShowVideo();
 }
