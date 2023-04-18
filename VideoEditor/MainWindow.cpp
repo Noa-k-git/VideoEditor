@@ -85,14 +85,14 @@ MainWindow::MainWindow(wxWindow* parent,
     finalVideoPanel->SetBackgroundColour(wxColor(50, 50, 80));
 
 
-    wxPanel* fake = new wxPanel(bottomSplitter);
-    fake->SetBackgroundColour(wxColor(5, 203, 32));
-    wxPanel* fake1 = new wxPanel(bottomSplitter);
-    fake1->SetBackgroundColour(wxColor(82, 34, 234));
+    wxPanel* sequenceWindow = new wxPanel(bottomSplitter);
+    sequenceWindow->SetBackgroundColour(wxColor(5, 203, 32));
+    wxPanel* effectWindow = new wxPanel(bottomSplitter);
+    effectWindow->SetBackgroundColour(wxColor(82, 34, 234));
 
     videoWindowSplitter->SplitVertically(ogShowVideoPanel, finalVideoPanel, 0.5);
     topSplitter->SplitVertically(sourcesPanel_, videoWindowSplitter, 0.5);
-    bottomSplitter->SplitVertically(fake, fake1,0.5);
+    bottomSplitter->SplitVertically(sequenceWindow, effectWindow,0.5);
     mainSplitter->SplitHorizontally(topSplitter, bottomSplitter, 0.5);
 
     statusBar = CreateStatusBar();
