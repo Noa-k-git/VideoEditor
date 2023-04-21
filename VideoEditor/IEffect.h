@@ -1,5 +1,5 @@
 #include<opencv2/opencv.hpp>
-#include <vector>;
+#include <vector>
 
 extern "C" {
 #include <libavcodec/avcodec.h>

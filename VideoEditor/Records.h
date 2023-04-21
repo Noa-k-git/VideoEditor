@@ -17,7 +17,7 @@ public:
     std::vector<T>* GetRecords() const;
 private:
     std::pair<typename std::vector<T>::iterator, bool> NameInput(std::string&);
-    std::vector<T> * records;
+    std::vector<T> * videoSources;
 };
 
 //#include "records.h"
@@ -27,7 +27,7 @@ private:
 template <typename T>
 Records<T>::Records() {
     static_assert(std::is_base_of<UniqueName, std::remove_pointer_t<T>>::value, "Derived not derived from UniqueName");
-    this->records = new std::vector<T>();
+    this->videoSources = new std::vector<T>();
 }
 template <typename T>
 std::pair<typename std::vector<T>::iterator, bool> Records<T>::AddRecord(T record) {
@@ -39,7 +39,7 @@ std::pair<typename std::vector<T>::iterator, bool> Records<T>::AddRecord(T recor
         //record->SetName(input);
     }
     if (!result.second)
-        records->push_back(record);
+        videoSources->push_back(record);
     result.second = !result.second;
     return result;
 }
@@ -87,18 +87,18 @@ void Records<T>::RemoveRecord(std::string name) {
     auto result = Contains(name);
 
     if (result.second)
-        records->erase(result.first);
+        videoSources->erase(result.first);
 }
 
 template <typename T>
 std::pair<typename std::vector<T>::iterator, bool> Records<T>::Contains(std::string name) {
-    auto it = std::find_if(records->begin(), records->end(), [&](const T record) {
+    auto it = std::find_if(videoSources->begin(), videoSources->end(), [&](const T record) {
         return record->GetName() == name;
         });
-    return std::make_pair(it, it != records->end());
+    return std::make_pair(it, it != videoSources->end());
 }
 
 template <typename T>
 std::vector<T>* Records<T>::GetRecords() const {
-    return records;
+    return videoSources;
 }

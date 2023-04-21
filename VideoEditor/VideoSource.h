@@ -36,16 +36,18 @@ extern "C" {
 #include "Map.h"
 class VideoSource :
     //public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
-    public ISource<std::vector<SyncObject<AVFrame*>>>, public IImg, public IPlayable
+    public ISource<std::vector<SyncObject<AVFrame*>>>, public IImg, public IPlayable<AVFrame*>
 {
 public:
     static Records<VideoSource*> videoSources;
     VideoSource(std::string, std::string);
     VideoSource(std::string);
     virtual ~VideoSource();
+    int GetSize() override;
+    SyncObject<AVFrame*>& GetChunk(int at) override;
     void Show() override;
     void Play() override;
-    bool GetCreated();
+    inline bool GetCreated();
 
     const AVFrame* getFirstFrame();
 private:
@@ -56,3 +58,8 @@ private:
     //AVFrame* Cvmat2Avframe(cv::Mat* image, AVFrame* frame);
 };
 extern Records<VideoSource*> videoSources;
+
+inline bool VideoSource::GetCreated()
+{
+    return created;
+}

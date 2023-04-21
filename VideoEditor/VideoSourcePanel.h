@@ -1,6 +1,7 @@
 #pragma once
 #include <wx/panel.h>
 #include "VideoSource.h"
+#include "Sequence.h"
 #include "SmallBitmapButton.h"
 
 

@@ -1,6 +1,6 @@
 #include "VideoSourcePanel.h"
 #include <libswscale/swscale.h>
-#undef av_err2str(errnum)
+#undef av_err2str
 //extern char x[AV_ERROR_MAX_STRING_SIZE];
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)

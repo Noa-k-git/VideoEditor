@@ -1,10 +1,10 @@
 #pragma once
-
+#include "SyncObject.h"
+template <typename T>
 class IPlayable {
 public:
-	int fps;
-	int length;
-	IPlayable() { length = 0; fps = 30; }
-	virtual ~IPlayable() {}
-	void virtual Play() = 0;
+	virtual SyncObject<T>& GetChunk(int) = 0;
+	virtual int GetSize() = 0;
+	virtual ~IPlayable() {};
+	virtual void Play() = 0;
 };

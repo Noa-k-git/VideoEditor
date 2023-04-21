@@ -1,6 +1,6 @@
 #include "VideoSource.h"
 
-#undef av_err2str(errnum)
+#undef av_err2str
 char x[AV_ERROR_MAX_STRING_SIZE];
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
@@ -46,39 +46,41 @@ VideoSource::~VideoSource()
 	}
 	//std::vector<cv::Mat>().swap(source);
 }
-bool VideoSource::GetCreated()
+
+int VideoSource::GetSize()
 {
-	return created;
+	return source_.size();
 }
+
 void VideoSource::ReadSource()
 {
 	auto lock = this->LockSource();
 	std::vector<SyncObject<AVFrame*>> newSource;
 
-	cv::VideoCapture vidCapture(path);
-	// prints error message if the stream is invalid
-	if (!vidCapture.isOpened())
-	{
-		wxMessageBox("Error openning video stream of file with OpenCV");
-		return;
-	}
-	else
-	{
-		// Obtain fps and frame count by get() method and print
-		// You can replace 5 with CAP_PROP_FPS as well, they are enumerations
-		this->fps = vidCapture.get(5);
-		std::cout << "Frames per second :" << this->fps << std::endl;
+	//cv::VideoCapture vidCapture(path);
+	//// prints error message if the stream is invalid
+	//if (!vidCapture.isOpened())
+	//{
+	//	wxMessageBox("Error openning video stream of file with OpenCV");
+	//	return;
+	//}
+	//else
+	//{
+	//	// Obtain fps and frame count by get() method and print
+	//	// You can replace 5 with CAP_PROP_FPS as well, they are enumerations
+	//	this->fps = vidCapture.get(5);
+	//	std::cout << "Frames per second :" << this->fps << std::endl;
 
-		// Obtain frame_count using opencv built in frame count reading method
-		// You can replace 7 with CAP_PROP_FRAME_COUNT as well, they are enumerations
-		this->length = vidCapture.get(7); // number of frames
+	//	// Obtain frame_count using opencv built in frame count reading method
+	//	// You can replace 7 with CAP_PROP_FRAME_COUNT as well, they are enumerations
+	//	this->length = vidCapture.get(7); // number of frames
 
-		this->resolution[0] = vidCapture.get(cv::CAP_PROP_FRAME_WIDTH);
-		this->resolution[1] = vidCapture.get(cv::CAP_PROP_FRAME_HEIGHT);
-		std::cout << "  Frame count :" << this->length << std::endl;
-	}
+	//	this->resolution[0] = vidCapture.get(cv::CAP_PROP_FRAME_WIDTH);
+	//	this->resolution[1] = vidCapture.get(cv::CAP_PROP_FRAME_HEIGHT);
+	//	std::cout << "  Frame count :" << this->length << std::endl;
+	//}
 
-	vidCapture.release(); // closes the file
+	//vidCapture.release(); // closes the file
 
 	// Open the file using libavformat
 	AVFormatContext* av_format_ctx = avformat_alloc_context();
@@ -196,26 +198,6 @@ void VideoSource::ReadSource()
 	avcodec_free_context(&av_codec_ctx);
 	//this->LockSource();
 	source_.swap(newSource);
-
-	//FILE* f = fopen(path.c_str(), "rb");
-	//for (int i = 0; i < 200; i++)
-	//{
-	//	AVFrame* pRGBFrame = av_frame_alloc();
-
-	//	pRGBFrame->format = AV_PIX_FMT_RGB24;
-	//	pRGBFrame->width = 192;
-	//	pRGBFrame->height = 108;
-	//	int sts = av_frame_get_buffer(pRGBFrame, 0);
-
-	//	assert(sts == 0);
-	//	assert((pRGBFrame->linesize[0] == 192 * 3));  //Make sure buffers are continuous in memory.
-
-	//	fread(pRGBFrame->data[0], 1, 192 * 108 * 3, f);   //Read RGB
-
-	//	source_.push_back(pRGBFrame);
-	//}
-	//fclose(f);
-
 }
 
 cv::Mat VideoSource::Avframe2Cvmat(const AVFrame* av_frame)
@@ -278,6 +260,13 @@ void VideoSource::ReadSource(std::string path)
 	vidCapture.release();
 }*/
 
+SyncObject<AVFrame*>& VideoSource::GetChunk(int idx)
+{
+	if (idx < GetSize())
+		return source_.at(idx);
+	return source_.at(GetSize() - 1);
+}
+
 void VideoSource::Show()
 {
     // TODO: add exeption handling for not having anything inside source
@@ -290,20 +279,20 @@ void VideoSource::Show()
 
 void VideoSource::Play()
 {
-	auto start = std::chrono::high_resolution_clock::now();
-	// Read the frames to the last frame
-	auto sec_delay = std::chrono::milliseconds(long long(float(1 / this->fps) * 1e3));
-	for (int frame = 0; frame < source_.size(); frame++)
-	{
-		//display frames
-		//cv::imshow("Frame", source[frame]);
-		int key = cv::waitKey(1 / this->fps * 1e3 - 9);
-		if (key == 'q')
-		{
-			std::cout << "q key is pressed by the user. Stopping the video" << std::endl;
-			cv::destroyAllWindows();
-			return;
-		}
-	}
-	cv::destroyAllWindows();
+	//auto start = std::chrono::high_resolution_clock::now();
+	//// Read the frames to the last frame
+	//auto sec_delay = std::chrono::milliseconds(long long(float(1 / this->fps) * 1e3));
+	//for (int frame = 0; frame < source_.size(); frame++)
+	//{
+	//	//display frames
+	//	//cv::imshow("Frame", source[frame]);
+	//	int key = cv::waitKey(1 / this->fps * 1e3 - 9);
+	//	if (key == 'q')
+	//	{
+	//		std::cout << "q key is pressed by the user. Stopping the video" << std::endl;
+	//		cv::destroyAllWindows();
+	//		return;
+	//	}
+	//}
+	//cv::destroyAllWindows();
 }

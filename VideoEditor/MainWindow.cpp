@@ -79,8 +79,8 @@ MainWindow::MainWindow(wxWindow* parent,
     m_sourcesWindow->SetSizer(m_sourcesSizer);
     m_sourcesWindow->SetScrollRate(FromDIP(5), FromDIP(5));
     // Setting the video panel for the final version
-    ShowVideoPanel* finalVideoPanel = new ShowVideoPanel(videoWindowSplitter);
-    ogShowVideoPanel = new ShowVideoPanel(videoWindowSplitter);
+    ShowVideoPanel<Sequence>* finalVideoPanel = new ShowVideoPanel<Sequence>(videoWindowSplitter);
+    ogShowVideoPanel = new ShowVideoPanel<VideoSource>(videoWindowSplitter);
 
     finalVideoPanel->SetBackgroundColour(wxColor(50, 50, 80));
 

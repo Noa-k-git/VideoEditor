@@ -1,5 +1,6 @@
 #pragma once
 #include "VideoClip.h"
+#include "IPlayable.h"
 #include <wx/msgdlg.h>
 struct Settings {
 	int length; // the num of frames in the video
@@ -7,7 +8,7 @@ struct Settings {
 };
 
 
-class Sequence : public UniqueName
+class Sequence : public UniqueName, public IPlayable<AVFrame*>
 {
 private:
 	Settings settings;	
@@ -21,5 +22,9 @@ public:
 	void SaveVideo(std::string&);
 	void AddClip(VideoClip*, int);
 	void AddClip(VideoClip*);
+
+	int GetSize() override { return 0; };
+	SyncObject<AVFrame*>& GetChunk(int at) override { return video.at(0)->GetClip().at(0); };
+	void Play() override {};
 };
 extern Records<Sequence*> sequences;

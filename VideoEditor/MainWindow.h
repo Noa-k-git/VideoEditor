@@ -37,7 +37,7 @@ public:
     DECLARE_EVENT_TABLE();
 private:
     wxStatusBar* statusBar;
-    ShowVideoPanel* ogShowVideoPanel;
+    ShowVideoPanel<VideoSource>* ogShowVideoPanel;
     wxScrolledWindow* m_sourcesWindow;
     wxWrapSizer* m_sourcesSizer;
 };
