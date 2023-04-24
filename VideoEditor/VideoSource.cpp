@@ -7,12 +7,12 @@ char x[AV_ERROR_MAX_STRING_SIZE];
 
 Records<VideoSource*> VideoSource::videoSources;
 
-VideoSource::VideoSource(std::string path, std::string name) : ISource(path, name), IImg(), IPlayable()
+VideoSource::VideoSource(std::string path, std::string name) : ISource(path, name), IImg()
 {
 	UpdateCreated();
 }
 
-VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
+VideoSource::VideoSource(std::string path) : ISource(path), IImg()
 {
 	UpdateCreated();
 }

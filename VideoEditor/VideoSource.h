@@ -36,7 +36,7 @@ extern "C" {
 #include "Map.h"
 class VideoSource :
     //public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
-    public ISource<std::vector<SyncObject<AVFrame*>>>, public IImg, public IPlayable<AVFrame*>
+    public ISource<AVFrame*>, public IImg
 {
 public:
     static Records<VideoSource*> videoSources;

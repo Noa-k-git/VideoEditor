@@ -8,7 +8,7 @@ struct Settings {
 };
 
 
-class Sequence : public UniqueName, public IPlayable<AVFrame*>
+class Sequence : public IPlayable<AVFrame*>
 {
 private:
 	Settings settings;	

@@ -5,6 +5,7 @@
 #include<functional>
 #include<wx/msgdlg.h>
 #include"IPLayable.h"
+#include "SyncObject.h"
 /*
 struct Info {
 	double fps; // clip's frames per seconds
@@ -13,7 +14,7 @@ struct Info {
 	std::string type;
 };*/
 template <typename T>
-class ISource : public IPlayable{
+class ISource : public IPlayable<T>{
 public:
 	//static std::vector<std::thread>* readingThreads;
 
@@ -21,7 +22,7 @@ private:
 	std::string ExtractName(std::string path);
 protected:
 	std::string path;
-	T source_;
+	std::vector<SyncObject<T>> source_;
 	mutable std::mutex mutex_;
 	virtual void ReadSource() = 0;
 
@@ -30,7 +31,7 @@ public:
 	ISource(std::string, std::string);
 	ISource(std::string);
 	virtual ~ISource() {}
-	inline T& GetSource() {
+	inline std::vector<SyncObject<T>>& GetSource() {
 		return source_;
 	}
 	inline std::unique_lock<std::mutex> LockSource() {
@@ -45,7 +46,7 @@ public:
 // Implementation of none pure virtual mehtods
 
 template <typename T>
-ISource<T>::ISource(std::string path, std::string name) : IPlayable(name) {
+ISource<T>::ISource(std::string path, std::string name) : IPlayable<T>(name) {
 	this->path = path;
 	//std::thread readData(std::bind(&ISource::ReadSource, this, path));
 	//std::thread readData(&ISource::ReadSource, this, path);

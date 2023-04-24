@@ -7,7 +7,7 @@
 
 Records<Sequence*> Sequence::sequences;
 
-Sequence::Sequence(std::string name) : UniqueName(name)
+Sequence::Sequence(std::string name) : IPlayable<AVFrame*>(name)
 {
     if (Sequence::sequences.AddRecord(this).second)
         created = true;
