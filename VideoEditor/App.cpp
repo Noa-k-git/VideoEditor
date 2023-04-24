@@ -29,8 +29,8 @@ bool App::OnInit()
 
 App::~App()
 {
-	for (auto& thread : *ISource<std::vector<AVFrame>>::readingThreads) {
-		if (thread.joinable())
-			thread.join();
-	}
+	//for (auto& thread : *ISource<std::vector<AVFrame>>::readingThreads) {
+	//	if (thread.joinable())
+	//		thread.join();
+	//}
 }

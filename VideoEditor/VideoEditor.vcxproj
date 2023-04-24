@@ -158,7 +158,6 @@
     <ClCompile Include="SyncObject.cpp" />
     <ClCompile Include="Transition.cpp" />
     <ClCompile Include="SourceID.cpp" />
-    <ClCompile Include="UniqueName.cpp" />
     <ClCompile Include="VideoClip.cpp" />
     <ClCompile Include="VideoSource.cpp" />
     <ClCompile Include="VideoSourcePanel.cpp" />
@@ -187,7 +186,6 @@
     <ClInclude Include="SyncObject.h" />
     <ClInclude Include="Transition.h" />
     <ClInclude Include="SourceID.h" />
-    <ClInclude Include="UniqueName.h" />
     <ClInclude Include="VideoClip.h" />
     <ClInclude Include="VideoSource.h" />
     <ClInclude Include="VideoSourcePanel.h" />

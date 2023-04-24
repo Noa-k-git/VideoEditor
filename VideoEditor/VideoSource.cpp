@@ -9,27 +9,12 @@ Records<VideoSource*> VideoSource::videoSources;
 
 VideoSource::VideoSource(std::string path, std::string name) : ISource(path, name), IImg(), IPlayable()
 {
-	if (!VideoSource::videoSources.AddRecord(this).second) {
-		created = false;
-	}
-	else {
-		std::thread readData(&VideoSource::ReadSource, this);
-		readingThreads->push_back(std::move(readData));
-		created = true;
-	}
+	UpdateCreated();
 }
 
 VideoSource::VideoSource(std::string path) : ISource(path), IImg(), IPlayable()
 {
-	if (!VideoSource::videoSources.AddRecord(this).second)
-	{
-		created = false;
-	}
-	else {
-		std::thread readData(&VideoSource::ReadSource, this);
-		readingThreads->push_back(std::move(readData));
-		created = true;
-	}
+	UpdateCreated();
 }
 
 VideoSource::~VideoSource()
@@ -47,6 +32,17 @@ VideoSource::~VideoSource()
 	//std::vector<cv::Mat>().swap(source);
 }
 
+void VideoSource::UpdateCreated() {
+	if (!VideoSource::videoSources.AddRecord(this).second) {
+		created = false;
+	}
+	else {
+		VideoSource::ReadSource();
+		//std::thread readData(&VideoSource::ReadSource, this);
+		//readingThreads->push_back(std::move(readData));
+		created = true;
+	}
+}
 int VideoSource::GetSize()
 {
 	return source_.size();

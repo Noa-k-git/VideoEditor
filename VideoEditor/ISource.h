@@ -4,7 +4,7 @@
 #include<mutex>
 #include<functional>
 #include<wx/msgdlg.h>
-#include"UniqueName.h"
+#include"IPLayable.h"
 /*
 struct Info {
 	double fps; // clip's frames per seconds
@@ -13,9 +13,9 @@ struct Info {
 	std::string type;
 };*/
 template <typename T>
-class ISource : public UniqueName{
+class ISource : public IPlayable{
 public:
-	static std::vector<std::thread>* readingThreads;
+	//static std::vector<std::thread>* readingThreads;
 
 private:
 	std::string ExtractName(std::string path);
@@ -39,13 +39,13 @@ public:
 };
 
 // Initializing the static member
-template <typename T>
-std::vector<std::thread> * ISource<T>::readingThreads = new std::vector<std::thread>();
+//template <typename T>
+//std::vector<std::thread> * ISource<T>::readingThreads = new std::vector<std::thread>();
 
 // Implementation of none pure virtual mehtods
 
 template <typename T>
-ISource<T>::ISource(std::string path, std::string name) : UniqueName(name) {
+ISource<T>::ISource(std::string path, std::string name) : IPlayable(name) {
 	this->path = path;
 	//std::thread readData(std::bind(&ISource::ReadSource, this, path));
 	//std::thread readData(&ISource::ReadSource, this, path);

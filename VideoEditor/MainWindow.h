@@ -26,8 +26,9 @@ public:
         const wxString& name = wxASCII_STR(wxFrameNameStr));
 	~MainWindow();
 
-    void onNew(wxCommandEvent& event);
-    void OnImport(wxCommandEvent& event);
+    void onNew(wxCommandEvent& event_);
+    void OnImport(wxCommandEvent& event_);
+    void OnNewSequence(wxCommandEvent& event_);
     void onTest(wxCommandEvent& event);
     void onQuit(wxCommandEvent& event);
     void onClose(wxCloseEvent& event);
@@ -37,7 +38,7 @@ public:
     DECLARE_EVENT_TABLE();
 private:
     wxStatusBar* statusBar;
-    ShowVideoPanel<VideoSource>* ogShowVideoPanel;
+    ShowVideoPanel* ogShowVideoPanel;
     wxScrolledWindow* m_sourcesWindow;
     wxWrapSizer* m_sourcesSizer;
 };

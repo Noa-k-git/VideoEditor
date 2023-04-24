@@ -53,6 +53,7 @@ public:
 private:
     bool created;
     void ReadSource() override;
+    void UpdateCreated();
     cv::Mat Avframe2Cvmat(const AVFrame*);
     //AVFrame* CopyFrame(const AVFrame*);
     //AVFrame* Cvmat2Avframe(cv::Mat* image, AVFrame* frame);

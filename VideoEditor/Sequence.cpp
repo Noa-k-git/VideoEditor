@@ -9,7 +9,11 @@ Records<Sequence*> Sequence::sequences;
 
 Sequence::Sequence(std::string name) : UniqueName(name)
 {
-    Sequence::sequences.AddRecord(this);
+    if (Sequence::sequences.AddRecord(this).second)
+        created = true;
+    else
+        created = false;
+    
 }
 
 Sequence::Sequence() : Sequence("My Sequence")

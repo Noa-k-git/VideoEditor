@@ -66,21 +66,32 @@ MainWindow::MainWindow(wxWindow* parent,
     sourcesTitle_->SetForegroundColour(wxColor(240, 240, 240));
     std::string iconColor = "white";
     wxBitmap addIcon(iconColor + (std::string)"Add.png", wxBITMAP_TYPE_PNG);
-    SmallBitmapButton* importVideoButton = new SmallBitmapButton(sourcesPanel_, wxID_ANY, addIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | wxBORDER_NONE);
-    importVideoButton->SetToolTip(new wxToolTip("Import Video"));
-    importVideoButton->Bind(wxEVT_BUTTON, &MainWindow::OnImport, this);
+    SmallBitmapButton* newObjectButton = new SmallBitmapButton(sourcesPanel_, wxID_ANY, addIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | wxBORDER_NONE);
+    newObjectButton->SetToolTip(new wxToolTip("Append Object.."));
+
+    wxMenu* addMenu = new wxMenu();
+    wxMenuItem* importItem_ = new wxMenuItem(addMenu, wxID_ANY, "Import Video");
+    Connect(importItem_->GetId(), wxEVT_MENU, wxCommandEventHandler(MainWindow::OnImport));
+    addMenu->Append(importItem_);
+    wxMenuItem* newSeqItem_ = new wxMenuItem(addMenu, wxID_ANY, "New Sequence");
+    //Connect(importItem_->GetId(), wxEVT_MENU, wxCommandEventHandler(MainWindow::OnImport));
+    addMenu->Append(newSeqItem_);
+    newObjectButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent& event) {
+        // show the menu
+        PopupMenu(addMenu);
+        });
 
     sourcesLayoutBoxSizer_->Add(sourcesTitle_, 0, wxALL, 10);
     sourcesLayoutBoxSizer_->Add(m_sourcesWindow, 1, wxEXPAND);
-    sourcesLayoutBoxSizer_->Add(importVideoButton, 0, wxEXPAND);
+    sourcesLayoutBoxSizer_->Add(newObjectButton, 0, wxEXPAND);
     sourcesPanel_->SetSizer(sourcesLayoutBoxSizer_);
     
     m_sourcesSizer = new wxWrapSizer(wxHORIZONTAL);
     m_sourcesWindow->SetSizer(m_sourcesSizer);
     m_sourcesWindow->SetScrollRate(FromDIP(5), FromDIP(5));
     // Setting the video panel for the final version
-    ShowVideoPanel<Sequence>* finalVideoPanel = new ShowVideoPanel<Sequence>(videoWindowSplitter);
-    ogShowVideoPanel = new ShowVideoPanel<VideoSource>(videoWindowSplitter);
+    ShowVideoPanel* finalVideoPanel = new ShowVideoPanel(videoWindowSplitter);
+    ogShowVideoPanel = new ShowVideoPanel(videoWindowSplitter);
 
     finalVideoPanel->SetBackgroundColour(wxColor(50, 50, 80));
 
@@ -90,11 +101,20 @@ MainWindow::MainWindow(wxWindow* parent,
     wxPanel* effectWindow = new wxPanel(bottomSplitter);
     effectWindow->SetBackgroundColour(wxColor(82, 34, 234));
 
+    Layout();
     videoWindowSplitter->SplitVertically(ogShowVideoPanel, finalVideoPanel, 0.5);
+    videoWindowSplitter->SetSashGravity(1);
     topSplitter->SplitVertically(sourcesPanel_, videoWindowSplitter, 0.5);
     bottomSplitter->SplitVertically(sequenceWindow, effectWindow,0.5);
     mainSplitter->SplitHorizontally(topSplitter, bottomSplitter, 0.5);
-
+    
+    videoWindowSplitter->SetMinimumPaneSize(50);
+    topSplitter->SetMinimumPaneSize(50);
+    bottomSplitter->SetMinimumPaneSize(50);
+    mainSplitter->SetMinimumPaneSize(50);
+    Layout();
+    //int a = (int)mainSplitter->GetClientSize().GetHeight() * 0.5;
+    //mainSplitter->SetSashPosition((int)mainSplitter->GetClientSize().GetHeight() * 0.5);
     statusBar = CreateStatusBar();
     statusBar->SetStatusText(_("Ready!"));
     this->Bind(WIDGET_DELETED_EVENT, &MainWindow::OnRefresh, this);
@@ -105,7 +125,7 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::onNew(wxCommandEvent& WXUNUSED(event))
+void MainWindow::onNew(wxCommandEvent& WXUNUSED(event_))
 {
     wxMessageBox("MainWindow::onNew");
     PushStatusText(_("MainWinsow::onNew"));
@@ -114,7 +134,7 @@ void MainWindow::onNew(wxCommandEvent& WXUNUSED(event))
     PopStatusText();
 }
 
-void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
+void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event_))
 {
     //wxMessageBox("Start Import");
     wxFileDialog fileDialog(this, "Open File", "", "", "*.mp4", wxFD_OPEN);
@@ -155,12 +175,12 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
             wxGetApp().CallAfter([this]() {
 
                 });
-            for (auto& thread : *ISource<std::vector<SyncObject<AVFrame*>>>::readingThreads) {
+            /*for (auto& thread : *ISource<std::vector<SyncObject<AVFrame*>>>::readingThreads) {
                 if (thread.joinable())
                 {
                     thread.join();
                 }
-            }
+            }*/
             wxGetApp().CallAfter([this, v]() {
                 auto vsPanel = new VideoSourcePanel(m_sourcesWindow, v, ogShowVideoPanel->GetId());
                 //statusBar->SetStatusText(_("Finished"));
@@ -190,6 +210,18 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event))
     //(*Sequence::sequences.Contains("a").first)->AddClip(new VideoClip(*VideoSource::videoSources.Contains("v").first));
     //std::string fname = "RecordVideo.mp4";
     //(*Sequence::sequences.Contains("a").first)->SaveVideo(fname);
+}
+
+void MainWindow::OnNewSequence(wxCommandEvent& WXUNUSED(event_))
+{
+    Sequence* s = new Sequence();
+    if (s->GetCreated()) {
+
+    }
+    else {
+        delete s;
+    }
+
 }
 
 void MainWindow::OnRefresh(wxCommandEvent& event_)

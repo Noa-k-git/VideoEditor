@@ -72,9 +72,6 @@
     <ClCompile Include="Records.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UniqueName.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VideoSourcePanel.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
@@ -153,9 +150,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Records.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UniqueName.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VideoSourcePanel.h">

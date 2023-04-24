@@ -13,6 +13,7 @@ class Sequence : public UniqueName, public IPlayable<AVFrame*>
 private:
 	Settings settings;	
 	std::vector<VideoClip*> video;
+	bool created;
 	//std::vector<std::vector<AVFrame>> results;
 public:
 	static Records<Sequence*> sequences;
@@ -22,9 +23,15 @@ public:
 	void SaveVideo(std::string&);
 	void AddClip(VideoClip*, int);
 	void AddClip(VideoClip*);
+	inline bool GetCreated();
 
 	int GetSize() override { return 0; };
 	SyncObject<AVFrame*>& GetChunk(int at) override { return video.at(0)->GetClip().at(0); };
 	void Play() override {};
 };
 extern Records<Sequence*> sequences;
+
+inline bool Sequence::GetCreated()
+{
+	return created;
+}
