@@ -16,6 +16,7 @@ private:
 	bool created;
 	//std::vector<std::vector<AVFrame>> results;
 public:
+	static AVFrame* CreateBlackFrame(int width, int height, enum AVPixelFormat pixFmt);
 	static Records<Sequence*> sequences;
 	Sequence(std::string);
 	Sequence();
@@ -26,7 +27,11 @@ public:
 	inline bool GetCreated();
 
 	int GetSize() override { return 0; };
-	SyncObject<AVFrame*>& GetChunk(int at) override { return video.at(0)->GetClip().at(0); };
+	SyncObject<AVFrame*>* GetChunk(int at) override { 
+		if (video.size() == 0) {
+			return nullptr;
+		}
+		return &video.at(0)->GetClip().at(0); };
 	void Play() override {};
 };
 extern Records<Sequence*> sequences;

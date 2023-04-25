@@ -44,7 +44,7 @@ public:
     VideoSource(std::string);
     virtual ~VideoSource();
     int GetSize() override;
-    SyncObject<AVFrame*>& GetChunk(int at) override;
+    SyncObject<AVFrame*>* GetChunk(int at) override;
     void Show() override;
     void Play() override;
     inline bool GetCreated();

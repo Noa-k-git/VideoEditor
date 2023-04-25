@@ -7,34 +7,43 @@
 
 wxDEFINE_EVENT(SHOW_VIDEO_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(WIDGET_DELETED_EVENT, wxCommandEvent);
-VideoSourcePanel::VideoSourcePanel(wxWindow* parent, VideoSource* videoSource, wxWindowID showWindow) : wxPanel(parent, wxID_ANY), m_videoSource(videoSource)
+VideoSourcePanel::VideoSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoSource, wxWindowID showWindow) : wxPanel(parent, wxID_ANY), m_videoSource(videoSource)
 {
 	m_showWindowID = showWindow;
-	const AVFrame* frame = m_videoSource->getFirstFrame();
-	AVFrame* rgbFrame = av_frame_alloc(); // a copy frame of the first frame in the videoSource
-	 // set the properties of the copy to match the og frame
-	rgbFrame->width = frame->width;
-	rgbFrame->height = frame->height;
-	rgbFrame->format = AV_PIX_FMT_RGB24;
+	SyncObject<AVFrame*>* syncFrame = m_videoSource->GetChunk(0);
+	AVFrame* rgbFrame = nullptr;
+	if (syncFrame)
+	{
+		const AVFrame* frame = syncFrame->GetObject();
+		rgbFrame = av_frame_alloc(); // a copy frame of the first frame in the videoSource
+		// set the properties of the copy to match the og frame
+		rgbFrame->width = frame->width;
+		rgbFrame->height = frame->height;
+		rgbFrame->format = AV_PIX_FMT_RGB24;
 
-	// allocate memofy for the copy
-	int ret = av_frame_get_buffer(rgbFrame, 0);
-	if (ret < 0) {
-		wxMessageBox((std::string)"ERROR: Allocat memory for VideoSourcePanel: " +av_err2str(ret));
+		// allocate memofy for the copy
+		int ret = av_frame_get_buffer(rgbFrame, 0);
+		if (ret < 0) {
+			wxMessageBox((std::string)"ERROR: Allocat memory for VideoSourcePanel: " + av_err2str(ret));
+		}
+
+		// Set up the SwsContext* for the conversion
+		SwsContext* swsContext = sws_getContext(
+			frame->width, frame->height, (AVPixelFormat)frame->format,
+			rgbFrame->width, rgbFrame->height, AV_PIX_FMT_RGB24,
+			SWS_BILINEAR, NULL, NULL, NULL
+		);
+
+		// Convert the frame from YUV to RGB
+		sws_scale(swsContext, frame->data, frame->linesize, 0,
+			frame->height, rgbFrame->data, rgbFrame->linesize);
+		// Clean up
+		sws_freeContext(swsContext);
 	}
-
-	// Set up the SwsContext* for the conversion
-	SwsContext* swsContext = sws_getContext(
-		frame->width, frame->height, (AVPixelFormat)frame->format,
-		rgbFrame->width, rgbFrame->height, AV_PIX_FMT_RGB24,
-		SWS_BILINEAR, NULL, NULL, NULL
-	);
-
-	// Convert the frame from YUV to RGB
-	sws_scale(swsContext, frame->data, frame->linesize, 0,
-		frame->height, rgbFrame->data, rgbFrame->linesize);
-	// Clean up
-	sws_freeContext(swsContext);
+	else {
+		rgbFrame = Sequence::CreateBlackFrame(1, 1, AV_PIX_FMT_RGB24);
+	}
+	
 
 	wxImage image(rgbFrame->width, rgbFrame->height, rgbFrame->data[0], true);
 	wxSize thumbnailSize(120, 84);

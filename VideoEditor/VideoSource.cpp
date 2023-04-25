@@ -256,11 +256,11 @@ void VideoSource::ReadSource(std::string path)
 	vidCapture.release();
 }*/
 
-SyncObject<AVFrame*>& VideoSource::GetChunk(int idx)
+SyncObject<AVFrame*>* VideoSource::GetChunk(int idx)
 {
 	if (idx < GetSize())
-		return source_.at(idx);
-	return source_.at(GetSize() - 1);
+		return &source_.at(idx);
+	return &source_.at(GetSize() - 1);
 }
 
 void VideoSource::Show()

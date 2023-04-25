@@ -5,6 +5,29 @@
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
+AVFrame* Sequence::CreateBlackFrame(int width, int height, enum AVPixelFormat pixFmt) {
+    AVFrame* frame = av_frame_alloc();
+    if (!frame) {
+        return NULL;
+    }
+
+    frame->format = pixFmt;
+    frame->width = width;
+    frame->height = height;
+
+    int ret = av_frame_get_buffer(frame, 32); // 32-byte alignment
+    if (ret < 0) {
+        av_frame_free(&frame);
+        return NULL;
+    }
+
+    // Set all pixel values to zero
+    av_frame_make_writable(frame);
+    memset(frame->data[0], 0, frame->linesize[0] * frame->height);
+
+    return frame;
+}
+
 Records<Sequence*> Sequence::sequences;
 
 Sequence::Sequence(std::string name) : IPlayable<AVFrame*>(name)

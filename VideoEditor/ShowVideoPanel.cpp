@@ -134,7 +134,7 @@ void ShowVideoPanel::ShowVideo()
 	AVFrame* firstFrame;
 	SetVideo();
 	if (m_playablePtr)
-		firstFrame = m_playablePtr->GetChunk(0).GetObject();
+		firstFrame = m_playablePtr->GetChunk(0)->GetObject();
 	else
 		return;
 
@@ -160,8 +160,8 @@ void ShowVideoPanel::ShowVideo()
 		AVFrame* frame = nullptr;
 		SetVideo();
 		if (m_playablePtr) {
-			SyncObject<AVFrame*>& syncframe = m_playablePtr->GetChunk(pos);
-			frame = syncframe.GetObject();
+			SyncObject<AVFrame*>* syncframe = m_playablePtr->GetChunk(pos);
+			frame = syncframe->GetObject();
 			if (!frame)
 				break;
 		}

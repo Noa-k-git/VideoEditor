@@ -12,12 +12,13 @@ BufferedBitmap::BufferedBitmap(wxWindow* parent, const wxBitmap& bitmap)
 void BufferedBitmap::OnPaint(wxPaintEvent& evt)
 {
     wxAutoBufferedPaintDC dc(this);
+    dc.SetBackground(wxBrush(wxColor(15, 15, 15)));
     dc.Clear();
-
+    
     DoPrepareDC(dc);
 
     wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
-
+    
     if (gc)
     {
         // scaling consistent with wxStaticBitmap

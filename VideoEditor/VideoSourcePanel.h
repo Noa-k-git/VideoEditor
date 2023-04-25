@@ -12,12 +12,12 @@ class VideoSourcePanel :
     public wxPanel
 {
 public:
-    VideoSourcePanel(wxWindow* parent, VideoSource* videoSource, wxWindowID showWindow);
+    VideoSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoSource, wxWindowID showWindow);
     ~VideoSourcePanel();
 private:
     wxWindowID m_showWindowID;
 
-    VideoSource* m_videoSource; // The video source object to be represented
+    IPlayable<AVFrame*>* m_videoSource; // The video source object to be represented
     wxBoxSizer* m_mainSizer;
     wxBitmapButton* m_thumbnailButton; // the first avframe in the video source
     wxStaticText* m_videoName; // the name of the video source

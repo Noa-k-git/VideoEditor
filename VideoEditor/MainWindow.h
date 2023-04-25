@@ -1,4 +1,6 @@
 #pragma once
+#include <libavutil/imgutils.h>
+#include <libavutil/frame.h>
 #include "SubWindows.h"
 #include "VideoSourcePanel.h"
 #include "VideoSource.h"
@@ -37,8 +39,10 @@ public:
 
     DECLARE_EVENT_TABLE();
 private:
+    std::mutex statusBarMutex;
     wxStatusBar* statusBar;
     ShowVideoPanel* ogShowVideoPanel;
+    ShowVideoPanel* finalVideoPanel;
     wxScrolledWindow* m_sourcesWindow;
     wxWrapSizer* m_sourcesSizer;
 };

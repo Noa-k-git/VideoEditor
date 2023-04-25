@@ -18,6 +18,7 @@ END_EVENT_TABLE()
 //    const wxString& name) :
 //    wxFrame(parent, id, title, pos, size, style, name) {}
 
+
 MainWindow::MainWindow(wxWindow* parent,
     wxWindowID id,
     const wxString& title,
@@ -39,10 +40,11 @@ MainWindow::MainWindow(wxWindow* parent,
     --------------------------------|
     
     */
-
+    wxColor panelBgColor(wxColor(20, 20, 20));
     wxSplitterWindow* mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_LIVE_UPDATE);
-    mainSplitter->SetBackgroundColour(wxColor(200, 100, 100));
+    //mainSplitter->SetBackgroundColour(wxColor(200, 100, 100));
+    mainSplitter->SetBackgroundColour(panelBgColor);
 
     wxSplitterWindow* topSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_BORDER | wxSP_LIVE_UPDATE);
@@ -50,16 +52,19 @@ MainWindow::MainWindow(wxWindow* parent,
 
     wxSplitterWindow* videoWindowSplitter= new wxSplitterWindow(topSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_BORDER | wxSP_LIVE_UPDATE);
-    videoWindowSplitter->SetBackgroundColour(wxColor(100, 200, 100));
+    //videoWindowSplitter->SetBackgroundColour(wxColor(100, 200, 100));
+    videoWindowSplitter->SetBackgroundColour(panelBgColor);
 
     wxSplitterWindow* bottomSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_BORDER | wxSP_LIVE_UPDATE);
-    bottomSplitter->SetBackgroundColour(wxColor(100, 0, 100));
+    //bottomSplitter->SetBackgroundColour(wxColor(100, 0, 100));
+    bottomSplitter->SetBackgroundColour(panelBgColor);
     
     wxPanel* sourcesPanel_ = new wxPanel(topSplitter, wxID_ANY);
 
     m_sourcesWindow = new wxScrolledWindow(sourcesPanel_, wxID_ANY, wxDefaultPosition);
-    m_sourcesWindow->SetBackgroundColour(wxColor(230, 230, 100));
+    //m_sourcesWindow->SetBackgroundColour(wxColor(230, 230, 100));
+    m_sourcesWindow->SetBackgroundColour(panelBgColor);
 
     wxBoxSizer* sourcesLayoutBoxSizer_ = new wxBoxSizer(wxVERTICAL);
     wxStaticText* sourcesTitle_ = new wxStaticText(sourcesPanel_, wxID_ANY, "Sources");
@@ -74,7 +79,7 @@ MainWindow::MainWindow(wxWindow* parent,
     Connect(importItem_->GetId(), wxEVT_MENU, wxCommandEventHandler(MainWindow::OnImport));
     addMenu->Append(importItem_);
     wxMenuItem* newSeqItem_ = new wxMenuItem(addMenu, wxID_ANY, "New Sequence");
-    //Connect(importItem_->GetId(), wxEVT_MENU, wxCommandEventHandler(MainWindow::OnImport));
+    Connect(newSeqItem_->GetId(), wxEVT_MENU, wxCommandEventHandler(MainWindow::OnNewSequence));
     addMenu->Append(newSeqItem_);
     newObjectButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent& event) {
         // show the menu
@@ -90,16 +95,19 @@ MainWindow::MainWindow(wxWindow* parent,
     m_sourcesWindow->SetSizer(m_sourcesSizer);
     m_sourcesWindow->SetScrollRate(FromDIP(5), FromDIP(5));
     // Setting the video panel for the final version
-    ShowVideoPanel* finalVideoPanel = new ShowVideoPanel(videoWindowSplitter);
+    finalVideoPanel = new ShowVideoPanel(videoWindowSplitter);
     ogShowVideoPanel = new ShowVideoPanel(videoWindowSplitter);
 
-    finalVideoPanel->SetBackgroundColour(wxColor(50, 50, 80));
+    //finalVideoPanel->SetBackgroundColour(wxColor(50, 50, 80));
+    finalVideoPanel->SetBackgroundColour(panelBgColor);
 
 
     wxPanel* sequenceWindow = new wxPanel(bottomSplitter);
-    sequenceWindow->SetBackgroundColour(wxColor(5, 203, 32));
+    //sequenceWindow->SetBackgroundColour(wxColor(5, 203, 32));
+    sequenceWindow->SetBackgroundColour(panelBgColor);
     wxPanel* effectWindow = new wxPanel(bottomSplitter);
-    effectWindow->SetBackgroundColour(wxColor(82, 34, 234));
+    //effectWindow->SetBackgroundColour(wxColor(82, 34, 234));
+    sequenceWindow->SetBackgroundColour(panelBgColor);
 
     Layout();
     videoWindowSplitter->SplitVertically(ogShowVideoPanel, finalVideoPanel, 0.5);
@@ -115,8 +123,11 @@ MainWindow::MainWindow(wxWindow* parent,
     Layout();
     //int a = (int)mainSplitter->GetClientSize().GetHeight() * 0.5;
     //mainSplitter->SetSashPosition((int)mainSplitter->GetClientSize().GetHeight() * 0.5);
-    statusBar = CreateStatusBar();
-    statusBar->SetStatusText(_("Ready!"));
+    //statusBar = CreateStatusBar();
+    statusBar = new wxStatusBar(this, wxID_ANY, 0);
+    SetStatusBar(statusBar);
+    statusBar->PushStatusText(_("Ready!"));
+    
     this->Bind(WIDGET_DELETED_EVENT, &MainWindow::OnRefresh, this);
 
 }
@@ -165,16 +176,41 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event_))
     //wxMessageBox("Processing video");
     //auto processVideoLambda = 
     std::thread t([this, filePath]() {
+        wxGetApp().CallAfter([this]() {
+            std::lock_guard<std::mutex> lock(statusBarMutex);
+            for (int i = 0; i < statusBar->GetFieldsCount(); i++)
+            {
+                wxString text = statusBar->GetStatusText(i);
+                wxMessageOutputDebug().Printf("\t+\tb Status bar field %d: %s", i, text);
+                wxMessageOutputDebug().Printf("%d", statusBar->GetFieldsCount());
+            }
+            statusBar->PushStatusText(_("Processing Video ") + std::to_string(VideoSource::videoSources.GetRecords()->size()) + _("0..."));
+            //statusBar->PushStatusText(_("Processing Video ") + std::to_string(VideoSource::videoSources.GetRecords()->size()) + _("1..."));
+            //statusBar->PushStatusText(_("Processing Video ") + std::to_string(VideoSource::videoSources.GetRecords()->size()) + _("2..."));
+            for (int i = 0; i < statusBar->GetFieldsCount(); i++)
+            {
+                wxString text = statusBar->GetStatusText(i);
+                wxMessageOutputDebug().Printf("%d", statusBar->GetFieldsCount());
+                wxMessageOutputDebug().Printf("\t+\ta Status bar field %d: %s", i, text);
+            }
+            wxMessageOutputDebug().Printf("Processing Video: %d", statusBar->GetFieldsCount());
+            });
         VideoSource* v = new VideoSource(filePath);
         wxGetApp().CallAfter([this]() {
-            statusBar->PushStatusText(_("Processing Video..."));
-            wxMessageOutputDebug().Printf("Processing Video...");
+            for (int i = 0; i < statusBar->GetFieldsCount(); i++)
+            {
+                wxString text = statusBar->GetStatusText(i);
+                wxMessageOutputDebug().Printf("\t-\tStatus bar field %d: %s", i, text);
+            }
+            std::lock_guard<std::mutex> lock(statusBarMutex);
+            statusBar->PopStatusText();
+            wxMessageOutputDebug().Printf("Remove Processing Video: %d", statusBar->GetFieldsCount());
+            
+            //statusBar->PopStatusText();
             });
         if (v->GetCreated())
         {
-            wxGetApp().CallAfter([this]() {
 
-                });
             /*for (auto& thread : *ISource<std::vector<SyncObject<AVFrame*>>>::readingThreads) {
                 if (thread.joinable())
                 {
@@ -194,9 +230,6 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event_))
                 wxMessageBox(_("Video is already defined... If not try first to change the video name"), _("Error in importing video"));
                 });
         }
-        wxGetApp().CallAfter([&]() {
-            statusBar->PopStatusText();
-            });
         });
 
     t.detach();
@@ -216,7 +249,12 @@ void MainWindow::OnNewSequence(wxCommandEvent& WXUNUSED(event_))
 {
     Sequence* s = new Sequence();
     if (s->GetCreated()) {
-
+        wxGetApp().CallAfter([this, s]() {
+            auto vsPanel = new VideoSourcePanel(m_sourcesWindow, s, finalVideoPanel->GetId());
+            //statusBar->SetStatusText(_("Finished"));
+            m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
+            m_sourcesSizer->Layout();
+            });
     }
     else {
         delete s;
