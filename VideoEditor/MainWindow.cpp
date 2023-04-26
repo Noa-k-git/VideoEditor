@@ -40,7 +40,7 @@ MainWindow::MainWindow(wxWindow* parent,
     --------------------------------|
     
     */
-    wxColor panelBgColor(wxColor(20, 20, 20));
+    wxColor panelBgColor(wxColor(204, 204, 204));
     wxSplitterWindow* mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_LIVE_UPDATE);
     //mainSplitter->SetBackgroundColour(wxColor(200, 100, 100));
@@ -68,7 +68,7 @@ MainWindow::MainWindow(wxWindow* parent,
 
     wxBoxSizer* sourcesLayoutBoxSizer_ = new wxBoxSizer(wxVERTICAL);
     wxStaticText* sourcesTitle_ = new wxStaticText(sourcesPanel_, wxID_ANY, "Sources");
-    sourcesTitle_->SetForegroundColour(wxColor(240, 240, 240));
+    //sourcesTitle_->SetForegroundColour(wxColor(240, 240, 240));
     std::string iconColor = "white";
     wxBitmap addIcon(iconColor + (std::string)"Add.png", wxBITMAP_TYPE_PNG);
     SmallBitmapButton* newObjectButton = new SmallBitmapButton(sourcesPanel_, wxID_ANY, addIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | wxBORDER_NONE);
@@ -273,5 +273,3 @@ void MainWindow::OnRefresh(wxCommandEvent& event_)
 //    //this->SetSizerAndFit(mainSizer);
 //    row1Sizer->Layout();
 //}
-
-

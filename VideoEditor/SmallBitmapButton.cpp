@@ -8,10 +8,26 @@ SmallBitmapButton::SmallBitmapButton(wxWindow* parent, wxWindowID id, wxBitmap b
 	SetSize(m_buttonSize);
 }
 
+void SmallBitmapButton::ChangeBitmap(wxBitmap bitmap) {
+	this->SetBitmap(bitmap);
+	RescaleBitmap();
+}
 void SmallBitmapButton::RescaleBitmap()
 {
 	wxImage img = this->GetBitmap().ConvertToImage();
 	img.Rescale(m_iconSize.GetWidth(), m_iconSize.GetHeight(), wxIMAGE_QUALITY_HIGH);
-	this->SetBitmap(img);
+	wxImage finalImg(m_buttonSize);
+	finalImg.InitAlpha();
+	// Set all pixels in the image to white
+	for (int x = 0; x < m_buttonSize.GetWidth(); x++) {
+		for (int y = 0; y < m_buttonSize.GetHeight(); y++) {
+			finalImg.SetRGB(x, y, 255, 255, 255); // set the pixel color to white
+			finalImg.SetAlpha(x, y, 0); // set the pixel alpha to fully opaque
+		}
+	}
+	wxPoint pastePos((m_buttonSize.GetWidth() - m_iconSize.GetWidth()) / 2, (m_buttonSize.GetHeight() - m_iconSize.GetHeight()) / 2);
+	finalImg.Paste(img, pastePos.x, pastePos.y);
+
+	this->SetBitmap(finalImg);
 
 }

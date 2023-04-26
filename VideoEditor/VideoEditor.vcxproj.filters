@@ -33,9 +33,6 @@
     <ClCompile Include="SourceID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Transition.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Bezier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -96,9 +93,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IEffect.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Transition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bezier.h">
@@ -191,6 +185,24 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="whiteAdd.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="gotostart.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="prevframe.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="pause.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="play.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="nextframe.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="gotoend.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

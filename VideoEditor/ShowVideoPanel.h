@@ -32,11 +32,11 @@ private:
 	wxButton* m_zoomOutButton;
 
 	// media controls
-	wxButton* m_pausePlay; // pause - play button
-	wxButton* m_gotoStart; // goto start button
-	wxButton* m_gotoEnd; // goto end button
-	wxButton* m_prevFrame; // previous frame button
-	wxButton* m_nextFrame; // next frame button
+	SmallBitmapButton* m_pausePlay; // pause - play button
+	SmallBitmapButton* m_gotoStart; // goto start button
+	SmallBitmapButton* m_gotoEnd; // goto end button
+	SmallBitmapButton* m_prevFrame; // previous frame button
+	SmallBitmapButton* m_nextFrame; // next frame button
 
 	wxSlider* timeline;
 
@@ -46,6 +46,8 @@ private:
 	std::string m_vidName;
 	IPlayable<AVFrame*>* m_playablePtr;
 
+	void PauseVideo();
+	void PlayVideo();
 	void SetVideoName(wxCommandEvent& event);
 	void SetVideo();
 	void ShowVideo();

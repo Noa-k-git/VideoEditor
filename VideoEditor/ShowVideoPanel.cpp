@@ -29,19 +29,24 @@ ShowVideoPanel::ShowVideoPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
 	m_frameControlSizer->Add(m_zoomInButton, 0, wxLEFT, FromDIP(5));
 	m_frameControlSizer->Add(m_zoomOutButton, 0, wxLEFT, FromDIP(5));
 
-	m_gotoStart = new wxButton(this, wxID_ANY, "<<", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+	wxBitmap gotoStartIcon("gotostart.png", wxBITMAP_TYPE_PNG);
+	m_gotoStart = new SmallBitmapButton(this, wxID_ANY, gotoStartIcon, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
 	m_gotoStart->SetToolTip(new wxToolTip(_("Goto Start")));
 
-	m_prevFrame = new wxButton(this, wxID_ANY, "<", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+	wxBitmap prevFrameIcon("prevframe.png", wxBITMAP_TYPE_PNG);
+	m_prevFrame = new SmallBitmapButton(this, wxID_ANY, prevFrameIcon, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
 	m_prevFrame->SetToolTip(new wxToolTip(_("Previous Frame")));
 
-	m_pausePlay = new wxButton(this, wxID_ANY, "| |", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-	m_pausePlay->SetToolTip(new wxToolTip(_("Play/Pause")));
+	wxBitmap playIcon("play.png", wxBITMAP_TYPE_PNG);
+	m_pausePlay = new SmallBitmapButton(this, wxID_ANY, playIcon, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
+	m_pausePlay->SetToolTip(new wxToolTip(_("Play")));
 
-	m_nextFrame = new wxButton(this, wxID_ANY, ">", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+	wxBitmap nextFrameIcon("nextframe.png", wxBITMAP_TYPE_PNG);
+	m_nextFrame = new SmallBitmapButton(this, wxID_ANY, nextFrameIcon, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
 	m_nextFrame->SetToolTip(new wxToolTip(_("Next Frame")));
 
-	m_gotoEnd = new wxButton(this, wxID_ANY, ">>", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+	wxBitmap gotoEndIcon("gotoend.png", wxBITMAP_TYPE_PNG);
+	m_gotoEnd = new SmallBitmapButton(this, wxID_ANY, gotoEndIcon, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
 	m_gotoEnd->SetToolTip(new wxToolTip(_("Goto End")));
 
 	timeline = new wxSlider(this, wxID_ANY, 0, 0, 1, wxDefaultPosition);
@@ -60,7 +65,7 @@ ShowVideoPanel::ShowVideoPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
 	m_mainSizer = new wxBoxSizer(wxVERTICAL);
 	m_mainSizer->Add(m_frameBufferedBitmap, 1, wxEXPAND | wxALL, 10);
 	m_mainSizer->Add(m_frameControlSizer, 0, wxALIGN_LEFT | wxRIGHT | wxBOTTOM, FromDIP(10));
-	m_mainSizer->Add(m_mediaControlSizer, 0, wxEXPAND | wxLEFT | wxRIGHT, 10);
+	m_mainSizer->Add(m_mediaControlSizer, 0, wxEXPAND | wxLEFT | wxRIGHT, 0);
 	m_mainSizer->Layout();
 	SetSizerAndFit(m_mainSizer);
 	//parent->Bind(wxEVT_SIZE, &ShowVideoPanel::OnParentSize, this);
@@ -83,7 +88,18 @@ ShowVideoPanel::ShowVideoPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
 	//refreshTimer->Start(100000);
 }
 
-
+void ShowVideoPanel::PauseVideo() {
+	paused.store(true);
+	wxBitmap playIcon("play.png", wxBITMAP_TYPE_PNG);
+	m_pausePlay->ChangeBitmap(playIcon);
+	m_pausePlay->SetToolTip(new wxToolTip(_("Play")));
+}
+void ShowVideoPanel::PlayVideo() {
+	paused.store(false);
+	wxBitmap pauseIcon("pause.png", wxBITMAP_TYPE_PNG);
+	m_pausePlay->ChangeBitmap(pauseIcon);
+	m_pausePlay->SetToolTip(new wxToolTip(_("Pause")));
+}
 void ShowVideoPanel::SetVideo() {
 	m_playablePtr = nullptr;
 	try {
@@ -102,7 +118,7 @@ void ShowVideoPanel::SetVideo() {
 }
 void ShowVideoPanel::SetVideoName(wxCommandEvent& event_)
 {
-	paused = true;
+	PauseVideo();
 	m_vidName = event_.GetString().ToStdString();
 	SetVideo();
 	timeline->SetValue(0);
@@ -210,40 +226,43 @@ void ShowVideoPanel::OnZoomOut(wxCommandEvent& event)
 void ShowVideoPanel::OnPausePlay(wxCommandEvent& event)
 {
 	bool x = this->paused.load();
-	paused.store(!x);
 	if (x) {
+		PlayVideo();
 		std::thread t(&ShowVideoPanel::ShowVideo, this);
 		t.detach();
+	}
+	else {
+		PauseVideo();
 	}
 
 }
 
 void ShowVideoPanel::OnTimelineScroll(wxCommandEvent& event)
 {
-	this->paused.store(true);
+	PauseVideo();
 	std::thread t(&ShowVideoPanel::ShowVideo, this);
 	t.detach();
 }
 
 void ShowVideoPanel::OnGotoStart(wxCommandEvent& event_) {
-	this->paused.store(true);
+	PauseVideo();
 	this->timeline->SetValue(0);
 	ShowVideo();
 }
 
 void ShowVideoPanel::OnGotoEnd(wxCommandEvent& event_) {
-	this->paused.store(true);
+	PauseVideo();
 	this->timeline->SetValue(timeline->GetMax() - 1);
 	ShowVideo();
 }
 
 void ShowVideoPanel::OnPrevFrame(wxCommandEvent& event_) {
-	this->paused.store(true);
+	PauseVideo();
 	this->timeline->SetValue(timeline->GetValue() - 2); // this is also solves range errors
 	ShowVideo();
 }
 
 void ShowVideoPanel::OnNextFrame(wxCommandEvent& event_) {
-	this->paused.store(true);
+	PauseVideo();
 	ShowVideo();
 }

@@ -156,7 +156,6 @@
     <ClCompile Include="SmallBitmapButton.cpp" />
     <ClCompile Include="SubWindows.cpp" />
     <ClCompile Include="SyncObject.cpp" />
-    <ClCompile Include="Transition.cpp" />
     <ClCompile Include="SourceID.cpp" />
     <ClCompile Include="VideoClip.cpp" />
     <ClCompile Include="VideoSource.cpp" />
@@ -184,7 +183,6 @@
     <ClInclude Include="SmallBitmapButton.h" />
     <ClInclude Include="SubWindows.h" />
     <ClInclude Include="SyncObject.h" />
-    <ClInclude Include="Transition.h" />
     <ClInclude Include="SourceID.h" />
     <ClInclude Include="VideoClip.h" />
     <ClInclude Include="VideoSource.h" />
@@ -195,6 +193,12 @@
     <Image Include="blackAdd.png" />
     <Image Include="blackDelete.png" />
     <Image Include="blackEdit.png" />
+    <Image Include="gotoend.png" />
+    <Image Include="gotostart.png" />
+    <Image Include="nextframe.png" />
+    <Image Include="pause.png" />
+    <Image Include="play.png" />
+    <Image Include="prevframe.png" />
     <Image Include="whiteAdd.png" />
     <Image Include="whiteDelete.png" />
     <Image Include="whiteEdit.png" />
