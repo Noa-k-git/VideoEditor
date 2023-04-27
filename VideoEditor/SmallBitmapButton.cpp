@@ -1,8 +1,12 @@
 #include "SmallBitmapButton.h"
 
-SmallBitmapButton::SmallBitmapButton(wxWindow* parent, wxWindowID id, wxBitmap bitmap, const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name)
-	: wxBitmapButton(parent, id, bitmap, pos, size, style, validator, name)
+SmallBitmapButton::SmallBitmapButton(wxWindow* parent, wxWindowID id, wxBitmap bitmap, const wxPoint& pos, const wxSize& size, const wxSize& bitmapSize, long style, const wxValidator& validator, const wxString& name)
+	: wxBitmapButton(parent, id, bitmap, pos, wxDefaultSize, style, validator, name)
 {
+	m_iconSize = bitmapSize;
+	m_buttonSize = size;
+	m_buttonColor = BTN_BACKGROUND_COLOUR;
+
 	RescaleBitmap();
 	SetBackgroundColour(m_buttonColor);
 	SetSize(m_buttonSize);

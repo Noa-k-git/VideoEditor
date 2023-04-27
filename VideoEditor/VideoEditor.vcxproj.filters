@@ -84,8 +84,17 @@
     <ClCompile Include="BufferedBitmap.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
+    <ClCompile Include="SeqControlWindow.cpp">
+      <Filter>Source Files\Design</Filter>
+    </ClCompile>
+    <ClCompile Include="ClipItemPanel.cpp">
+      <Filter>Source Files\Design</Filter>
+    </ClCompile>
     <ClCompile Include="SmallBitmapButton.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Design</Filter>
+    </ClCompile>
+    <ClCompile Include="SeqSourcePanel.cpp">
+      <Filter>Source Files\Design</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -161,8 +170,20 @@
     <ClInclude Include="BufferedBitmap.h">
       <Filter>Header Files\Design</Filter>
     </ClInclude>
+    <ClInclude Include="SeqControlWindow.h">
+      <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="ClipItemPanel.h">
+      <Filter>Header Files\Design</Filter>
+    </ClInclude>
     <ClInclude Include="SmallBitmapButton.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="DesignConstatns.h">
+      <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="SeqSourcePanel.h">
+      <Filter>Header Files\Design</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +224,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="gotoend.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="rightarrow.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

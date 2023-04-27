@@ -145,12 +145,15 @@
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="BufferedBitmap.cpp" />
     <ClCompile Include="Client.cpp" />
+    <ClCompile Include="ClipItemPanel.cpp" />
     <ClCompile Include="EffectProperty.cpp" />
     <ClCompile Include="InputDialog.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Records.cpp" />
     <ClCompile Include="ScaleEffect.cpp" />
+    <ClCompile Include="SeqControlWindow.cpp" />
+    <ClCompile Include="SeqSourcePanel.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="ShowVideoPanel.cpp" />
     <ClCompile Include="SmallBitmapButton.cpp" />
@@ -166,6 +169,8 @@
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="BufferedBitmap.h" />
     <ClInclude Include="Client.h" />
+    <ClInclude Include="ClipItemPanel.h" />
+    <ClInclude Include="DesignConstatns.h" />
     <ClInclude Include="EffectProperty.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="id.h" />
@@ -178,6 +183,8 @@
     <ClInclude Include="Map.h" />
     <ClInclude Include="Records.h" />
     <ClInclude Include="ScaleEffect.h" />
+    <ClInclude Include="SeqControlWindow.h" />
+    <ClInclude Include="SeqSourcePanel.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="ShowVideoPanel.h" />
     <ClInclude Include="SmallBitmapButton.h" />
@@ -199,6 +206,7 @@
     <Image Include="pause.png" />
     <Image Include="play.png" />
     <Image Include="prevframe.png" />
+    <Image Include="rightarrow.png" />
     <Image Include="whiteAdd.png" />
     <Image Include="whiteDelete.png" />
     <Image Include="whiteEdit.png" />

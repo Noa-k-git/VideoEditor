@@ -273,22 +273,22 @@ void VideoSource::Show()
 
 }
 
-void VideoSource::Play()
-{
-	//auto start = std::chrono::high_resolution_clock::now();
-	//// Read the frames to the last frame
-	//auto sec_delay = std::chrono::milliseconds(long long(float(1 / this->fps) * 1e3));
-	//for (int frame = 0; frame < source_.size(); frame++)
-	//{
-	//	//display frames
-	//	//cv::imshow("Frame", source[frame]);
-	//	int key = cv::waitKey(1 / this->fps * 1e3 - 9);
-	//	if (key == 'q')
-	//	{
-	//		std::cout << "q key is pressed by the user. Stopping the video" << std::endl;
-	//		cv::destroyAllWindows();
-	//		return;
-	//	}
-	//}
-	//cv::destroyAllWindows();
-}
+//void VideoSource::Play()
+//{
+//	//auto start = std::chrono::high_resolution_clock::now();
+//	//// Read the frames to the last frame
+//	//auto sec_delay = std::chrono::milliseconds(long long(float(1 / this->fps) * 1e3));
+//	//for (int frame = 0; frame < source_.size(); frame++)
+//	//{
+//	//	//display frames
+//	//	//cv::imshow("Frame", source[frame]);
+//	//	int key = cv::waitKey(1 / this->fps * 1e3 - 9);
+//	//	if (key == 'q')
+//	//	{
+//	//		std::cout << "q key is pressed by the user. Stopping the video" << std::endl;
+//	//		cv::destroyAllWindows();
+//	//		return;
+//	//	}
+//	//}
+//	//cv::destroyAllWindows();
+//}

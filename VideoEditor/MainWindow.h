@@ -3,6 +3,8 @@
 #include <libavutil/frame.h>
 #include "SubWindows.h"
 #include "VideoSourcePanel.h"
+#include "SeqSourcePanel.h"
+#include "SeqControlWindow.h"
 #include "VideoSource.h"
 #include "VideoClip.h"
 #include "Sequence.h"
@@ -44,6 +46,7 @@ private:
     ShowVideoPanel* ogShowVideoPanel;
     ShowVideoPanel* finalVideoPanel;
     wxScrolledWindow* m_sourcesWindow;
+    SeqControlWindow* m_sequenceControlWindow;
     wxWrapSizer* m_sourcesSizer;
 };
 

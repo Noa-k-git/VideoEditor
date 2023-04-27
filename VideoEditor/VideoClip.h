@@ -1,5 +1,6 @@
 #pragma once
 #include "VideoSource.h"
+#include "IPlayable.h"
 #include "IEffect.h"
 // FFmpeg
 
@@ -9,7 +10,7 @@ extern "C" {
 #include <libswscale/swscale.h> // image scaling and color conversion API, converting pixel formats and resizing images 
 }
 
-class VideoClip
+class VideoClip : public IPlayable<AVFrame*>
 {
 private:
 	VideoSource* videoSource;
@@ -23,7 +24,9 @@ public:
 	bool SetStart(int);
 	bool SetEnd(int);
 	void ApplyEffects();
-	vector<SyncObject<AVFrame*>>& GetClip();
+	SyncObject<AVFrame*>* GetChunk(int) override;
+	int GetSize() override;
+	std::string SourceName();
 	std::string ToString() const {
 		
 	}

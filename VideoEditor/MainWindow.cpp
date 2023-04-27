@@ -1,5 +1,5 @@
 #include "MainWindow.h"
-
+#include "DesignConstatns.h"
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
     //EVT_MENU(wxID_NEW, MainWindow::OnImport)
     //EVT_MENU(wxID_NEW, MainWindow::onNew)
@@ -40,11 +40,10 @@ MainWindow::MainWindow(wxWindow* parent,
     --------------------------------|
     
     */
-    wxColor panelBgColor(wxColor(204, 204, 204));
     wxSplitterWindow* mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_LIVE_UPDATE);
     //mainSplitter->SetBackgroundColour(wxColor(200, 100, 100));
-    mainSplitter->SetBackgroundColour(panelBgColor);
+    mainSplitter->SetBackgroundColour(WINDOW_BACKGOUND_COLOUR);
 
     wxSplitterWindow* topSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_BORDER | wxSP_LIVE_UPDATE);
@@ -53,25 +52,25 @@ MainWindow::MainWindow(wxWindow* parent,
     wxSplitterWindow* videoWindowSplitter= new wxSplitterWindow(topSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_BORDER | wxSP_LIVE_UPDATE);
     //videoWindowSplitter->SetBackgroundColour(wxColor(100, 200, 100));
-    videoWindowSplitter->SetBackgroundColour(panelBgColor);
+    videoWindowSplitter->SetBackgroundColour(WINDOW_BACKGOUND_COLOUR);
 
     wxSplitterWindow* bottomSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_BORDER | wxSP_LIVE_UPDATE);
     //bottomSplitter->SetBackgroundColour(wxColor(100, 0, 100));
-    bottomSplitter->SetBackgroundColour(panelBgColor);
+    bottomSplitter->SetBackgroundColour(WINDOW_BACKGOUND_COLOUR);
     
     wxPanel* sourcesPanel_ = new wxPanel(topSplitter, wxID_ANY);
 
     m_sourcesWindow = new wxScrolledWindow(sourcesPanel_, wxID_ANY, wxDefaultPosition);
     //m_sourcesWindow->SetBackgroundColour(wxColor(230, 230, 100));
-    m_sourcesWindow->SetBackgroundColour(panelBgColor);
+    m_sourcesWindow->SetBackgroundColour(WINDOW_BACKGOUND_COLOUR);
 
     wxBoxSizer* sourcesLayoutBoxSizer_ = new wxBoxSizer(wxVERTICAL);
     wxStaticText* sourcesTitle_ = new wxStaticText(sourcesPanel_, wxID_ANY, "Sources");
     //sourcesTitle_->SetForegroundColour(wxColor(240, 240, 240));
     std::string iconColor = "white";
     wxBitmap addIcon(iconColor + (std::string)"Add.png", wxBITMAP_TYPE_PNG);
-    SmallBitmapButton* newObjectButton = new SmallBitmapButton(sourcesPanel_, wxID_ANY, addIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | wxBORDER_NONE);
+    SmallBitmapButton* newObjectButton = new SmallBitmapButton(sourcesPanel_, wxID_ANY, addIcon, wxDefaultPosition, BTN_SIZE, BTN_ICON_SIZE, wxBU_AUTODRAW | wxBORDER_NONE);
     newObjectButton->SetToolTip(new wxToolTip("Append Object.."));
 
     wxMenu* addMenu = new wxMenu();
@@ -94,26 +93,41 @@ MainWindow::MainWindow(wxWindow* parent,
     m_sourcesSizer = new wxWrapSizer(wxHORIZONTAL);
     m_sourcesWindow->SetSizer(m_sourcesSizer);
     m_sourcesWindow->SetScrollRate(FromDIP(5), FromDIP(5));
+
     // Setting the video panel for the final version
     finalVideoPanel = new ShowVideoPanel(videoWindowSplitter);
     ogShowVideoPanel = new ShowVideoPanel(videoWindowSplitter);
 
     //finalVideoPanel->SetBackgroundColour(wxColor(50, 50, 80));
-    finalVideoPanel->SetBackgroundColour(panelBgColor);
+    finalVideoPanel->SetBackgroundColour(WINDOW_BACKGOUND_COLOUR);
 
 
-    wxPanel* sequenceWindow = new wxPanel(bottomSplitter);
-    //sequenceWindow->SetBackgroundColour(wxColor(5, 203, 32));
-    sequenceWindow->SetBackgroundColour(panelBgColor);
+    wxPanel* m_sequenceWindow = new wxPanel(bottomSplitter);
+    m_sequenceWindow->SetBackgroundColour(WINDOW_BACKGOUND_COLOUR);
     wxPanel* effectWindow = new wxPanel(bottomSplitter);
     //effectWindow->SetBackgroundColour(wxColor(82, 34, 234));
-    sequenceWindow->SetBackgroundColour(panelBgColor);
+    m_sequenceWindow->SetBackgroundColour(WINDOW_BACKGOUND_COLOUR);
+    //m_sequenceWindow->SetBackgroundColour(wxColor(5, 203, 32));
 
+    wxBoxSizer* sequenceWindowSizer_ = new wxBoxSizer(wxVERTICAL);
+    m_sequenceWindow->SetSizer(sequenceWindowSizer_);
+    
+    wxStaticText* seqNameText_ = new wxStaticText(m_sequenceWindow, wxID_ANY, "Sequence here...");
+    seqNameText_->SetFont(seqNameText_->GetFont().Italic());
+    sequenceWindowSizer_->Add(seqNameText_, 0, wxALL, 10);
+    wxMessageOutputDebug().Printf("\t\t\t%d", m_sequenceWindow->GetId());
+    wxMessageOutputDebug().Printf("\t\t\t%d", seqNameText_->GetId());
+
+    m_sequenceControlWindow = new SeqControlWindow(m_sequenceWindow, seqNameText_);
+    sequenceWindowSizer_->Add(m_sequenceControlWindow, 1, wxEXPAND|wxALL, 10);
+
+    sequenceWindowSizer_->Layout();
+    
     Layout();
     videoWindowSplitter->SplitVertically(ogShowVideoPanel, finalVideoPanel, 0.5);
     videoWindowSplitter->SetSashGravity(1);
     topSplitter->SplitVertically(sourcesPanel_, videoWindowSplitter, 0.5);
-    bottomSplitter->SplitVertically(sequenceWindow, effectWindow,0.5);
+    bottomSplitter->SplitVertically(effectWindow, m_sequenceWindow, 0.5);
     mainSplitter->SplitHorizontally(topSplitter, bottomSplitter, 0.5);
     
     videoWindowSplitter->SetMinimumPaneSize(50);
@@ -128,7 +142,7 @@ MainWindow::MainWindow(wxWindow* parent,
     SetStatusBar(statusBar);
     statusBar->PushStatusText(_("Ready!"));
     
-    this->Bind(WIDGET_DELETED_EVENT, &MainWindow::OnRefresh, this);
+    this->Bind(WIDGET_DELETED_EVT, &MainWindow::OnRefresh, this);
 
 }
 
@@ -218,7 +232,7 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event_))
                 }
             }*/
             wxGetApp().CallAfter([this, v]() {
-                auto vsPanel = new VideoSourcePanel(m_sourcesWindow, v, ogShowVideoPanel->GetId());
+                auto vsPanel = new VideoSourcePanel(m_sourcesWindow, v, ogShowVideoPanel->GetId(), m_sequenceControlWindow->GetId());
                 //statusBar->SetStatusText(_("Finished"));
                 m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
                 m_sourcesSizer->Layout();
@@ -250,7 +264,7 @@ void MainWindow::OnNewSequence(wxCommandEvent& WXUNUSED(event_))
     Sequence* s = new Sequence();
     if (s->GetCreated()) {
         wxGetApp().CallAfter([this, s]() {
-            auto vsPanel = new VideoSourcePanel(m_sourcesWindow, s, finalVideoPanel->GetId());
+            auto vsPanel = new SeqSourcePanel(m_sourcesWindow, s, finalVideoPanel->GetId(), m_sequenceControlWindow->GetId());
             //statusBar->SetStatusText(_("Finished"));
             m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
             m_sourcesSizer->Layout();

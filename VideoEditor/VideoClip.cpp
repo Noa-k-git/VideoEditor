@@ -1,7 +1,7 @@
 #pragma once
 #include "VideoClip.h"
 #include<algorithm>
-VideoClip::VideoClip(VideoSource* videoSource)
+VideoClip::VideoClip(VideoSource* videoSource) : IPlayable(videoSource->GetName())
 {
 	this->videoSource = videoSource;
 	this->edges[0] = 0;
@@ -64,8 +64,24 @@ void VideoClip::ApplyEffects()
 	//this->updated = true;
 }
 
-vector<SyncObject<AVFrame*>>& VideoClip::GetClip()
+SyncObject<AVFrame*>* VideoClip::GetChunk(int)
 {
-	this->ApplyEffects();
-	return *clip;
+	return nullptr;
 }
+
+int VideoClip::GetSize()
+{
+	return 0;
+}
+
+std::string VideoClip::SourceName()
+{
+	if (videoSource)
+	return videoSource->GetName();
+}
+//
+//vector<SyncObject<AVFrame*>>& VideoClip::GetClip()
+//{
+//	this->ApplyEffects();
+//	return *clip;
+//}

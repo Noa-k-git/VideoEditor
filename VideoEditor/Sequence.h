@@ -25,14 +25,16 @@ public:
 	void AddClip(VideoClip*, int);
 	void AddClip(VideoClip*);
 	inline bool GetCreated();
+	inline int GetLength() { return video.size(); }
+	inline VideoClip* GetClipAt(int idx) { return video.at(idx); }
 
 	int GetSize() override { return 0; };
 	SyncObject<AVFrame*>* GetChunk(int at) override { 
 		if (video.size() == 0) {
 			return nullptr;
 		}
-		return &video.at(0)->GetClip().at(0); };
-	void Play() override {};
+		return video.at(0)->GetChunk(0); };
+	//void Play() override {};
 };
 extern Records<Sequence*> sequences;
 

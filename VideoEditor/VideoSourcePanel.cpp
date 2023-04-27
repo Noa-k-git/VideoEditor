@@ -1,15 +1,18 @@
 #include "VideoSourcePanel.h"
+#include "DesignConstatns.h"
 #include <libswscale/swscale.h>
 #undef av_err2str
 //extern char x[AV_ERROR_MAX_STRING_SIZE];
 #define av_err2str(errnum) \
     av_make_error_string(x, AV_ERROR_MAX_STRING_SIZE, errnum)
 
-wxDEFINE_EVENT(SHOW_VIDEO_EVENT, wxCommandEvent);
-wxDEFINE_EVENT(WIDGET_DELETED_EVENT, wxCommandEvent);
-VideoSourcePanel::VideoSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoSource, wxWindowID showWindow) : wxPanel(parent, wxID_ANY), m_videoSource(videoSource)
+wxDEFINE_EVENT(ADD_TO_SEQUENCE_EVT, wxCommandEvent);
+wxDEFINE_EVENT(SHOW_VIDEO_EVT, wxCommandEvent);
+wxDEFINE_EVENT(WIDGET_DELETED_EVT, wxCommandEvent);
+VideoSourcePanel::VideoSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoSource, wxWindowID showWindow, wxWindowID sequenceWindow) : wxPanel(parent, wxID_ANY), m_videoSource(videoSource)
 {
 	m_showWindowID = showWindow;
+	m_sequenceWindowID = sequenceWindow;
 	SyncObject<AVFrame*>* syncFrame = m_videoSource->GetChunk(0);
 	AVFrame* rgbFrame = nullptr;
 	if (syncFrame)
@@ -46,22 +49,21 @@ VideoSourcePanel::VideoSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoS
 	
 
 	wxImage image(rgbFrame->width, rgbFrame->height, rgbFrame->data[0], true);
-	wxSize thumbnailSize(120, 84);
-	wxImage finalImg(thumbnailSize);
-	finalImg.SetRGB(wxRect(thumbnailSize), 0, 0, 0);
+	wxImage finalImg(THUMBNAIL_SIZE);
+	finalImg.SetRGB(wxRect(THUMBNAIL_SIZE), 0, 0, 0);
 	int w = image.GetWidth();
 	int h = image.GetHeight();
 	double scaleFactor = 1.0;
 	if (w > h) {
-		scaleFactor = 1.0 * thumbnailSize.GetWidth() / w;
+		scaleFactor = 1.0 * THUMBNAIL_SIZE.GetWidth() / w;
 	}
 	else {
-		scaleFactor = 1.0 * thumbnailSize.GetHeight() / h;
+		scaleFactor = 1.0 * THUMBNAIL_SIZE.GetHeight() / h;
 	}
 	int scaledW = w * scaleFactor;
 	int scaledH = h * scaleFactor;
 	image.Rescale(scaledW, scaledH, wxIMAGE_QUALITY_HIGH);
-	finalImg.Paste(image, (thumbnailSize.GetWidth() - scaledW / 2 - thumbnailSize.GetWidth() / 2), (thumbnailSize.GetHeight() - scaledH / 2 - thumbnailSize.GetHeight() / 2));
+	finalImg.Paste(image, (THUMBNAIL_SIZE.GetWidth() - scaledW / 2 - THUMBNAIL_SIZE.GetWidth() / 2), (THUMBNAIL_SIZE.GetHeight() - scaledH / 2 - THUMBNAIL_SIZE.GetHeight() / 2));
 	// create a wxBitmap from the wxImage
 	wxBitmap bitmap(finalImg);
 
@@ -69,31 +71,31 @@ VideoSourcePanel::VideoSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoS
 	m_thumbnailButton = new wxBitmapButton(this, wxID_ANY, bitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW|wxBORDER_NONE);
 
 	// Create video name label
-	m_videoName = new wxStaticText(this, wxID_ANY, m_videoSource->GetName(), wxDefaultPosition, wxSize(thumbnailSize.GetWidth(), -1));
-	m_videoName->SetForegroundColour(wxColor(240, 240, 240));
+	m_videoName = new wxStaticText(this, wxID_ANY, m_videoSource->GetName(), wxDefaultPosition, wxSize(THUMBNAIL_SIZE.GetWidth(), -1));
+	m_videoName->SetForegroundColour(TEXT_COLOUR);
 
 	std::string iconColor = "white";
 	wxBitmap addIcon(iconColor + (std::string)"Add.png", wxBITMAP_TYPE_PNG);
-	m_addButton = new SmallBitmapButton(this, wxID_ANY, addIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW|wxBORDER_NONE);
+	m_addButton = new SmallBitmapButton(this, wxID_ANY, addIcon, wxDefaultPosition, BTN_SIZE, BTN_ICON_SIZE, wxBU_AUTODRAW|wxBORDER_NONE);
 	m_addButton->SetToolTip(new wxToolTip("Add to sequence"));
 	// Create edit button with pencil icon
 	wxBitmap editIcon(iconColor + (std::string)"Edit.png", wxBITMAP_TYPE_PNG);
-	m_editButton = new SmallBitmapButton(this, wxID_ANY, editIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW| wxBORDER_NONE);
+	m_editButton = new SmallBitmapButton(this, wxID_ANY, editIcon, wxDefaultPosition, BTN_SIZE, BTN_ICON_SIZE, wxBU_AUTODRAW | wxBORDER_NONE);
 	m_editButton->SetToolTip(new wxToolTip("Change name"));
 
 	// Create delete button with trashcan icon
 	wxBitmap deleteIcon(iconColor + (std::string)"Delete.png", wxBITMAP_TYPE_PNG);
-	m_deleteButton = new SmallBitmapButton(this, wxID_ANY, deleteIcon, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW|wxBORDER_NONE);
+	m_deleteButton = new SmallBitmapButton(this, wxID_ANY, deleteIcon, wxDefaultPosition, BTN_SIZE, BTN_ICON_SIZE, wxBU_AUTODRAW|wxBORDER_NONE);
 	m_deleteButton->SetToolTip(new wxToolTip("Delete source"));
 
 	// Set up event handlers
 	//m_thumbnailButton->Bind(wxEVT_LEFT_DCLICK, &VideoSourcePanel::onMouseLeftDoubleClick, this);
 	m_thumbnailButton->Bind(wxEVT_LEFT_DOWN, wxMouseEventHandler(VideoSourcePanel::onMouseLeftDown), this);
 	m_thumbnailButton->Bind(wxEVT_LEFT_DCLICK, wxMouseEventHandler(VideoSourcePanel::onMouseLeftDoubleClick), this);
+	//m_addButton->Bind(wxEVT_LEFT_DCLICK, &VideoSourcePanel::onAddButtonClicked, this);
 	m_addButton->Bind(wxEVT_BUTTON, &VideoSourcePanel::onAddButtonClicked, this);
 	m_editButton->Bind(wxEVT_BUTTON, &VideoSourcePanel::onEditButtonClicked, this);
 	m_deleteButton->Bind(wxEVT_BUTTON, &VideoSourcePanel::onDeleteButtonClicked, this);
-	
 	wxBoxSizer* buttonsSizer_ = new wxBoxSizer(wxHORIZONTAL);
 	buttonsSizer_->Add(m_addButton, 0, wxRIGHT, 5);
 	buttonsSizer_->Add(m_editButton, 0, wxLEFT | wxRIGHT, 5);
@@ -106,7 +108,7 @@ VideoSourcePanel::VideoSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoS
 	m_mainSizer->Layout();
 	//SetMinSize(wxSize(300, 300));
 	SetSizerAndFit(m_mainSizer);
-	SetBackgroundColour(wxColor(50, 50, 50));
+	SetBackgroundColour(PANEL_WIDGET_BACKGROUND_COLOUR);
 }
 
 VideoSourcePanel::~VideoSourcePanel()
@@ -129,7 +131,7 @@ void VideoSourcePanel::rescaleBitmap(wxBitmap& bitmap, const wxSize& size)
 
 void VideoSourcePanel::onMouseLeftDown(wxMouseEvent& event)
 {
-	wxCommandEvent event_(SHOW_VIDEO_EVENT, GetId());
+	wxCommandEvent event_(SHOW_VIDEO_EVT, GetId());
 	event_.SetEventObject(this);
 	event_.SetString(m_videoSource->GetName());
 	
@@ -142,10 +144,19 @@ void VideoSourcePanel::onMouseLeftDown(wxMouseEvent& event)
 
 void VideoSourcePanel::onMouseLeftDoubleClick(wxMouseEvent& event)
 {
+
 }
 
 void VideoSourcePanel::onAddButtonClicked(wxCommandEvent& event)
 {
+	wxCommandEvent event_(ADD_TO_SEQUENCE_EVT, GetId());
+	event_.SetEventObject(this);
+	event_.SetString(m_videoSource->GetName());
+
+	wxWindow* window = FindWindowById(m_sequenceWindowID);
+	if (window != nullptr) {
+		wxPostEvent(window, event_);
+	}
 }
 
 void VideoSourcePanel::onEditButtonClicked(wxCommandEvent& event)
@@ -159,7 +170,7 @@ void VideoSourcePanel::onEditButtonClicked(wxCommandEvent& event)
 void VideoSourcePanel::onDeleteButtonClicked(wxCommandEvent& event)
 {
 	wxWindow* topLevelParent = wxGetTopLevelParent(this);
-	wxCommandEvent event_(WIDGET_DELETED_EVENT, GetId());
+	wxCommandEvent event_(WIDGET_DELETED_EVT, GetId());
 	event_.SetEventObject(this);
 	Destroy();
 	wxPostEvent(topLevelParent, event_);

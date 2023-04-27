@@ -4,18 +4,20 @@
 #include "Sequence.h"
 #include "SmallBitmapButton.h"
 
-
-wxDECLARE_EVENT(SHOW_VIDEO_EVENT, wxCommandEvent);
-wxDECLARE_EVENT(WIDGET_DELETED_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(ADD_TO_SEQUENCE_EVT, wxCommandEvent);
+wxDECLARE_EVENT(SHOW_VIDEO_EVT, wxCommandEvent);
+wxDECLARE_EVENT(WIDGET_DELETED_EVT, wxCommandEvent);
 
 class VideoSourcePanel :
     public wxPanel
 {
 public:
-    VideoSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoSource, wxWindowID showWindow);
+    VideoSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoSource, wxWindowID showWindow, wxWindowID sequenceWindow);
     ~VideoSourcePanel();
-private:
+    virtual void onAddButtonClicked(wxCommandEvent& event);
+protected:
     wxWindowID m_showWindowID;
+    wxWindowID m_sequenceWindowID;
 
     IPlayable<AVFrame*>* m_videoSource; // The video source object to be represented
     wxBoxSizer* m_mainSizer;
@@ -28,7 +30,6 @@ private:
     void rescaleBitmap(wxBitmap&, const wxSize&);
     void onMouseLeftDown(wxMouseEvent& event);
     void onMouseLeftDoubleClick(wxMouseEvent& event);
-    void onAddButtonClicked(wxCommandEvent& event);
     void onEditButtonClicked(wxCommandEvent& event);
     void onDeleteButtonClicked(wxCommandEvent& event);
 };

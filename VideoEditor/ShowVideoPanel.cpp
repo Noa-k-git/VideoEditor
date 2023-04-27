@@ -30,26 +30,26 @@ ShowVideoPanel::ShowVideoPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
 	m_frameControlSizer->Add(m_zoomOutButton, 0, wxLEFT, FromDIP(5));
 
 	wxBitmap gotoStartIcon("gotostart.png", wxBITMAP_TYPE_PNG);
-	m_gotoStart = new SmallBitmapButton(this, wxID_ANY, gotoStartIcon, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
+	m_gotoStart = new SmallBitmapButton(this, wxID_ANY, gotoStartIcon, wxDefaultPosition, BTN_SIZE, BTN_ICON_SIZE, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
 	m_gotoStart->SetToolTip(new wxToolTip(_("Goto Start")));
 
 	wxBitmap prevFrameIcon("prevframe.png", wxBITMAP_TYPE_PNG);
-	m_prevFrame = new SmallBitmapButton(this, wxID_ANY, prevFrameIcon, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
+	m_prevFrame = new SmallBitmapButton(this, wxID_ANY, prevFrameIcon, wxDefaultPosition, BTN_SIZE, BTN_ICON_SIZE, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
 	m_prevFrame->SetToolTip(new wxToolTip(_("Previous Frame")));
 
 	wxBitmap playIcon("play.png", wxBITMAP_TYPE_PNG);
-	m_pausePlay = new SmallBitmapButton(this, wxID_ANY, playIcon, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
+	m_pausePlay = new SmallBitmapButton(this, wxID_ANY, playIcon, wxDefaultPosition, BTN_SIZE, BTN_ICON_SIZE, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
 	m_pausePlay->SetToolTip(new wxToolTip(_("Play")));
 
 	wxBitmap nextFrameIcon("nextframe.png", wxBITMAP_TYPE_PNG);
-	m_nextFrame = new SmallBitmapButton(this, wxID_ANY, nextFrameIcon, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
+	m_nextFrame = new SmallBitmapButton(this, wxID_ANY, nextFrameIcon, wxDefaultPosition, BTN_SIZE, BTN_ICON_SIZE, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
 	m_nextFrame->SetToolTip(new wxToolTip(_("Next Frame")));
 
 	wxBitmap gotoEndIcon("gotoend.png", wxBITMAP_TYPE_PNG);
-	m_gotoEnd = new SmallBitmapButton(this, wxID_ANY, gotoEndIcon, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
+	m_gotoEnd = new SmallBitmapButton(this, wxID_ANY, gotoEndIcon, wxDefaultPosition, BTN_SIZE, BTN_ICON_SIZE, wxBU_EXACTFIT | wxBU_AUTODRAW | wxBORDER_NONE);
 	m_gotoEnd->SetToolTip(new wxToolTip(_("Goto End")));
 
-	timeline = new wxSlider(this, wxID_ANY, 0, 0, 1, wxDefaultPosition);
+	timeline = new wxSlider(this, wxID_ANY, 0, 0, 1, wxDefaultPosition, wxDefaultSize);
 
 	wxBoxSizer* hMediabuttonSizer_ = new wxBoxSizer(wxHORIZONTAL);
 	hMediabuttonSizer_->Add(m_gotoStart, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBU_EXACTFIT, 5);
@@ -70,7 +70,7 @@ ShowVideoPanel::ShowVideoPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
 	SetSizerAndFit(m_mainSizer);
 	//parent->Bind(wxEVT_SIZE, &ShowVideoPanel::OnParentSize, this);
 
-	Bind(SHOW_VIDEO_EVENT, &ShowVideoPanel::SetVideoName, this);
+	Bind(SHOW_VIDEO_EVT, &ShowVideoPanel::SetVideoName, this);
 	m_zoomInButton->Bind(wxEVT_BUTTON, &ShowVideoPanel::OnZoomIn, this);
 	m_zoomOutButton->Bind(wxEVT_BUTTON, &ShowVideoPanel::OnZoomOut, this);
 	m_pausePlay->Bind(wxEVT_BUTTON, &ShowVideoPanel::OnPausePlay, this);
