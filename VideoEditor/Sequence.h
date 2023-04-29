@@ -24,6 +24,7 @@ public:
 	void SaveVideo(std::string&);
 	void AddClip(VideoClip*, int);
 	void AddClip(VideoClip*);
+	bool SwapClipsAt(int idx1, int idx2);
 	inline bool GetCreated();
 	inline int GetLength() { return video.size(); }
 	inline VideoClip* GetClipAt(int idx) { return video.at(idx); }

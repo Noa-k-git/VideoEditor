@@ -11,6 +11,16 @@ SeqControlWindow::SeqControlWindow(wxWindow* parent, wxStaticText* title, wxWind
 	m_sequencePtr = nullptr;
 	Bind(SET_WORKING_SEQUENCE_EVT, &SeqControlWindow::SetSeqName, this);
 	Bind(ADD_TO_SEQUENCE_EVT, &SeqControlWindow::OnAddClip, this);
+	//Bind(SWAP_CLIP_WITH_PREV_EVT, [&](wxCommandEvent& event_) {
+	//	wxMessageOutputDebug().Printf("here!");
+	//	SeqControlWindow::SwapClips(event_.GetInt() - 1, event_.GetInt());
+	//	}, this);
+	//Bind(SWAP_CLIP_WITH_PREV_EVT, [&](wxCommandEvent& event_) {
+	//	SeqControlWindow::SwapClips(event_.GetInt() + 1, event_.GetInt());
+	//	}, this);
+	Bind(SWAP_CLIP_WITH_PREV_EVT, &SeqControlWindow::OnSwapWithPrev, this);
+	Bind(SWAP_CLIP_WITH_NEXT_EVT, &SeqControlWindow::OnSwapWithNext, this);
+
 }
 
 void SeqControlWindow::SetSequencePtr()
@@ -24,7 +34,9 @@ void SeqControlWindow::SetSequencePtr()
 
 void SeqControlWindow::SetSeqName(wxCommandEvent& event_)
 {
-	m_clipsSizer->Clear();
+	wxMessageOutputDebug().Printf("here2");
+
+	m_clipsSizer->Clear(true);
 	m_seqName = event_.GetString().ToStdString();
 	m_title->SetLabel(m_seqName);
 	m_title->SetFont(m_title->GetFont().Bold());
@@ -40,14 +52,50 @@ void SeqControlWindow::SetSeqName(wxCommandEvent& event_)
 
 void SeqControlWindow::SetSequence()
 {
-	m_clipsSizer->Clear();
+	m_clipsSizer->Clear(true);
 	for (int i = 0; i < m_sequencePtr->GetLength(); i++) {
-		m_clipsSizer->Add(new ClipItemPanel(m_sequencePtr->GetClipAt(i), this, wxID_ANY), 0, wxEXPAND|wxBOTTOM, 5);
+		m_clipsSizer->Add(new ClipItemPanel(m_sequencePtr->GetClipAt(i), i, this, wxID_ANY), 0, wxEXPAND|wxBOTTOM, 10);
 	}
 	m_clipsSizer->Layout();
-	Refresh();
-	GetParent()->Refresh();
-	SetSizerAndFit(m_clipsSizer);
+	GetParent()->GetSizer()->Layout();
+
+}
+
+void SeqControlWindow::SwapClips(int idx1, int idx2)
+{
+	if (m_sequencePtr) {
+		if (idx1 > idx2) {
+			idx1 += idx2;
+			idx2 = idx1 - idx2;
+			idx1 = idx1 - idx2;
+		}
+		if (!m_sequencePtr->SwapClipsAt(idx1, idx2))
+			return;
+		wxSizerItem* item1 = m_clipsSizer->GetItem(idx1);
+		wxSizerItem* item2 = m_clipsSizer->GetItem(idx2);
+
+		ClipItemPanel* clip1 = new ClipItemPanel(m_sequencePtr->GetClipAt(idx1), idx1, this);
+		ClipItemPanel* clip2 = new ClipItemPanel(m_sequencePtr->GetClipAt(idx2), idx2, this);
+		m_clipsSizer->Replace(item1->GetWindow(), clip1);
+		m_clipsSizer->Replace(item2->GetWindow(), clip2);
+		//m_clipsSizer->Detach(idx1);
+		//m_clipsSizer->Detach(idx1);
+		//if (item1->GetWindow()) {
+		//	item1->GetWindow()->Destroy();
+		//	RemoveChild(item1->GetWindow());
+		//}
+		//if (item2->GetWindow()) {
+		//	item2->GetWindow()->Destroy();
+		//	RemoveChild(item2->GetWindow());
+		//}
+		//m_clipsSizer->Insert(idx1, clip1);
+		//m_clipsSizer->Insert(idx2, clip2);
+
+
+		m_clipsSizer->Layout();
+		Layout();
+		Refresh();
+	}
 }
 
 void SeqControlWindow::OnAddClip(wxCommandEvent& event_)
@@ -58,8 +106,24 @@ void SeqControlWindow::OnAddClip(wxCommandEvent& event_)
 		auto findVid = VideoSource::videoSources.Contains(event_.GetString().ToStdString());
 		if (findVid.second) {
 			m_sequencePtr->AddClip(new VideoClip(*findVid.first));
-			SetSequence();
+			int idx = m_sequencePtr->GetLength() - 1;
+			m_clipsSizer->Add(new ClipItemPanel(m_sequencePtr->GetClipAt(idx), idx, this, wxID_ANY), 0, wxEXPAND | wxBOTTOM, 10);
+			//SetSequence();
+			m_clipsSizer->Layout();
+			GetParent()->GetSizer()->Layout();
 		}
 	}
 }
+
+void SeqControlWindow::OnSwapWithPrev(wxCommandEvent& event_)
+{
+	SeqControlWindow::SwapClips(event_.GetInt() - 1, event_.GetInt());
+}
+
+void SeqControlWindow::OnSwapWithNext(wxCommandEvent& event_)
+{
+	SeqControlWindow::SwapClips(event_.GetInt() + 1, event_.GetInt());
+
+}
+
 

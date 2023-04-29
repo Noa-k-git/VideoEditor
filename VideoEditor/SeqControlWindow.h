@@ -14,6 +14,9 @@ private:
 	wxStaticText* m_title;
 	wxBoxSizer* m_clipsSizer;
 
+	void SwapClips(int idx1, int idx2);
 	void OnAddClip(wxCommandEvent& event_);
+	void OnSwapWithPrev(wxCommandEvent& event_);
+	void OnSwapWithNext(wxCommandEvent& event_);
 
 };

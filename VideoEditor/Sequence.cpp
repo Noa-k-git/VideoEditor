@@ -1,4 +1,6 @@
+#pragma once
 #include "Sequence.h"
+#include <algorithm>
 
 #undef av_err2str
 //extern char x[AV_ERROR_MAX_STRING_SIZE];
@@ -369,4 +371,13 @@ void Sequence::AddClip(VideoClip* videoClip, int idx)
 void Sequence::AddClip(VideoClip* videoClip)
 {
     AddClip(videoClip, -1);
+}
+
+bool Sequence::SwapClipsAt(int idx1, int idx2) {
+    if (idx1 > -1 && idx2 > -1 && idx1 < video.size() && idx2 < video.size())
+    {
+        std::iter_swap(video.begin() + idx1, video.begin() + idx2);
+        return true;
+    }
+    return false;
 }

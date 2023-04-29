@@ -1,9 +1,12 @@
 #include "ClipItemPanel.h"
+wxDEFINE_EVENT(SWAP_CLIP_WITH_PREV_EVT, wxCommandEvent);
+wxDEFINE_EVENT(SWAP_CLIP_WITH_NEXT_EVT, wxCommandEvent);
 
-ClipItemPanel::ClipItemPanel(VideoClip* videoClip, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
-	: wxScrolledWindow(parent, id, pos, size, style, name)
+ClipItemPanel::ClipItemPanel(VideoClip* videoClip, int idx, wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+	: wxPanel(parent, id, pos, size, style, name)
 {
 	m_videoClip = videoClip;
+	m_idx = idx;
 	SetBackgroundColour(PANEL_WIDGET_BACKGROUND_COLOUR);
 	wxBoxSizer* mainSizer_ = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer* arrowsSizer_ = new wxBoxSizer(wxVERTICAL);
@@ -25,7 +28,7 @@ ClipItemPanel::ClipItemPanel(VideoClip* videoClip, wxWindow* parent, wxWindowID 
 	clipName_->SetFont(clipName_->GetFont().Italic());
 	clipName_->SetForegroundColour(TEXT_COLOUR);
 	mainSizer_->Add(arrowsSizer_);
-	mainSizer_->Add(clipName_, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL| wxALL , 10);
+	mainSizer_->Add(clipName_, 0, wxEXPAND | wxALL , 10);
 	mainSizer_->Layout();
 	SetSizer(mainSizer_);
 	Refresh();
@@ -34,97 +37,88 @@ ClipItemPanel::ClipItemPanel(VideoClip* videoClip, wxWindow* parent, wxWindowID 
 
 void ClipItemPanel::OnUpArrow(wxCommandEvent& event_)
 {
-	// get the parent sizer
-	wxBoxSizer* parentSizer = dynamic_cast<wxBoxSizer*>(GetParent()->GetSizer());
+	wxCommandEvent newEvt(SWAP_CLIP_WITH_PREV_EVT, GetId());
+	newEvt.SetEventObject(this);
+	newEvt.SetInt(m_idx);
 
-	// get the index of this button in the sizer
-	int currIdx = parentSizer->GetItemCount() - 1;
-	bool found = false;
-	const wxSizerItemList& children = parentSizer->GetChildren();
-	wxSizerItemList::const_iterator it = children.begin(), end = children.end();
-	it++;
-	int idx = 0;
-	wxMessageOutputDebug().Printf("\thj\t%d", currIdx+1);
-
-	for (; it != end; it++) {
-		idx++;
-		wxSizerItem* p_item = *it;
-		if (p_item->GetWindow() == this) {
-			currIdx = idx;
-			found = true;
-			break;
-		}
+	wxWindow* window = GetParent();
+	if (window != nullptr) {
+		wxPostEvent(window, newEvt);
 	}
-	
-	if (found)
-	{
-		// detach this button from the sizer
-		parentSizer->Detach(this);
-
-		// insert this button above the button before it
-		parentSizer->Insert(currIdx - 1, this);
-
-		// refresh the sizer to update the layout
-		GetParent()->Layout();
-	}
-}
-
-void ClipItemPanel::OnDownArrow(wxCommandEvent& event_)
-{
-	// //get the parent sizer
+	//// get the parent sizer
 	//wxBoxSizer* parentSizer = dynamic_cast<wxBoxSizer*>(GetParent()->GetSizer());
 
 	//// get the index of this button in the sizer
 	//int currIdx = parentSizer->GetItemCount() - 1;
 	//bool found = false;
-	//parentSizer->GetChildren().Find(this);
-	//for (int idx = 0; idx < parentSizer->GetItemCount()-1; idx++) {
-	//	if ((*parentSizer->GetChildren().Item(idx)) >GetItem(idx)->GetId() == this->GetId()) {
+	//const wxSizerItemList& children = parentSizer->GetChildren();
+	//wxSizerItemList::const_iterator it = children.begin(), end = children.end();
+	//it++;
+	//int idx = 0;
+	//wxMessageOutputDebug().Printf("\thj\t%d", currIdx+1);
+
+	//for (; it != end; it++) {
+	//	idx++;
+	//	wxSizerItem* p_item = *it;
+	//	if (p_item->GetWindow() == this) {
 	//		currIdx = idx;
 	//		found = true;
 	//		break;
 	//	}
 	//}
-	//if (found) {
-
+	//
+	//if (found)
+	//{
 	//	// detach this button from the sizer
 	//	parentSizer->Detach(this);
 
 	//	// insert this button above the button before it
-	//	parentSizer->Insert(currIdx + 1, this);
+	//	parentSizer->Insert(currIdx - 1, this);
 
 	//	// refresh the sizer to update the layout
 	//	GetParent()->Layout();
 	//}
-		// get the parent sizer
-	wxBoxSizer* parentSizer = dynamic_cast<wxBoxSizer*>(GetParent()->GetSizer());
+}
 
-	// get the index of this button in the sizer
-	int currIdx = parentSizer->GetItemCount() - 1;
-	bool found = false;
-	const wxSizerItemList& children = parentSizer->GetChildren();
-	wxSizerItemList::const_iterator it = children.begin(), end = children.end();
-	end--;
-	int idx = 0;
-	for (; it != end; ++it) {
-		idx++;
-		wxSizerItem* p_item = *it;
-		if (p_item->GetWindow() == this) {
-			currIdx = idx;
-			found = true;
-			break;
-		}
+void ClipItemPanel::OnDownArrow(wxCommandEvent& event_)
+{
+	wxCommandEvent newEvt(SWAP_CLIP_WITH_NEXT_EVT, GetId());
+	newEvt.SetEventObject(this);
+	newEvt.SetInt(m_idx);
+
+	wxWindow* window = GetParent();
+	if (window != nullptr) {
+		wxPostEvent(window, newEvt);
 	}
 
-	if (found)
-	{
-		// detach this button from the sizer
-		parentSizer->Detach(this);
+	//wxBoxSizer* parentSizer = dynamic_cast<wxBoxSizer*>(GetParent()->GetSizer());
 
-		// insert this button above the button before it
-		parentSizer->Insert(currIdx - 1, this);
+	//// get the index of this button in the sizer
+	//int currIdx = parentSizer->GetItemCount() - 1;
+	//bool found = false;
+	//const wxSizerItemList& children = parentSizer->GetChildren();
+	//wxSizerItemList::const_iterator it = children.begin(), end = children.end();
+	//end--;
+	//int idx = 0;
+	//for (; it != end; ++it) {
+	//	idx++;
+	//	wxSizerItem* p_item = *it;
+	//	if (p_item->GetWindow() == this) {
+	//		currIdx = idx;
+	//		found = true;
+	//		break;
+	//	}
+	//}
 
-		// refresh the sizer to update the layout
-		GetParent()->Layout();
-	}
+	//if (found)
+	//{
+	//	// detach this button from the sizer
+	//	parentSizer->Detach(this);
+
+	//	// insert this button above the button before it
+	//	parentSizer->Insert(currIdx - 1, this);
+
+	//	// refresh the sizer to update the layout
+	//	GetParent()->Layout();
+	//}
 }
