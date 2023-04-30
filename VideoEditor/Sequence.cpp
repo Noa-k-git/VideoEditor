@@ -362,19 +362,22 @@ void Sequence::SaveVideo(std::string& output_filename)
 
 SyncObject<AVFrame*>* Sequence::GetChunk(int idx)
 {
-   // [[1, 2, 3], [4, 5, 6]]; at = 5;
+   // [[1, 2, 3], [4, 5, 6]]; at = 4;
+   // "idx = 1"
+    // sum = 6
+    // prevsum = 3
+    // 6-3
+    // 4 - (6-3) = 1 V
     int sum = 0;
-    int prevSum = 0;
+    int currIdx = 0;
     for (int i = 0; i < GetLength(); i++)
     {
         sum += video.at(i)->GetSize();
         if (sum > idx) {
-            sum -= prevSum;
-            return video.at(i)->GetChunk(idx);
+            return video.at(i)->GetChunk(idx-currIdx);
         }
-        prevSum = sum;
+        currIdx = sum;
     }
-    
     return nullptr;
 }
 

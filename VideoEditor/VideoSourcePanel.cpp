@@ -157,6 +157,7 @@ void VideoSourcePanel::onAddButtonClicked(wxCommandEvent& event)
 	if (window != nullptr) {
 		wxPostEvent(window, event_);
 	}
+
 }
 
 void VideoSourcePanel::onEditButtonClicked(wxCommandEvent& event)

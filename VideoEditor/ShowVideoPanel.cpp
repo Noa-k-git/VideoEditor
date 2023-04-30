@@ -113,6 +113,8 @@ void ShowVideoPanel::SetVideo() {
 			m_playablePtr = dynamic_cast<IPlayable<AVFrame*>*>(*findSeq.first);
 		}
 	}
+	if (m_playablePtr)
+		timeline->SetMax(m_playablePtr->GetSize());
 
 }
 void ShowVideoPanel::SetVideoName(wxCommandEvent& event_)
