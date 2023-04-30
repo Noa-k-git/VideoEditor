@@ -16,4 +16,7 @@ void SeqSourcePanel::onAddButtonClicked(wxCommandEvent& event_)
 	if (window != nullptr) {
 		wxPostEvent(window, newEvt);
 	}
+
+	wxMouseEvent mEvt(wxEVT_LEFT_DOWN);
+	this->onMouseLeftDown(mEvt);
 }

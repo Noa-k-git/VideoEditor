@@ -29,13 +29,13 @@ public:
 	inline int GetLength() { return video.size(); }
 	inline VideoClip* GetClipAt(int idx) { return video.at(idx); }
 
-	int GetSize() override { return 0; };
-	SyncObject<AVFrame*>* GetChunk(int at) override { 
-		if (video.size() == 0) {
-			return nullptr;
+	int GetSize() override { 
+		int sum = 0;
+		for (int i = 0; i < GetLength(); i++) {
+			sum += video.at(i)->GetSize();
 		}
-		return video.at(0)->GetChunk(0); };
-	//void Play() override {};
+		return sum; };
+	SyncObject<AVFrame*>* GetChunk(int at) override;
 };
 extern Records<Sequence*> sequences;
 

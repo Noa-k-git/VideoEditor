@@ -64,14 +64,19 @@ void VideoClip::ApplyEffects()
 	//this->updated = true;
 }
 
-SyncObject<AVFrame*>* VideoClip::GetChunk(int)
+SyncObject<AVFrame*>* VideoClip::GetChunk(int idx)
 {
+	this->ApplyEffects();
+	if (idx < edges[1] && idx > edges[0])
+		return &clip->at(idx);
 	return nullptr;
 }
 
 int VideoClip::GetSize()
 {
-	return 0;
+	this->ApplyEffects();
+	return clip->size();
+
 }
 
 std::string VideoClip::SourceName()

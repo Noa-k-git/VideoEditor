@@ -359,6 +359,25 @@ void Sequence::SaveVideo(std::string& output_filename)
     avformat_free_context(format_ctx);
 }
 
+
+SyncObject<AVFrame*>* Sequence::GetChunk(int idx)
+{
+   // [[1, 2, 3], [4, 5, 6]]; at = 5;
+    int sum = 0;
+    int prevSum = 0;
+    for (int i = 0; i < GetLength(); i++)
+    {
+        sum += video.at(i)->GetSize();
+        if (sum > idx) {
+            sum -= prevSum;
+            return video.at(i)->GetChunk(idx);
+        }
+        prevSum = sum;
+    }
+    
+    return nullptr;
+}
+
 void Sequence::AddClip(VideoClip* videoClip, int idx)
 {
     if (idx < 0 || idx > video.size()) {

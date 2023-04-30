@@ -102,19 +102,18 @@ void ShowVideoPanel::PlayVideo() {
 }
 void ShowVideoPanel::SetVideo() {
 	m_playablePtr = nullptr;
-	try {
-		auto findVid = VideoSource::videoSources.Contains(m_vidName);
-		if (findVid.second) {
-			//m_playablePtr = dynamic_cast<IPlayable<AVFrame*>*>(*findVid.first);
-			m_playablePtr = dynamic_cast<IPlayable<AVFrame*>*>(*findVid.first);
+	auto findVid = VideoSource::videoSources.Contains(m_vidName);
+	if (findVid.second)
+	{
+		m_playablePtr = dynamic_cast<IPlayable<AVFrame*>*>(*findVid.first);
+	}
+	else {
+		auto findSeq = Sequence::sequences.Contains(m_vidName);
+		if (findSeq.second) {
+			m_playablePtr = dynamic_cast<IPlayable<AVFrame*>*>(*findSeq.first);
 		}
 	}
-	catch (std::bad_cast&) {
-		auto findVid = Sequence::sequences.Contains(m_vidName);
-		if (findVid.second) {
-			m_playablePtr = dynamic_cast<IPlayable<AVFrame*>*>(*findVid.first);
-		}
-	}
+
 }
 void ShowVideoPanel::SetVideoName(wxCommandEvent& event_)
 {
@@ -149,8 +148,13 @@ void ShowVideoPanel::ShowVideo()
 	// set the properties of the copy to match the og frame
 	AVFrame* firstFrame;
 	SetVideo();
-	if (m_playablePtr)
-		firstFrame = m_playablePtr->GetChunk(0)->GetObject();
+	if (m_playablePtr) {
+		auto chunk = m_playablePtr->GetChunk(0);
+		if (chunk)
+			firstFrame = chunk->GetObject();
+		else
+			firstFrame = Sequence::CreateBlackFrame(1, 1, AV_PIX_FMT_RGB24);
+	}
 	else
 		return;
 
@@ -177,8 +181,9 @@ void ShowVideoPanel::ShowVideo()
 		SetVideo();
 		if (m_playablePtr) {
 			SyncObject<AVFrame*>* syncframe = m_playablePtr->GetChunk(pos);
+			if (syncframe)
 			frame = syncframe->GetObject();
-			if (!frame)
+			else
 				break;
 		}
 		else {
