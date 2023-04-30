@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 #include "DesignConstatns.h"
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
-    //EVT_MENU(wxID_NEW, MainWindow::OnImport)
+    EVT_MENU(wxID_SAVE, MainWindow::OnSave)
     //EVT_MENU(wxID_NEW, MainWindow::onNew)
     //EVT_MENU(wxID_EXIT, MainWindow::onQuit)
     //EVT_TOOL(wxID_HELP, MainWindow::onHelp)
@@ -40,10 +40,17 @@ MainWindow::MainWindow(wxWindow* parent,
     --------------------------------|
     
     */
+    wxBoxSizer* layoutSizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* menuSizer = new wxBoxSizer(wxHORIZONTAL);
+    
+    layoutSizer->Add(menuSizer, 0, wxFIXED_MINSIZE);
     wxSplitterWindow* mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_LIVE_UPDATE);
     //mainSplitter->SetBackgroundColour(wxColor(200, 100, 100));
     mainSplitter->SetBackgroundColour(WINDOW_BACKGOUND_COLOUR);
+    layoutSizer->Add(mainSplitter, 1);
+    layoutSizer->Layout();
+    // add buttons to the menu
 
     wxSplitterWindow* topSplitter = new wxSplitterWindow(mainSplitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_BORDER | wxSP_LIVE_UPDATE);
@@ -143,6 +150,10 @@ MainWindow::MainWindow(wxWindow* parent,
     statusBar->PushStatusText(_("Ready!"));
     
     this->Bind(WIDGET_DELETED_EVT, &MainWindow::OnRefresh, this);
+    wxAcceleratorEntry entries[1];
+    entries[0].Set(wxACCEL_CTRL, (int)'S', wxID_SAVE);
+    wxAcceleratorTable accel(1, entries);
+    SetAcceleratorTable(accel);
 
 }
 
@@ -274,6 +285,10 @@ void MainWindow::OnNewSequence(wxCommandEvent& WXUNUSED(event_))
         delete s;
     }
 
+}
+
+void MainWindow::OnSave(wxCommandEvent& event_)
+{
 }
 
 void MainWindow::OnRefresh(wxCommandEvent& event_)

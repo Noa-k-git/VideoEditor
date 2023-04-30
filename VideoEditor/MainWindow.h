@@ -33,7 +33,8 @@ public:
     void onNew(wxCommandEvent& event_);
     void OnImport(wxCommandEvent& event_);
     void OnNewSequence(wxCommandEvent& event_);
-    void onTest(wxCommandEvent& event);
+    void OnSave(wxCommandEvent& event_);
+    void onTest(wxCommandEvent& event_);
     void onQuit(wxCommandEvent& event);
     void onClose(wxCloseEvent& event);
     void onHelp(wxCommandEvent& event);
