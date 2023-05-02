@@ -155,6 +155,7 @@
     <ClCompile Include="SeqControlWindow.cpp" />
     <ClCompile Include="SeqSourcePanel.cpp" />
     <ClCompile Include="Sequence.cpp" />
+    <ClCompile Include="ServerProtocol.cpp" />
     <ClCompile Include="ShowVideoPanel.cpp" />
     <ClCompile Include="SmallBitmapButton.cpp" />
     <ClCompile Include="SubWindows.cpp" />
@@ -182,10 +183,12 @@
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Records.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="ScaleEffect.h" />
     <ClInclude Include="SeqControlWindow.h" />
     <ClInclude Include="SeqSourcePanel.h" />
     <ClInclude Include="Sequence.h" />
+    <ClInclude Include="ServerProtocol.h" />
     <ClInclude Include="ShowVideoPanel.h" />
     <ClInclude Include="SmallBitmapButton.h" />
     <ClInclude Include="SubWindows.h" />
@@ -213,6 +216,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="vidEd.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="VideoEditor.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

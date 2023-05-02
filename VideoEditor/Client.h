@@ -1,1 +1,3 @@
-int CreateConnection();
+namespace client {
+	int CreateConnection();
+}

@@ -96,6 +96,9 @@
     <ClCompile Include="SeqSourcePanel.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
+    <ClCompile Include="ServerProtocol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceID.h">
@@ -185,6 +188,12 @@
     <ClInclude Include="SeqSourcePanel.h">
       <Filter>Header Files\Design</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerProtocol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\functions.png">
@@ -232,5 +241,10 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="vidEd.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="VideoEditor.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
