@@ -13,7 +13,7 @@ App::App()
 
 bool App::OnInit()
 {
-	CreateConnection();
+	//client::CreateConnection();
 	if (!wxApp::OnInit())
 		return false;
 	wxImage::AddHandler(new wxPNGHandler);

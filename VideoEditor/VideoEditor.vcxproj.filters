@@ -28,6 +28,12 @@
     <Filter Include="Source Files\Design">
       <UniqueIdentifier>{5d4bcf9d-13b7-45db-931f-5c627cf68ca6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Encryption">
+      <UniqueIdentifier>{e41e3246-cb95-441a-a838-19b5d5c7de85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Encryption">
+      <UniqueIdentifier>{28cfb0f8-f541-4fae-89b1-3c64617d175b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SourceID.cpp">
@@ -98,6 +104,21 @@
     </ClCompile>
     <ClCompile Include="ServerProtocol.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SHA256.cpp">
+      <Filter>Source Files\Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="euclid.cpp">
+      <Filter>Source Files\Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="mpuint.cpp">
+      <Filter>Source Files\Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="random.cpp">
+      <Filter>Source Files\Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="rsa.cpp">
+      <Filter>Source Files\Encryption</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +214,21 @@
     </ClInclude>
     <ClInclude Include="ServerProtocol.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SHA256.h">
+      <Filter>Header Files\Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="euclid.h">
+      <Filter>Header Files\Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="mpuint.h">
+      <Filter>Header Files\Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="random.h">
+      <Filter>Header Files\Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="rsa.h">
+      <Filter>Header Files\Encryption</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

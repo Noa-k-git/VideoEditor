@@ -1,3 +1,88 @@
-namespace client {
-	int CreateConnection();
-}
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <iostream>
+#include "ServerProtocol.h"
+#include "SHA256.h"
+#ifndef CLIENT_CONSTANTS
+#define CLIENT_CONSTANTS
+#define INVALID_USER_ID -1
+#endif
+class Client {
+public:
+	Client();
+	~Client();
+	// @brief Creates a connection with the server and return the connected socket
+	void CreateConnection();
+	
+	/// <summary>
+	/// Signup request to the server
+	/// </summary>
+	/// <param name="username">User's username</param>
+	/// <param name="email">User's mail</param>
+	/// <param name="password">User's password, unencrypted</param>
+	void Signup(const std::string& username, const std::string& email, std::string password);
+
+	/// <summary>
+	/// Login request to the server
+	/// </summary>
+	/// <param name="mail">The user's mail</param>
+	/// <param name="password">The user's password, unencrypted</param>
+	void Login(const std::string& mail, std::string password);
+
+	/// <summary>
+	/// Logout from the server, thus logout from the project
+	/// </summary>
+	void Logout();
+
+	void PullInfo();
+	
+private:
+	SOCKET listeningSocket;
+	SOCKET writeSocket;
+
+	int userId;
+
+	void Connect(SOCKET &sock);
+	void Listener();
+
+	/// <summary>
+	/// Recieves the full message from a given socket
+	/// </summary>
+	/// <param name="sock">A given socket</param>
+	/// <returns>The full message</returns>
+	std::string RecieveMessage(SOCKET& sock);
+	void EncryptPassword(std::string& password);
+};
+
+//
+//int main() {
+//	// Generate public and private keys
+//	mpuint d(32), e(32), n(32);
+//	GenerateKeys(d, e, n);
+//
+//	// Convert string to numerical representation
+//	std::string message = "This should be encrypted";
+//	mpuint m(message.length() * 8);
+//	for (int i = 0; i < message.length(); i++) {
+//		m.value[i] = message[i];
+//	}
+//
+//	// Encrypt message using public key
+//	mpuint c(m.length);
+//	EncryptDecrypt(c, m, e, n);
+//
+//	// Decrypt message using private key
+//	mpuint decrypted(m.length);
+//	EncryptDecrypt(decrypted, c, d, n);
+//
+//	// Convert decrypted message back to string
+//	std::string decryptedMessage;
+//	for (int i = 0; i < decrypted.length; i++) {
+//		decryptedMessage += decrypted.value[i];
+//	}
+//
+//	std::cout << "Original message: " << message << std::endl;
+//	std::cout << "Decrypted message: " << decryptedMessage << std::endl;
+//
+//	return 0;
+//}

@@ -69,11 +69,11 @@ class Protocol:
         return succeed, cmd.strip(), b_message
 
     #def parse_header(header:bytes) -> 
-    def parse_message(message:bytes) -> List[str]:
+    def parse_message(message:str) -> List[str]:
         """Receives the message part of a request from the user and return a list of arguments passed by the user
 
         Args:
-            message (bytes): the message part of a request from the user
+            message (str): the message part of a request from the user
 
         Returns:
             List(str): the args in the request in a form of list.
