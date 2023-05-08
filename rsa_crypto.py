@@ -1,36 +1,121 @@
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
-import base64
-
-def generate_keys():
-    # RSA modulus length must be a multiple of 256 and >= 1024
-    modulus_length = 256*4  # use larger value in production
-    privatekey = RSA.generate(modulus_length, e=65537)
-    publickey = privatekey.publickey()
-    return privatekey, publickey
-
-def encrypt_message(a_message, publickey):
-    cipher = PKCS1_OAEP.new(publickey)
-    encrypted_msg = cipher.encrypt(a_message.encode())
-    encoded_encrypted_msg = base64.b64encode(encrypted_msg).decode()  # base64 encoded strings are database friendly
-    return encoded_encrypted_msg
-
-def decrypt_message(encoded_encrypted_msg, privatekey):
-    decoded_encrypted_msg = base64.b64decode(encoded_encrypted_msg.encode())
-    cipher = PKCS1_OAEP.new(privatekey)
-    decoded_decrypted_msg = cipher.decrypt(decoded_encrypted_msg).decode()
-    return decoded_decrypted_msg
-
-########## BEGIN ##########
-
-
-a_message = "a"*(26)
-privatekey , publickey = generate_keys()
-encrypted_msg = encrypt_message(a_message, publickey)
-decrypted_msg = decrypt_message(encrypted_msg, privatekey)
-
-# print("%s - (%d)" % (privatekey.exportKey() , len(privatekey.exportKey())))
-# print("%s - (%d)" % (publickey.exportKey() , len(publickey.exportKey())))
-print(" Original content: %s - (%d)" % (a_message, len(a_message)))
-print("Encrypted message: %s - (%d)" % (encrypted_msg, len(encrypted_msg)))
-print("Decrypted message: %s - (%d)" % (decrypted_msg, len(decrypted_msg)))
+import random
+import math
+ 
+# A set will be the collection of prime numbers,
+# where we can select random primes p and q
+prime = set()
+ 
+# We will run the function only once to fill the set of
+# prime numbers
+def primefiller():
+    # Method used to fill the primes set is Sieve of
+    # Eratosthenes (a method to collect prime numbers)
+    seive = [True] * 250
+    seive[0] = False
+    seive[1] = False
+    for i in range(2, 250):
+        for j in range(i * 2, 250, i):
+            seive[j] = False
+ 
+    # Filling the prime numbers
+    for i in range(len(seive)):
+        if seive[i]:
+            prime.add(i)
+ 
+ 
+# Picking a random prime number and erasing that prime
+# number from list because p!=q
+def pickrandomprime():
+    global prime
+    k = random.randint(0, len(prime) - 1)
+    it = iter(prime)
+    for _ in range(k):
+        next(it)
+ 
+    ret = next(it)
+    prime.remove(ret)
+    return ret
+ 
+ 
+def setkeys():
+    primefiller()
+    prime1 = pickrandomprime()  # First prime number
+    prime2 = pickrandomprime()  # Second prime number
+ 
+    n = prime1 * prime2
+    fi = (prime1 - 1) * (prime2 - 1)
+ 
+    e = 2
+    while True:
+        if math.gcd(e, fi) == 1:
+            break
+        e += 1
+ 
+    # d = (k*Φ(n) + 1) / e for some integer k
+    public_key = e
+ 
+    d = 2
+    while True:
+        if (d * e) % fi == 1:
+            break
+        d += 1
+ 
+    private_key = d
+    return public_key, private_key, n
+ 
+ 
+# To encrypt the given number
+def encrypt(message, public_key, n):
+    e = public_key
+    encrypted_text = 1
+    while e > 0:
+        encrypted_text *= message
+        encrypted_text %= n
+        e -= 1
+    return encrypted_text
+ 
+ 
+# To decrypt the given number
+def decrypt(encrypted_text, private_key, n):
+    d = private_key
+    decrypted = 1
+    while d > 0:
+        decrypted *= encrypted_text
+        decrypted %= n
+        d -= 1
+    return decrypted
+ 
+ 
+# First converting each character to its ASCII value and
+# then encoding it then decoding the number to get the
+# ASCII and converting it to character
+def encoder(message, public_key, n):
+    encoded = []
+    # Calling the encrypting function in encoding function
+    for letter in message:
+        encoded.append(encrypt(ord(letter), public_key, n))
+    return encoded
+ 
+ 
+def decoder(encoded, private_key, n):
+    s = ''
+    # Calling the decrypting function decoding function
+    for num in encoded:
+        s += chr(decrypt(num, private_key, n))
+    return s
+ 
+ 
+if __name__ == '__main__':
+    public_key, private_key, n = setkeys()
+    message = "Test Message"
+    # Uncomment below for manual input
+    # message = input("Enter the message\n")
+    # Calling the encoding function
+    coded = encoder(message, public_key, n)
+ 
+    print("Initial message:")
+    print(message)
+    print("\n\nThe encoded message(encrypted by public key)\n")
+    print(''.join(str(p) for p in coded))
+    print("\n\nThe decoded message(decrypted by public key)\n")
+    print(''.join(str(p) for p in decoder(coded, private_key, n)))

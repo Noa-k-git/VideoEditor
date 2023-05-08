@@ -108,15 +108,6 @@
     <ClCompile Include="SHA256.cpp">
       <Filter>Source Files\Encryption</Filter>
     </ClCompile>
-    <ClCompile Include="euclid.cpp">
-      <Filter>Source Files\Encryption</Filter>
-    </ClCompile>
-    <ClCompile Include="mpuint.cpp">
-      <Filter>Source Files\Encryption</Filter>
-    </ClCompile>
-    <ClCompile Include="random.cpp">
-      <Filter>Source Files\Encryption</Filter>
-    </ClCompile>
     <ClCompile Include="rsa.cpp">
       <Filter>Source Files\Encryption</Filter>
     </ClCompile>
@@ -216,15 +207,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SHA256.h">
-      <Filter>Header Files\Encryption</Filter>
-    </ClInclude>
-    <ClInclude Include="euclid.h">
-      <Filter>Header Files\Encryption</Filter>
-    </ClInclude>
-    <ClInclude Include="mpuint.h">
-      <Filter>Header Files\Encryption</Filter>
-    </ClInclude>
-    <ClInclude Include="random.h">
       <Filter>Header Files\Encryption</Filter>
     </ClInclude>
     <ClInclude Include="rsa.h">

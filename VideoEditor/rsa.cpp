@@ -1,237 +1,128 @@
-#include <stdlib.h>
-#include "rsa.h"
-#include "euclid.h"
-#include "random.h"
+﻿#include "rsa.h"
+#include <set>
+#include <cmath>
+#include <cstdlib>
+#include <numeric>
+#include <iostream>
 
-/*----------------------------------------------------------------------------
-This function uses Fermat's Theorem 100 times to test the primeness of a
-(large) positive integer.
-----------------------------------------------------------------------------*/
-
-static bool IsPrime(const mpuint& p)
+std::set<int>prime = {}; // a set will be the collection of prime numbers,
+// where we can select random primes p and q
+int public_key;
+int private_key;
+int n;
+// we will run the function only once to fill the set of
+// prime numbers
+void primefiller()
 {
-    mpuint pminus1(p);
-    pminus1 -= 1;
-    unsigned count = 101;
-    while (--count != 0)
-    {
-        mpuint r(p.length);
-        mpuint x(p.length);
-        {
-            for (unsigned i = 0; i < x.length; i++)
-                x.value[i] = rand() << 8 | rand();
+    // method used to fill the primes set is seive of
+    // eratosthenes(a method to collect prime numbers)
+
+    std::vector<bool> seive(250, true);
+    seive[0] = false;
+    seive[1] = false;
+    for (int i = 2; i < 250; i++) {
+        for (int j = i * 2; j < 250; j += i) {
+            seive[j] = false;
         }
-        x %= p;
-        if (x != 0)
-        {
-            mpuint::Power(x, pminus1, p, r);
-            if (r != 1)
-                return false;
-        }
+    } // filling the prime numbers
+    for (int i = 0; i < seive.size(); i++) {
+        if (seive[i])
+            prime.insert(i);
     }
-    return true;
 }
-
-/*----------------------------------------------------------------------------
-This function generates a (large) prime.
-----------------------------------------------------------------------------*/
-
-static void GeneratePrime(mpuint& p)
+// picking a random prime number and erasing that prime
+// number from list because p!=q
+int pickrandomprime()
 {
-    Random(p);
-    p.value[p.length - 1] |= 0x8000;
-    p.value[0] |= 1;
-    while (!IsPrime(p))
-        p += 2;
+    srand(time(NULL));
+    int k = rand() % prime.size();
+    auto it = prime.begin();
+    while (k--)
+        it++;
+    int ret = *it;
+    prime.erase(it);
+    return ret;
 }
-
-
-void GenerateKeys(mpuint& d, mpuint& e, mpuint& n)
+void rsa_encryption::setkeys(int& private_key, int& public_key, int & n)
 {
-    mpuint p(d.length / 2);
-    GeneratePrime(p);
-    mpuint q(d.length / 2);
-    GeneratePrime(q);
-    mpuint pp(p);
-    pp -= 1;
-    mpuint qq(q);
-    qq -= 1;
-    mpuint pq(d.length);
-    pq = pp;
-    pq *= qq;
-    n = p;
-    n *= q;
-    Random(d);
-    d %= pq;
-    mpuint temp(d.length);
-    mpuint g(d.length);
-    while (true)
-    {
-        EuclideanAlgorithm(d, pq, e, temp, g);
-        if (g == 1)
+    primefiller();
+    int prime1 = pickrandomprime(); // first prime number
+    int prime2 = pickrandomprime(); // second prime number
+    // to check the prime numbers selected
+    // cout<<prime1<<" "<<prime2<<endl;
+    n = prime1 * prime2;
+    int fi = (prime1 - 1) * (prime2 - 1);
+    int e = 2;
+    while (1) {
+        if (std::gcd(e, fi) == 1)
             break;
-        d += 1;
+        e++;
+    } // d = (k*Φ(n) + 1) / e for some integer k
+    public_key = e;
+    int d = 2;
+    while (1) {
+        if ((d * e) % fi == 1)
+            break;
+        d++;
     }
+    private_key = d;
 }
-
-//C++ program for encryption and decryption
-#include<iostream>
-#include<stdlib.h>
-#include<math.h>
-#include<string.h>
-
-using namespace std;
-
-int x, y, n, t, i, flag;
-long int e[50], d[50], temp[50], j;
-char en[50], m[50];
-char msg[100];
-int prime(long int); //function to check for prime number
-void encryption_key();
-long int cd(long int);
-void encrypt();
-void decrypt();
-
-int main()
+// to encrypt the given number
+long long int encrypt(double message, const int& public_key, const int& n)
 {
-    cout << "\nENTER FIRST PRIME NUMBER\n";
-    cin >> x;
-
-    //checking whether input is prime or not
-    flag = prime(x);
-    if (flag == 0)
-    {
-        cout << "\nINVALID INPUT\n";
-        exit(0);
+    int e = public_key;
+    long long int encrpyted_text = 1;
+    while (e--) {
+        encrpyted_text *= message;
+        encrpyted_text %= n;
     }
-
-    cout << "\nENTER SECOND PRIME NUMBER\n";
-    cin >> y;
-
-    flag = prime(y);
-    if (flag == 0 || x == y)
-    {
-        cout << "\nINVALID INPUT\n";
-        exit(0);
-    }
-
-    cout << "\nENTER MESSAGE OR STRING TO ENCRYPT\n";
-    cin >> msg;
-
-    for (i = 0; msg[i] != NULL; i++)
-        m[i] = msg[i];
-    n = x * y;
-    t = (x - 1) * (y - 1);
-
-    encryption_key();
-    cout << "\nPOSSIBLE VALUES OF e AND d ARE\n";
-
-    for (i = 0; i < j - 1; i++)
-        cout << "\n" << e[i] << "\t" << d[i];
-
-    encrypt();
-    decrypt();
-    return 0;
-} //end of the main program
-
-int prime(long int pr)
-{
-    int i;
-    j = sqrt(pr);
-    for (i = 2; i <= j; i++)
-    {
-        if (pr % i == 0)
-            return 0;
-    }
-    return 1;
+    return encrpyted_text;
 }
-
-//function to generate encryption key
-void encryption_key()
+// to decrypt the given number
+long long int decrypt(int encrpyted_text, const int& private_key, const int& n)
 {
-    int k;
-    k = 0;
-    for (i = 2; i < t; i++)
-    {
-        if (t % i == 0)
-            continue;
-        flag = prime(i);
-        if (flag == 1 && i != x && i != y)
-        {
-            e[k] = i;
-            flag = cd(e[k]);
-            if (flag > 0)
-            {
-                d[k] = flag;
-                k++;
-            }
-            if (k == 99)
-                break;
-        }
+    int d = private_key;
+    long long int decrypted = 1;
+    while (d--) {
+        decrypted *= encrpyted_text;
+        decrypted %= n;
     }
+    return decrypted;
 }
-
-long int cd(long int a)
+// first converting each character to its ASCII value and
+// then encoding it then decoding the number to get the
+// ASCII and converting it to character
+std::vector<int> rsa_encryption::encoder(std::string message, const int& public_key, const int& n)
 {
-    long int k = 1;
-    while (1)
-    {
-        k = k + t;
-        if (k % a == 0)
-            return(k / a);
-    }
+    std::vector<int> form;
+    // calling the encrypting function in encoding function
+    for (auto& letter : message)
+        form.push_back(encrypt((int)letter, public_key, n));
+    return form;
 }
-
-//function to encrypt the message
-void encrypt()
+std::string rsa_encryption::decoder(std::vector<int> encoded, const int& private_key, const int& n)
 {
-    long int pt, ct, key = e[0], k, len;
-    i = 0;
-    len = strlen(msg);
-
-    while (i != len)
-    {
-        pt = m[i];
-        pt = pt - 96;
-        k = 1;
-        for (j = 0; j < key; j++)
-        {
-            k = k * pt;
-            k = k % n;
-        }
-        temp[i] = k;
-        ct = k + 96;
-        en[i] = ct;
-        i++;
-    }
-    en[i] = -1;
-    cout << "\n\nTHE ENCRYPTED MESSAGE IS\n";
-    for (i = 0; en[i] != -1; i++)
-        cout << en[i];
+    std::string s;
+    // calling the decrypting function decoding function
+    for (auto& num : encoded)
+        s += decrypt(num, private_key, n);
+    return s;
 }
-
-//function to decrypt the message
-void decrypt()
-{
-    long int pt, ct, key = d[0], k;
-    i = 0;
-    while (en[i] != -1)
-    {
-        ct = temp[i];
-        k = 1;
-        for (j = 0; j < key; j++)
-        {
-            k = k * ct;
-            k = k % n;
-        }
-        pt = k + 96;
-        m[i] = pt;
-        i++;
-    }
-    m[i] = -1;
-    cout << "\n\nTHE DECRYPTED MESSAGE IS\n";
-    for (i = 0; m[i] != -1; i++)
-        cout << m[i];
-
-    cout << endl;
-}
+//int main()
+//{
+//    setkeys(private_key, public_key, n);
+//    std::string message = "Test Message";
+//    // uncomment below for manual input
+//    // cout<<"enter the message\n";getline(cin,message);
+//    // calling the encoding function
+//    std::vector<int> coded = encoder(message, public_key, n);
+//    std::cout << "Initial message:\n" << message;
+//    std::cout << "\n\nThe encoded message(encrypted by public "
+//        "key)\n";
+//    for (auto& p : coded)
+//        std::cout << p;
+//    std::cout << "\n\nThe decoded message(decrypted by private "
+//        "key)\n";
+//    std::cout << decoder(coded, private_key, n) << std::endl;
+//    return 0;
+//}
