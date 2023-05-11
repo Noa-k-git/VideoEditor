@@ -5,6 +5,8 @@
 #include <vector>
 #include <tuple>
 #include <algorithm>
+#include "rsa.h"
+#include "ShiftCipher.h"
 
 #ifndef SERVER_CONSTATNS
 #define SERVER_CONSTATNS
@@ -28,7 +30,7 @@ namespace server_protocol{
 	//  2) * ((x, x), (x, x), (x, x))-- > x * x; x * x; x * x
 	//  3) > (y, (x, x, (z, z, z)), y)-- > y; x * x > z > z > z; y
 
-	const int SHIFT_KEY = 4;
+	const int SHIFT_KEY = 7;
 	const char SEPARATORS[3] = { ';', '*', '>' };
 	const std::map < std::string, bool > CMD_STATUS = {
 		{"OK", true},
@@ -58,7 +60,7 @@ namespace server_protocol{
 	* @return - message The message
 	* 
 	*/
-	std::tuple<bool, std::string, bool, std::string> ParseResponse(const std::string& data);
+	std::tuple<bool, std::string, bool, std::string> ParseResponse(const std::string& data, int privateKey, int n);
 
 	/**
 	* @brief Parses the message part of a request from the user and returns a list of arguments passed by the user.
@@ -99,7 +101,7 @@ namespace server_protocol{
 	 * @return A list of all the parts to be sent to the server as the client request
 	 *         If an error occurred, empty vector is returned.
 	 */
-	std::vector<std::string> BuildRequest(const std::string& cmd, const std::string& message);
+	std::vector<std::string> BuildRequest(const std::string& cmd, const std::string& message, int serverKey, int serverN);
 
 	/*
 	* @brief Helper method. Gets a list, joins all of it's fields to one string divided by the delimiter

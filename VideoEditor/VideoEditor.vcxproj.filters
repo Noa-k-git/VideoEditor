@@ -111,6 +111,9 @@
     <ClCompile Include="rsa.cpp">
       <Filter>Source Files\Encryption</Filter>
     </ClCompile>
+    <ClCompile Include="ShiftCipher.cpp">
+      <Filter>Source Files\Encryption</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceID.h">
@@ -210,6 +213,9 @@
       <Filter>Header Files\Encryption</Filter>
     </ClInclude>
     <ClInclude Include="rsa.h">
+      <Filter>Header Files\Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="ShiftCipher.h">
       <Filter>Header Files\Encryption</Filter>
     </ClInclude>
   </ItemGroup>

@@ -15,7 +15,7 @@ class Protocol:
     MAX_MSG_LENGTH = MSG_HEADER_LENGTH + MAX_DATA_LENGTH  # Max size of total message
     PART_SIZE = 2048
     DELIMITER = "|"  # Delimiter character in protocol
-    
+    SHIFT_KEY = 7
     # Separators between args: 
     #   1) ;    (x,x,x) --> x;x;x
     #   2) *    ((x,x),(x,x),(x,x)) --> x*x;x*x;x*x

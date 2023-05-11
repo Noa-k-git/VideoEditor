@@ -43,7 +43,7 @@ int pickrandomprime()
     prime.erase(it);
     return ret;
 }
-void rsa_encryption::setkeys(int& private_key, int& public_key, int & n)
+void rsa_cipher::setkeys(int& private_key, int& public_key, int & n)
 {
     primefiller();
     int prime1 = pickrandomprime(); // first prime number
@@ -92,7 +92,7 @@ long long int decrypt(int encrpyted_text, const int& private_key, const int& n)
 // first converting each character to its ASCII value and
 // then encoding it then decoding the number to get the
 // ASCII and converting it to character
-std::vector<int> rsa_encryption::encoder(std::string message, const int& public_key, const int& n)
+std::vector<int> rsa_cipher::encoder(std::string message, const int& public_key, const int& n)
 {
     std::vector<int> form;
     // calling the encrypting function in encoding function
@@ -100,7 +100,7 @@ std::vector<int> rsa_encryption::encoder(std::string message, const int& public_
         form.push_back(encrypt((int)letter, public_key, n));
     return form;
 }
-std::string rsa_encryption::decoder(std::vector<int> encoded, const int& private_key, const int& n)
+std::string rsa_cipher::decoder(std::vector<int> encoded, const int& private_key, const int& n)
 {
     std::string s;
     // calling the decrypting function decoding function

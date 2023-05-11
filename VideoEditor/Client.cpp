@@ -1,10 +1,16 @@
 #include "Client.h"
-
+#ifndef PROTOCOL_FUNC
+#define PROTOCOL_FUNC
+#define PARSE_RESPONSE(data) server_protocol::ParseResponse(data, privateKey, myN)
+#define BUILD_REQUEST(cmd, msg) server_protocol::BuildRequest(cmd, msg, serverKey, serverN)
+#endif
 Client::Client()
 {
     listeningSocket = INVALID_SOCKET;
     writeSocket = INVALID_SOCKET;
     userId = INVALID_USER_ID;
+    privateKey = 0, publicKey = 0, serverKey = 0, myN = 0, serverN = 0;
+    rsa_cipher::setkeys(privateKey, publicKey, myN);
     WSADATA wsaData;
 
     // Initialize Winsock
@@ -29,6 +35,8 @@ Client::~Client()
 void Client::CreateConnection()
 {
     Connect(writeSocket);
+    std::string data= RecieveMessage(writeSocket);
+    serverKey = std::stoi(data);
     int iResult;
 
     // Send and receive data
@@ -56,7 +64,7 @@ void Client::Signup(const std::string& username, const std::string& email, std::
     
     do {
         std::string msg = server_protocol::BuildMessage({ username, email, password });
-        std::vector<std::string> requestParts = server_protocol::BuildRequest("LOGIN", msg);
+        std::vector<std::string> requestParts = BUILD_REQUEST("LOGIN", msg);
         for (auto& part : requestParts) {
             res = send(writeSocket, part.c_str(), part.size(), 0);
             if (res == SOCKET_ERROR)
@@ -66,7 +74,7 @@ void Client::Signup(const std::string& username, const std::string& email, std::
             }
         }
         std::string data = RecieveMessage(writeSocket);
-        std::tuple<bool, std::string, bool, std::string> info = server_protocol::ParseResponse(data);
+        std::tuple<bool, std::string, bool, std::string> info = PARSE_RESPONSE(data);
     } while (std::get<0>(info));
     if (std::get<2>(info)) {
         userId = std::stoi(std::get<3>(info));
@@ -81,7 +89,7 @@ void Client::Login(const std::string& mail, std::string password)
     
     do {
         std::string msg = server_protocol::BuildMessage({ mail, password });
-        std::vector<std::string> requestParts = server_protocol::BuildRequest("LOGIN", msg);
+        std::vector<std::string> requestParts = BUILD_REQUEST("LOGIN", msg);
         for (auto& part : requestParts) {
             res = send(writeSocket, part.c_str(), part.size(), 0);
             if (res == SOCKET_ERROR)
@@ -91,7 +99,7 @@ void Client::Login(const std::string& mail, std::string password)
             }
         }
         std::string data = RecieveMessage(writeSocket);
-        std::tuple<bool, std::string, bool, std::string> info = server_protocol::ParseResponse(data);
+        std::tuple<bool, std::string, bool, std::string> info = PARSE_RESPONSE(data);
     } while (std::get<0>(info));
     if (std::get<2>(info)) {
         userId = std::stoi(std::get<3>(info));
@@ -145,7 +153,7 @@ void Client::Listener()
 {
     Connect(listeningSocket);
     std::string data = RecieveMessage(listeningSocket);
-    auto info = server_protocol::ParseResponse(data);
+    auto info = server_protocol::ParseResponse(data, privateKey, myN);
     bool succeed = std::get<0>(info);
     if (succeed)
     {
@@ -182,7 +190,8 @@ std::string Client::RecieveMessage(SOCKET& sock)
     for (auto pair_ : parts) {
         fullMsg += std::get<1>(pair_);
     }
-    return fullMsg;
+    
+    return shift_cipher::dectypt(fullMsg, server_protocol::SHIFT_KEY);;
 }
 
 void Client::EncryptPassword(std::string& password)

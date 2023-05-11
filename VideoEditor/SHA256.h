@@ -14,10 +14,10 @@ typedef struct {
     uint state[8];
 } SHA256_CTX;
 
-void SHA256Transform(SHA256_CTX* ctx, uchar data[]);
-void SHA256Init(SHA256_CTX* ctx);
-void SHA256Update(SHA256_CTX* ctx, uchar data[], uint len);
-void SHA256Final(SHA256_CTX* ctx, uchar hash[]);
+//void SHA256Transform(SHA256_CTX* ctx, uchar data[]);
+//void SHA256Init(SHA256_CTX* ctx);
+//void SHA256Update(SHA256_CTX* ctx, uchar data[], uint len);
+//void SHA256Final(SHA256_CTX* ctx, uchar hash[]);
 std::string SHA256(char* data);
 
 #endif

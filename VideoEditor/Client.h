@@ -3,6 +3,8 @@
 #include <iostream>
 #include "ServerProtocol.h"
 #include "SHA256.h"
+#include "rsa.h"
+#include "ShiftCipher.h"
 #ifndef CLIENT_CONSTANTS
 #define CLIENT_CONSTANTS
 #define INVALID_USER_ID -1
@@ -41,6 +43,12 @@ private:
 	SOCKET writeSocket;
 
 	int userId;
+
+	int publicKey;
+	int privateKey;
+	int myN;
+	int serverKey;
+	int serverN;
 
 	void Connect(SOCKET &sock);
 	void Listener();
