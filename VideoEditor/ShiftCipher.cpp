@@ -1,4 +1,4 @@
-#include "ShiftCypher.h"
+#include "ShiftCipher.h"
 
 std::string shift_cipher::encrypt(std::string text, int s)
 {
@@ -8,7 +8,7 @@ std::string shift_cipher::encrypt(std::string text, int s)
 	for (int i = 0; i < text.length(); i++) {
 		// apply transformation to each character
 		// Encrypt Uppercase letters
-
+		auto x = text[i];
 		result += char(text[i] + s);
 	}
 

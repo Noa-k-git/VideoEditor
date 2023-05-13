@@ -20,3 +20,11 @@ void SeqSourcePanel::onAddButtonClicked(wxCommandEvent& event_)
 	wxMouseEvent mEvt(wxEVT_LEFT_DOWN);
 	this->onMouseLeftDown(mEvt);
 }
+
+void SeqSourcePanel::onEditButtonClicked(wxCommandEvent& event_)
+{
+	Sequence::sequences.UpdateName(m_videoSource->GetName());
+	m_videoName->SetLabelText(m_videoSource->GetName());
+	m_mainSizer->Layout();
+	SetSizerAndFit(m_mainSizer);
+}

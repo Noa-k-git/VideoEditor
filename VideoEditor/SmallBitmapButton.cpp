@@ -35,3 +35,7 @@ void SmallBitmapButton::RescaleBitmap()
 	this->SetBitmap(finalImg);
 
 }
+
+wxSize SmallBitmapButton::GetBitmapSize() {
+	return m_iconSize;
+}

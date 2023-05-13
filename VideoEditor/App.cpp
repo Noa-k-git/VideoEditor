@@ -16,6 +16,10 @@ bool App::OnInit()
 	//client::CreateConnection();
 	if (!wxApp::OnInit())
 		return false;
+	
+	//wxLocale::AddCatalogLookupPathPrefix(".");
+	//wxLocale local(wxLANGUAGE_ENGLISH, wxLOCALE_DONT_LOAD_DEFAULT);
+	//wxLocale::Init(wxLANGUAGE_ENGLISH, wxLOCALE_DONT_LOAD_DEFAULT);
 	wxImage::AddHandler(new wxPNGHandler);
 	//VideoSource* vs = new VideoSource("C:\\Users\\cyber\\source\\repos\\Noa-k-git\\VideoEditor\\video.mp4");
 	wxDisplay * display = new wxDisplay();

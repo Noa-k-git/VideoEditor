@@ -11,8 +11,11 @@
 #include "ShowVideoPanel.h"
 #include <wx/wxprec.h>
 #include <wx/splitter.h>
+#include <wx/statline.h>
 #include <wx/wrapsizer.h>
 #include "Map.h"
+#include "UserDialog.h"
+#include "Client.h"
 
  #ifndef WX_PRECOMP
 	#include <wx/wx.h>
@@ -32,6 +35,7 @@ public:
 
     void onNew(wxCommandEvent& event_);
     void OnImport(wxCommandEvent& event_);
+    void OnUser(wxCommandEvent& event_);
     void OnNewSequence(wxCommandEvent& event_);
     void OnSave(wxCommandEvent& event_);
     void onTest(wxCommandEvent& event_);
@@ -41,6 +45,7 @@ public:
     inline void OnRefresh(wxCommandEvent& event_);
 
     DECLARE_EVENT_TABLE();
+    ServerClient* clientPtr;
 private:
     std::mutex statusBarMutex;
     wxStatusBar* statusBar;

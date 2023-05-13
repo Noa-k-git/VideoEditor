@@ -40,15 +40,28 @@ MainWindow::MainWindow(wxWindow* parent,
     --------------------------------|
     
     */
+    SetBackgroundColour(WINDOW_BRIGHT_BACKGOUND_COLOUR);
     wxBoxSizer* layoutSizer = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* menuSizer = new wxBoxSizer(wxHORIZONTAL);
-    
-    layoutSizer->Add(menuSizer, 0, wxFIXED_MINSIZE);
+    clientPtr = new ServerClient();
+    layoutSizer->SetDimension(GetSize().x, GetSize().y, GetSize().GetWidth(), GetSize().GetHeight());
+    layoutSizer->Add(menuSizer, 0, wxEXPAND);
+
+    wxBitmap userIcon((std::string)"user4.png", wxBITMAP_TYPE_PNG);
+    SmallBitmapButton* loginButton = new SmallBitmapButton(this, wxID_ANY, userIcon, wxDefaultPosition, wxSize(32, 32), wxSize(26, 26), wxBU_AUTODRAW);
+    loginButton->Bind(wxEVT_BUTTON, &MainWindow::OnUser, this);
+    loginButton->SetForegroundColour(WINDOW_BRIGHT_FOREGROUND_COLOUR);
+    loginButton->SetBackgroundColour(WINDOW_BRIGHT_FOREGROUND_COLOUR);
+    loginButton->SetToolTip(new wxToolTip("User"));
+    wxBoxSizer* loginSizer = new wxBoxSizer(wxVERTICAL);
+    loginSizer->Add(loginButton, 0, wxALIGN_RIGHT|wxRIGHT, 10);
+    menuSizer->Add(loginSizer , 1, wxALL, 5);
+    menuSizer->Layout();
     wxSplitterWindow* mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_LIVE_UPDATE);
     //mainSplitter->SetBackgroundColour(wxColor(200, 100, 100));
     mainSplitter->SetBackgroundColour(WINDOW_BACKGOUND_COLOUR);
-    layoutSizer->Add(mainSplitter, 1);
+    layoutSizer->Add(mainSplitter, 1, wxEXPAND);
     layoutSizer->Layout();
     // add buttons to the menu
 
@@ -154,6 +167,7 @@ MainWindow::MainWindow(wxWindow* parent,
     entries[0].Set(wxACCEL_CTRL, (int)'S', wxID_SAVE);
     wxAcceleratorTable accel(1, entries);
     SetAcceleratorTable(accel);
+    SetSizer(layoutSizer);
 
 }
 
@@ -268,6 +282,12 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event_))
     //(*Sequence::sequences.Contains("a").first)->AddClip(new VideoClip(*VideoSource::videoSources.Contains("v").first));
     //std::string fname = "RecordVideo.mp4";
     //(*Sequence::sequences.Contains("a").first)->SaveVideo(fname);
+}
+
+void MainWindow::OnUser(wxCommandEvent& event_)
+{
+    UserDialog* dialog = new UserDialog(this);
+    dialog->ShowModal();
 }
 
 void MainWindow::OnNewSequence(wxCommandEvent& WXUNUSED(event_))

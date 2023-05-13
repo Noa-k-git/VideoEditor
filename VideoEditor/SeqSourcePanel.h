@@ -8,5 +8,6 @@ public:
     SeqSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoSource, wxWindowID showWindow, wxWindowID sequenceWindow);
 private:
     void onAddButtonClicked(wxCommandEvent& event_) override;
+    void onEditButtonClicked(wxCommandEvent& event_) override;
 };
 

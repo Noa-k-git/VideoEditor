@@ -1,10 +1,14 @@
+#pragma once
 #include "Client.h"
+#include <wx/wx.h>
+#include <wx/msgdlg.h>
+#include <wx/app.h>
 #ifndef PROTOCOL_FUNC
 #define PROTOCOL_FUNC
 #define PARSE_RESPONSE(data) server_protocol::ParseResponse(data, privateKey, myN)
 #define BUILD_REQUEST(cmd, msg) server_protocol::BuildRequest(cmd, msg, serverKey, serverN)
 #endif
-Client::Client()
+ServerClient::ServerClient()
 {
     listeningSocket = INVALID_SOCKET;
     writeSocket = INVALID_SOCKET;
@@ -25,38 +29,48 @@ Client::Client()
     CreateConnection();
 }
 
-Client::~Client()
+ServerClient::~ServerClient()
 {
     // Cleanup
     closesocket(writeSocket);
     WSACleanup();
 }
 
-void Client::CreateConnection()
+void ServerClient::CreateConnection()
 {
     Connect(writeSocket);
+    if (writeSocket == INVALID_SOCKET)
+    {
+        wxLocale local(wxLANGUAGE_ENGLISH, wxLOCALE_DONT_LOAD_DEFAULT);
+        wxMessageBox(wxT("Could not connect to server"), wxT("FATAL ERROR"), wxICON_ERROR);
+        //wxMessageDialog dialog(nullptr, "Could not connect to server", wxT("FATAL ERROR"), wxICON_ERROR);
+        //dialog.ShowModal();
+        exit(EXIT_FAILURE);
+    }
     std::string data= RecieveMessage(writeSocket);
-    serverKey = std::stoi(data);
-    int iResult;
+    std::vector<std::string> keyN = server_protocol::SplitString(data, '|');
+    serverKey = std::stoi(keyN.at(0));
+    serverN = std::stoi(keyN.at(1));
+    //int iResult;
 
     // Send and receive data
-    char sendbuf[] = "Hello from the client!";
-    iResult = send(writeSocket, sendbuf, strlen(sendbuf), 0);
-    if (iResult == SOCKET_ERROR) {
-        std::cout << "Error sending data: " << WSAGetLastError() << std::endl;
-        closesocket(writeSocket);
-        WSACleanup();
-        return;
-    }
+    //char sendbuf[] = "Hello from the client!";
+    //iResult = send(writeSocket, sendbuf, strlen(sendbuf), 0);
+    //if (iResult == SOCKET_ERROR) {
+    //    std::cout << "Error sending data: " << WSAGetLastError() << std::endl;
+    //    closesocket(writeSocket);
+    //    WSACleanup();
+    //    return;
+    //}
 
-    char recvbuf[256];
-    iResult = recv(writeSocket, recvbuf, sizeof(recvbuf), 0);
+    //char recvbuf[256];
+    //iResult = recv(writeSocket, recvbuf, sizeof(recvbuf), 0);
 
 
     return;
 }
 
-void Client::Signup(const std::string& username, const std::string& email, std::string password)
+void ServerClient::Signup(const std::string& username, const std::string& email, std::string password)
 {
     int res = 0;
     std::tuple<bool, std::string, bool, std::string> info;
@@ -81,7 +95,7 @@ void Client::Signup(const std::string& username, const std::string& email, std::
     }
 }
 
-void Client::Login(const std::string& mail, std::string password)
+void ServerClient::Login(const std::string& mail, std::string password)
 {
     int res = 0;
     std::tuple<bool, std::string, bool, std::string> info;
@@ -106,15 +120,15 @@ void Client::Login(const std::string& mail, std::string password)
     }
 }
 
-void Client::Logout()
+void ServerClient::Logout()
 {
 }
 
-void Client::PullInfo()
+void ServerClient::PullInfo()
 {
 }
 
-void Client::Connect(SOCKET& sock)
+void ServerClient::Connect(SOCKET& sock)
 {
     // Create a socket
    // AV_INET -> IPv4
@@ -149,7 +163,7 @@ void Client::Connect(SOCKET& sock)
     }
 }
 
-void Client::Listener()
+void ServerClient::Listener()
 {
     Connect(listeningSocket);
     std::string data = RecieveMessage(listeningSocket);
@@ -164,12 +178,13 @@ void Client::Listener()
 
 }
 
-std::string Client::RecieveMessage(SOCKET& sock)
+std::string ServerClient::RecieveMessage(SOCKET& sock)
 {
     char recvbuf[server_protocol::PART_SIZE];
     std::vector<std::tuple<int, std::string>> parts;
     std::string fullMsg = "";
     while (true) {
+        std::memset(recvbuf, 0, sizeof(recvbuf));
         int iResult = recv(sock, recvbuf, sizeof(recvbuf), 0);
         /*if (iResult > 0) {
             std::cout << "Received: " << recvbuf << std::endl;
@@ -194,7 +209,7 @@ std::string Client::RecieveMessage(SOCKET& sock)
     return shift_cipher::dectypt(fullMsg, server_protocol::SHIFT_KEY);;
 }
 
-void Client::EncryptPassword(std::string& password)
+void ServerClient::EncryptPassword(std::string& password)
 {
     char* password_c = new char[password.size() + 1];
     std::strcpy(password_c, password.c_str());

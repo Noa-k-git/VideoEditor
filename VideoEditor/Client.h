@@ -1,3 +1,4 @@
+#pragma once
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
@@ -9,10 +10,10 @@
 #define CLIENT_CONSTANTS
 #define INVALID_USER_ID -1
 #endif
-class Client {
+class ServerClient {
 public:
-	Client();
-	~Client();
+	ServerClient();
+	~ServerClient();
 	// @brief Creates a connection with the server and return the connected socket
 	void CreateConnection();
 	

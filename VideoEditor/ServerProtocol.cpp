@@ -45,7 +45,7 @@ std::vector<std::string> server_protocol::ParseMessage(const std::string& messag
 			return parts;
 		}
 	}
-	return std::vector<std::string>();
+	return {message};
 }
 
 std::string server_protocol::BuildMessage(const std::vector<std::string>& msgLst)
@@ -94,7 +94,7 @@ std::vector<std::string> server_protocol::BuildRequest(const std::string& cmd, c
 	return parts;
 }
 
-std::string CreateHeader(const std::vector<std::string>& headerFields, int publicKey, int n) {
+std::string server_protocol::CreateHeader(const std::vector<std::string>& headerFields, int publicKey, int n) {
 	std::string decoded = server_protocol::JoinRequestFields(headerFields);
 	std::vector<int> encodedIntVec = rsa_cipher::encoder(decoded, publicKey, n);
 	std::vector<std::string> encodedStrVec (encodedIntVec.size());

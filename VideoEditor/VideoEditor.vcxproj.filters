@@ -114,6 +114,9 @@
     <ClCompile Include="ShiftCipher.cpp">
       <Filter>Source Files\Encryption</Filter>
     </ClCompile>
+    <ClCompile Include="UserDialog.cpp">
+      <Filter>Source Files\Design</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceID.h">
@@ -218,6 +221,9 @@
     <ClInclude Include="ShiftCipher.h">
       <Filter>Header Files\Encryption</Filter>
     </ClInclude>
+    <ClInclude Include="UserDialog.h">
+      <Filter>Header Files\Design</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\functions.png">
@@ -260,6 +266,21 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="rightarrow.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="user.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="user2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="user4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="passwordeye.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="openeye.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

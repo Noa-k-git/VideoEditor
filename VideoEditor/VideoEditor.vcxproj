@@ -166,6 +166,7 @@
     <ClCompile Include="SubWindows.cpp" />
     <ClCompile Include="SyncObject.cpp" />
     <ClCompile Include="SourceID.cpp" />
+    <ClCompile Include="UserDialog.cpp" />
     <ClCompile Include="VideoClip.cpp" />
     <ClCompile Include="VideoSource.cpp" />
     <ClCompile Include="VideoSourcePanel.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="SubWindows.h" />
     <ClInclude Include="SyncObject.h" />
     <ClInclude Include="SourceID.h" />
+    <ClInclude Include="UserDialog.h" />
     <ClInclude Include="VideoClip.h" />
     <ClInclude Include="VideoSource.h" />
     <ClInclude Include="VideoSourcePanel.h" />
@@ -214,10 +216,15 @@
     <Image Include="gotoend.png" />
     <Image Include="gotostart.png" />
     <Image Include="nextframe.png" />
+    <Image Include="openeye.png" />
+    <Image Include="passwordeye.png" />
     <Image Include="pause.png" />
     <Image Include="play.png" />
     <Image Include="prevframe.png" />
     <Image Include="rightarrow.png" />
+    <Image Include="user.png" />
+    <Image Include="user2.png" />
+    <Image Include="user4.png" />
     <Image Include="whiteAdd.png" />
     <Image Include="whiteDelete.png" />
     <Image Include="whiteEdit.png" />

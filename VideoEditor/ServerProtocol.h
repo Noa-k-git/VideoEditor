@@ -30,7 +30,7 @@ namespace server_protocol{
 	//  2) * ((x, x), (x, x), (x, x))-- > x * x; x * x; x * x
 	//  3) > (y, (x, x, (z, z, z)), y)-- > y; x * x > z > z > z; y
 
-	const int SHIFT_KEY = 7;
+	const int SHIFT_KEY = 2;
 	const char SEPARATORS[3] = { ';', '*', '>' };
 	const std::map < std::string, bool > CMD_STATUS = {
 		{"OK", true},
@@ -102,6 +102,7 @@ namespace server_protocol{
 	 *         If an error occurred, empty vector is returned.
 	 */
 	std::vector<std::string> BuildRequest(const std::string& cmd, const std::string& message, int serverKey, int serverN);
+	std::string CreateHeader(const std::vector<std::string>& headerFields, int publicKey, int n);
 
 	/*
 	* @brief Helper method. Gets a list, joins all of it's fields to one string divided by the delimiter

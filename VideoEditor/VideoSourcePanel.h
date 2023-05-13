@@ -15,6 +15,7 @@ public:
     VideoSourcePanel(wxWindow* parent, IPlayable<AVFrame*>* videoSource, wxWindowID showWindow, wxWindowID sequenceWindow);
     ~VideoSourcePanel();
     virtual void onAddButtonClicked(wxCommandEvent& event);
+    virtual void onEditButtonClicked(wxCommandEvent& event);
 protected:
     wxWindowID m_showWindowID;
     wxWindowID m_sequenceWindowID;
@@ -30,7 +31,6 @@ protected:
     void rescaleBitmap(wxBitmap&, const wxSize&);
     void onMouseLeftDown(wxMouseEvent& event);
     void onMouseLeftDoubleClick(wxMouseEvent& event);
-    void onEditButtonClicked(wxCommandEvent& event);
     void onDeleteButtonClicked(wxCommandEvent& event);
 };
 

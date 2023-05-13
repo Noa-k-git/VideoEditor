@@ -19,8 +19,9 @@ public:
         long style = wxBU_AUTODRAW, const wxValidator& validator = wxDefaultValidator,
         const wxString& name = wxButtonNameStr);
     void ChangeBitmap(wxBitmap bimap);
-private:
+    wxSize GetBitmapSize();
     void RescaleBitmap();
+private:
     wxSize m_iconSize;
     wxSize m_buttonSize;
     wxColour m_buttonColor;
