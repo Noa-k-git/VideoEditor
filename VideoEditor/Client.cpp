@@ -23,8 +23,8 @@ ServerClient::ServerClient()
 
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
-        std::cout << "WSAStartup failed: " << iResult << std::endl;
-        return;
+        wxMessageBox(wxT("WSAStartup failed: " + std::to_string(iResult)), wxT("FATAL ERROR"), wxICON_ERROR);
+        exit(EXIT_FAILURE);
     }
     CreateConnection();
 }
@@ -51,6 +51,7 @@ void ServerClient::CreateConnection()
     std::vector<std::string> keyN = server_protocol::SplitString(data, '|');
     serverKey = std::stoi(keyN.at(0));
     serverN = std::stoi(keyN.at(1));
+    SendKeys();
     //int iResult;
 
     // Send and receive data
@@ -70,58 +71,61 @@ void ServerClient::CreateConnection()
     return;
 }
 
-void ServerClient::Signup(const std::string& username, const std::string& email, std::string password)
+std::tuple<bool, std::string> ServerClient::SendRecieve(std::string cmd, std::string message)
 {
     int res = 0;
     std::tuple<bool, std::string, bool, std::string> info;
-    EncryptPassword(password);
-    
     do {
-        std::string msg = server_protocol::BuildMessage({ username, email, password });
-        std::vector<std::string> requestParts = BUILD_REQUEST("LOGIN", msg);
+        std::vector<std::string> requestParts = BUILD_REQUEST(cmd, message);
         for (auto& part : requestParts) {
             res = send(writeSocket, part.c_str(), part.size(), 0);
             if (res == SOCKET_ERROR)
             {
-                // handle something
-                return;
+                CreateConnection();
             }
         }
         std::string data = RecieveMessage(writeSocket);
-        std::tuple<bool, std::string, bool, std::string> info = PARSE_RESPONSE(data);
-    } while (std::get<0>(info));
-    if (std::get<2>(info)) {
-        userId = std::stoi(std::get<3>(info));
-    }
+        info = PARSE_RESPONSE(data);
+    } while (!std::get<0>(info));
+    return std::tuple<bool, std::string>(std::get<2>(info), std::get<3>(info));
 }
 
-void ServerClient::Login(const std::string& mail, std::string password)
+void ServerClient::SendKeys()
 {
-    int res = 0;
-    std::tuple<bool, std::string, bool, std::string> info;
+    std::string msg = server_protocol::BuildMessage({ std::to_string(publicKey), std::to_string(myN) });
+    std::tuple<bool, std::string> info;
+    do { info = SendRecieve("RSAKEY", msg); } while (!std::get<0>(info));
+}
+
+std::tuple<bool, std::string> ServerClient::Signup(const std::string& username, const std::string& email, std::string password)
+{
+    std::tuple<bool, std::string> info;
     EncryptPassword(password);
-    
-    do {
-        std::string msg = server_protocol::BuildMessage({ mail, password });
-        std::vector<std::string> requestParts = BUILD_REQUEST("LOGIN", msg);
-        for (auto& part : requestParts) {
-            res = send(writeSocket, part.c_str(), part.size(), 0);
-            if (res == SOCKET_ERROR)
-            {
-                // handle something
-                return;
-            }
-        }
-        std::string data = RecieveMessage(writeSocket);
-        std::tuple<bool, std::string, bool, std::string> info = PARSE_RESPONSE(data);
-    } while (std::get<0>(info));
-    if (std::get<2>(info)) {
-        userId = std::stoi(std::get<3>(info));
+    std::string msg = server_protocol::BuildMessage({ username, email, password });
+    info = SendRecieve("SIGNUP", msg);
+    if (std::get<0>(info)) {
+        userId = std::stoi(std::get<1>(info));
     }
+    return info;
+}
+
+std::tuple<bool, std::string> ServerClient::Login(const std::string& mail, std::string password)
+{
+    std::tuple<bool, std::string> info;
+    EncryptPassword(password);
+    std::string msg = server_protocol::BuildMessage({ mail, password });
+    info = SendRecieve("LOGIN", msg);
+
+    if (std::get<0>(info)) {
+        userId = std::stoi(std::get<1>(info));
+    }
+    return info;
 }
 
 void ServerClient::Logout()
 {
+    SendRecieve("LOGOUT", "");
+    userId = INVALID_USER_ID;
 }
 
 void ServerClient::PullInfo()

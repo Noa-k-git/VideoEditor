@@ -4,6 +4,7 @@ import queue
 import select
 import socket
 import threading
+import time
 from abc import ABC, abstractmethod
 
 import shift_cipher
@@ -87,13 +88,7 @@ class Server(ABC):
                     (new_socket, address) = self.server_socket.accept()
                     logging.info(f"new socket connected to server: {new_socket.getpeername()}")
                     self.clients.append(Client(new_socket))
-
-                    # sending to client the server public key
-                    response_fields = [self.public_key, self.n]
-                    res = Protocol.join_response_fields(response_fields)
-                    response_parts = Protocol.chunk_response(res)
-                    for part in response_parts:
-                        self.messages_to_send.put((new_socket, part))
+                    threading.Thread(target=self.send_rsa_keys, args=(new_socket,)).start()
 
                 else:
                     try:
@@ -149,3 +144,12 @@ class Server(ABC):
         """
         self.clients.remove(current_socket)
         current_socket.close()
+
+    def send_rsa_keys(self, new_socket):
+        time.sleep(0.1)
+        # sending to client the server public key
+        response_fields = [self.public_key, self.n]
+        res = Protocol.join_response_fields(response_fields)
+        response_parts = Protocol.chunk_response(res)
+        for part in response_parts:
+            self.messages_to_send.put((new_socket, part))

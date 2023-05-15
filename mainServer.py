@@ -18,10 +18,36 @@ class MainServer(Server):
             data (str): client request
         """
 
+        def client_in_project(user_client: Client, project_id: int):
+            """
+            Checks Whether the client is in a project according to project_id
+            :param user_client: the client
+            :param project_id: the project id
+            :return: True if yes, False of no
+            """
+            res = self.db.select(self.db.tables['project_users'], item=database.ProjectUser(user_id=user_client.id,
+                                                                                            project_id=project_id))
+            if res:
+                return True
+            return False
+
         # handling clients requests
-        def signup(info: bytes) -> Tuple[bool, str]:
+        def rsa_key(user_client: Client, info: bytes) -> Tuple[bool, str]:
+            """
+            The client public key, n
+            :param user_client: the client
+            :param info: the message information
+            :return: bool -> if error occurred false, str -> message to send
+            """
+            try:
+                user_client.rsa_key, user_client.rsa_n = [int(x) for x in Protocol.parse_message(info.decode())]
+            except ValueError:
+                return False, "Message arguments"
+            return True, ""
+
+        def signup(user_client: Client, info: bytes) -> Tuple[bool, str]:
             """A signup request from the user. Append the new user to the database
-            
+
             Args:
                 info (bytes): the message information
 
@@ -38,10 +64,11 @@ class MainServer(Server):
             u_id = self.db.select(self.db.tables['users']['id_'], database.User(email=email, password=password))
 
             if u_id:
+                user_client.id = int(u_id)
                 return True, f"{u_id[0][0]}"
             return False, "Email in use"
 
-        def login(info: bytes) -> Tuple[bool, str]:
+        def login(user_client: Client, info: bytes) -> Tuple[bool, str]:
             """A login request from the user
 
             Args:
@@ -57,24 +84,22 @@ class MainServer(Server):
                 return False, "Message arguments"
             u_id = self.db.select(self.db.tables['users']['id_'], database.User(email=email, password=password))
             if u_id:
+                user_client.id = int(u_id)
                 return True, f"{u_id[0][0]}"
             return False, "Incorrect email or password"
 
-        def logout(info: bytes) -> Tuple[bool, str]:
-            pass
+        def logout(user_client: Client, info: bytes) -> Tuple[bool, str]:
+            user_client.id = -1
+            return True, ""
 
-        def pull_info(info: bytes) -> Tuple[bool, str]:
-            user_id = ""
-            try:
-                user_id = Protocol.parse_message(info.decode())[0]
-            except ValueError:
-                return False, "Message arguments"
+        def pull_info(user_client: Client, info: bytes) -> Tuple[bool, str]:
+
             projects = self.db.join_select(og=self.db.tables['project_users'],
                                            columns=self.db.tables['projects']['id_', 'name'],
                                            join={self.db.tables['projects']['id_']: [
                                                self.db.tables['project_users']['project_id'], ]},
                                            where=[(self.db.tables['project_users'],
-                                                   database.ProjectUser(user_id=int(user_id))), ])
+                                                   database.ProjectUser(user_id=int(user_client.id))), ])
 
             if not projects:
                 return True, ''
@@ -99,7 +124,7 @@ class MainServer(Server):
             result = [(p_id, p_name, projects_users[p_id]) for p_id, p_name in projects]
             return True, result
 
-        def _add_users_by_mail(emails, p_id, my_id=None):
+        def _add_users_by_mail(user_client: Client, emails, p_id, my_id=None):
             if not isinstance(emails, list):
                 emails = [emails]
             if emails:
@@ -115,7 +140,7 @@ class MainServer(Server):
             for id_ in users_id:
                 self.db.insert(self.db.tables['project_users'], database.ProjectUser(project_id=p_id, user_id=id_[0]))
 
-        def create(info: bytes) -> Tuple[bool, str]:
+        def create(user_client: Client, info: bytes) -> Tuple[bool, str]:
             u_id, p_name, emails = "", "", ""
             try:
                 u_id, p_name, emails = Protocol.parse_message(info.decode())
@@ -126,19 +151,21 @@ class MainServer(Server):
             _add_users_by_mail(emails, p_id, u_id)
             return True, p_id
 
-        def add_users(info: bytes) -> Tuple[bool, str]:
-            u_id, p_id, emails = "", "", ""
+        def add_users(user_client: Client, info: bytes) -> Tuple[bool, str]:
+            p_id, emails = "", ""
             try:
-                u_id, p_id, emails = Protocol.parse_message(info.decode())
+                p_id, emails = Protocol.parse_message(info.decode())
             except ValueError:
                 return False, 'Message arguments'
-            if self.db.select(self.db.tables['projects']['admin_id'], database.Project(id_=p_id, admin_id=u_id)):
+            if self.db.select(self.db.tables['projects']['admin_id'],
+                              database.Project(id_=p_id, admin_id=user_client.id)):
+
                 _add_users_by_mail(emails, p_id)
             else:
                 return False, 'Permission'
             return True, ''
 
-        def remove_user(info: bytes) -> Tuple[bool, str]:
+        def remove_user(user_client: Client, info: bytes) -> Tuple[bool, str]:
             u_id, p_id, email = "", "", ""
             try:
                 u_id, p_id, email = Protocol.parse_message(info.decode())
@@ -154,41 +181,49 @@ class MainServer(Server):
                 return False, 'Permission'
             return True, ''
 
-        def push_project(info: bytes) -> Tuple[bool, str]:
-            u_id, p_id, content = "", "", ""
+        def push_project(user_client: Client, info: bytes) -> Tuple[bool, str]:
+            p_id, content = "", ""
             try:
-                u_id, p_id, content = Protocol.parse_message(info.decode())
+                p_id, content = Protocol.parse_message(info.decode())
             except ValueError:
                 return False, 'Message arguments'
-            admin_id = self.db.select(self.db.tables['projects']['admin_id'], database.Project(id_=p_id))[0][0]
+            admin_id = self.db.select(self.db.tables['projects']['admin_id'],
+                                      database.Project(id_=user_client.id))[0][0]
             approved = None
-            if int(u_id) == admin_id:
+            if user_client.id == admin_id:
                 approved = content
 
             self.db.update(self.db.tables['projects'], database.Project(content=content, approved=approved),
                            database.Project(id_=int(p_id)))
             return True, ''
 
-        def pull_project(info: bytes) -> Tuple[bool, str]:
+        def pull_project(user_client: Client, info: bytes) -> Tuple[bool, str]:
             pass
 
-        commands = {'SIGNUP': signup,
-                    'LOGIN': login,
-                    'LOGOUT': logout,
-                    'PULLINFO': pull_info,
-                    'CREATE': create,
-                    'ADDUSERS': add_users,
-                    'REMOVEUSER': remove_user,
-                    'PUSHPROJECT': push_project,
-                    'PULLPROJECT': pull_project,
-                    }
-        k, cmd, message = Protocol.parse_data(data, self.private_key, self.n)  # b for binary
+        commands = {
+            'RSAKEY': rsa_key,
+            'SIGNUP': signup,
+            'LOGIN': login,
+            'LOGOUT': logout,
+            'PULLINFO': pull_info,
+            'CREATE': create,
+            'ADDUSERS': add_users,
+            'REMOVEUSER': remove_user,
+            'PUSHPROJECT': push_project,
+            'PULLPROJECT': pull_project,
+        }
+        k, cmd, message = Protocol.parse_data(data, self.private_key, self.n)
+        logging.info(f"{cmd}, {message}")
         response_parts = []
         client = self.clients.get_client(current_socket)
         key_par = (client.rsa_key, client.rsa_n,)
+
         try:
             if k:
-                code, r_message = commands[cmd](message)
+                code, r_message = commands[cmd](client, message)
+                key_par = (client.rsa_key, client.rsa_n,)
+
+                logging.info(f"{code}, {r_message}")
 
                 response_parts = Protocol.build_response(cmd, code, Protocol.build_message(r_message),
                                                          *key_par)

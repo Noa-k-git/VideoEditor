@@ -21,19 +21,19 @@ std::tuple<bool, std::string, bool, std::string> server_protocol::ParseResponse(
 	std::vector<std::string> header_fields = SplitString(header, DELIMITER);
 	try {
 		cmd = header_fields.at(0);
-		int length = std::stoi(header_fields.at(1));
+		status = CMD_STATUS.at(header_fields.at(1));
+		int length = std::stoi(header_fields.at(2));
 		if (length != message.size()) {
 			succeed = false;
 			message = "Message corrupted";
 		}
-		status = CMD_STATUS.at(header_fields.at(2));
 	}
 	catch (const std::exception& e) {
 		succeed = false;
 		message = e.what();
 	}
 	
-	return std::tuple<bool, std::string, bool, std::string>(succeed, cmd.substr(0, cmd.find_last_not_of(' ')), status, message);
+	return std::tuple<bool, std::string, bool, std::string>(succeed, cmd.substr(0, cmd.find_last_not_of(' ') + 1), status, message);
 }
 
 

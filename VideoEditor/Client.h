@@ -16,21 +16,23 @@ public:
 	~ServerClient();
 	// @brief Creates a connection with the server and return the connected socket
 	void CreateConnection();
-	
+	std::tuple<bool, std::string> SendRecieve(std::string, std::string);
+	void SendKeys();
 	/// <summary>
 	/// Signup request to the server
 	/// </summary>
 	/// <param name="username">User's username</param>
 	/// <param name="email">User's mail</param>
 	/// <param name="password">User's password, unencrypted</param>
-	void Signup(const std::string& username, const std::string& email, std::string password);
+	std::tuple<bool, std::string> Signup(const std::string& username, const std::string& email, std::string password);
 
 	/// <summary>
 	/// Login request to the server
 	/// </summary>
 	/// <param name="mail">The user's mail</param>
 	/// <param name="password">The user's password, unencrypted</param>
-	void Login(const std::string& mail, std::string password);
+	/// <returns> If Login succeed </returns>
+	std::tuple<bool, std::string> Login(const std::string& mail, std::string password);
 
 	/// <summary>
 	/// Logout from the server, thus logout from the project

@@ -59,11 +59,12 @@ class Protocol:
         succeed = True
         b_header, b_message = data.split(Protocol.DELIMITER.encode(), 1)
         # data[:Protocol.MSG_HEADER_LENGTH], data[Protocol.MSG_HEADER_LENGTH:]
+        print(b_header)
         try:
             enc_header = b_header.decode().split(',')
-            header = rsa_crypto.decoder(enc_header, key, n)
-
-            if header.count(Protocol.DELIMITER) != 2:
+            header = rsa_crypto.decoder([int(enc) for enc in enc_header], key, n)
+            print(header)
+            if header.count(Protocol.DELIMITER) != 1:
                 raise FormatError
             header_fields = header.split(Protocol.DELIMITER)
             cmd = header_fields[0]
@@ -71,9 +72,10 @@ class Protocol:
             if length != len(b_message):
                 succeed = False
                 b_message = b'Message corrupted'
-        except (Exception,):
+        except (Exception,)as e:
             succeed = False
             b_message = b'Header format'
+            print(e)
 
         return succeed, cmd.strip(), b_message
 
@@ -162,7 +164,7 @@ class Protocol:
 
         response_lst.append(Protocol.pad_field(length, Protocol.SIZE_FIELD_LENGTH))
         enc_header = rsa_crypto.encoder(Protocol.join_response_fields(response_lst), client_key, client_n)
-        header = str(enc_header).replace('[', '').replace('[', '').replace(' ', '')
+        header = str(enc_header).replace('[', '').replace(']', '').replace(' ', '')
         response_lst.clear()
         response_lst.append(header)
         response_lst.append(message)

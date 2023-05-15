@@ -283,6 +283,9 @@
     <Image Include="openeye.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="logout_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="vidEd.txt" />

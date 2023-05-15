@@ -43,7 +43,6 @@ MainWindow::MainWindow(wxWindow* parent,
     SetBackgroundColour(WINDOW_BRIGHT_BACKGOUND_COLOUR);
     wxBoxSizer* layoutSizer = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* menuSizer = new wxBoxSizer(wxHORIZONTAL);
-    clientPtr = new ServerClient();
     layoutSizer->SetDimension(GetSize().x, GetSize().y, GetSize().GetWidth(), GetSize().GetHeight());
     layoutSizer->Add(menuSizer, 0, wxEXPAND);
 
@@ -169,6 +168,7 @@ MainWindow::MainWindow(wxWindow* parent,
     SetAcceleratorTable(accel);
     SetSizer(layoutSizer);
 
+    clientPtr = new ServerClient();
 }
 
 MainWindow::~MainWindow()
@@ -286,7 +286,7 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event_))
 
 void MainWindow::OnUser(wxCommandEvent& event_)
 {
-    UserDialog* dialog = new UserDialog(this);
+    UserDialog* dialog = new UserDialog(clientPtr, this);
     dialog->ShowModal();
 }
 

@@ -215,6 +215,7 @@
     <Image Include="blackEdit.png" />
     <Image Include="gotoend.png" />
     <Image Include="gotostart.png" />
+    <Image Include="logout_icon.png" />
     <Image Include="nextframe.png" />
     <Image Include="openeye.png" />
     <Image Include="passwordeye.png" />
