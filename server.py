@@ -88,48 +88,51 @@ class Server(ABC):
                     (new_socket, address) = self.server_socket.accept()
                     logging.info(f"new socket connected to server: {new_socket.getpeername()}")
                     self.clients.append(Client(new_socket))
-                    threading.Thread(target=self.send_rsa_keys, args=(new_socket,)).start()
 
                 else:
-                    try:
-                        data = b''
-                        parts = []
-                        while True:
-                            try:
-                                part = current_socket.recv(1024)
-                            except ConnectionAbortedError:
-                                raise ConnectionResetError
-                            # if it is an empty packet then it is the last packet
-                            if len(part) == Protocol.NUM_FIELD_LENGTH:
-                                logging.debug(f'new data from client {current_socket.getpeername()}: {parts}')
-                                break
-                            try:
-                                parts.append((int(part[:Protocol.NUM_FIELD_LENGTH]), part[Protocol.NUM_FIELD_LENGTH:]))
-                            except ValueError:
-                                cl = self.clients.get_client(current_socket)
-                                cl_par = (cl.rsa_key, cl.rsa_n)
-                                response_parts = Protocol.build_response('NUMERIC', False,
-                                                                         "Packets number format", *cl_par)
-                                for response in response_parts:
-                                    self.messages_to_send.put((current_socket, response))
-                        parts.sort()
-                        for part in parts:
-                            data += part[1]
-                        data = shift_cipher.decrypt(data.decode(), Protocol.SHIFT_KEY).encode()
-                        if data == b'end':
-                            p_id = current_socket.getpeername()
-                            self.messages_to_send.put((current_socket, b'end'))
-                            self.connection_closed(current_socket)
-                            current_socket.close()
-                            logging.info(f"Connection with client {p_id} closed.")
+                    threading.Thread(target=self.receive_request, args=(current_socket,)).start()
 
-                        else:
-                            threading.Thread(target=self.handle_client, args=(current_socket, data)).start()
+    def receive_request(self, current_socket):
+        try:
+            data = b''
+            parts = []
+            while True:
+                part = current_socket.recv(1024)
+                # if it is an empty packet then it is the last packet
+                if len(part) == Protocol.NUM_FIELD_LENGTH:
+                    logging.debug(f'new data from client {current_socket.getpeername()}: {parts}')
+                    break
+                try:
+                    parts.append((int(part[:Protocol.NUM_FIELD_LENGTH]), part[Protocol.NUM_FIELD_LENGTH:]))
+                    logging.debug(shift_cipher.decrypt(part[Protocol.NUM_FIELD_LENGTH:].decode(), Protocol.SHIFT_KEY))
+                except ValueError:
+                    cl = self.clients.get_client(current_socket)
+                    cl_par = (cl.rsa_key, cl.rsa_n)
+                    response_parts = Protocol.build_response('NUMERIC', False,
+                                                             "Packets number format", *cl_par)
+                    for response in response_parts:
+                        self.messages_to_send.put((current_socket, response))
+                    return
 
-                    except ConnectionResetError:  # handling a client randomly closed
-                        logging.error("ConnectionResetError: Socket forcibly closed!")
-                        self.connection_closed(current_socket)
-    
+            parts.sort()
+            for part in parts:
+                data += part[1]
+            data = shift_cipher.decrypt(data.decode(), Protocol.SHIFT_KEY).encode()
+            if data == b'end':
+                p_id = current_socket.getpeername()
+                self.messages_to_send.put((current_socket, b'end'))
+                self.connection_closed(current_socket)
+                current_socket.close()
+                logging.info(f"Connection with client {p_id} closed.")
+
+            else:
+                time.sleep(0.1)
+                self.handle_client(current_socket, data)
+
+        except (ConnectionResetError, ConnectionAbortedError, OSError):  # handling a client randomly closed
+            logging.error("Socket forcibly closed!")
+            self.connection_closed(current_socket)
+
     @abstractmethod
     def handle_client(self, current_socket: socket.socket, data: str):
         """Handling the client's request.
@@ -145,11 +148,4 @@ class Server(ABC):
         self.clients.remove(current_socket)
         current_socket.close()
 
-    def send_rsa_keys(self, new_socket):
-        time.sleep(0.1)
-        # sending to client the server public key
-        response_fields = [self.public_key, self.n]
-        res = Protocol.join_response_fields(response_fields)
-        response_parts = Protocol.chunk_response(res)
-        for part in response_parts:
-            self.messages_to_send.put((new_socket, part))
+

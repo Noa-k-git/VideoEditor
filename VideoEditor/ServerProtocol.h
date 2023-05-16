@@ -71,6 +71,8 @@ namespace server_protocol{
 	*/
 	std::vector<std::string> ParseMessage(const std::string& message);
 	
+	void StringToParts(std::string fullMsg, std::vector<std::string>& res);
+
 	/**
 	 * @brief Builds a message string to send according to the protocol, using a vector of arguments
 	 *

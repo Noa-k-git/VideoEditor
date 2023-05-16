@@ -16,6 +16,7 @@ public:
 	~ServerClient();
 	// @brief Creates a connection with the server and return the connected socket
 	void CreateConnection();
+	void SendParts(const std::vector<std::string>& requestParts);
 	std::tuple<bool, std::string> SendRecieve(std::string, std::string);
 	void SendKeys();
 	/// <summary>
@@ -40,7 +41,8 @@ public:
 	void Logout();
 
 	void PullInfo();
-	
+
+	bool IsValidId();	
 private:
 	SOCKET listeningSocket;
 	SOCKET writeSocket;

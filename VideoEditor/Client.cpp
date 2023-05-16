@@ -3,6 +3,8 @@
 #include <wx/wx.h>
 #include <wx/msgdlg.h>
 #include <wx/app.h>
+#include <thread>
+#include <chrono>
 #ifndef PROTOCOL_FUNC
 #define PROTOCOL_FUNC
 #define PARSE_RESPONSE(data) server_protocol::ParseResponse(data, privateKey, myN)
@@ -47,6 +49,9 @@ void ServerClient::CreateConnection()
         //dialog.ShowModal();
         exit(EXIT_FAILURE);
     }
+    std::vector<std::string> requestParts;
+    server_protocol::StringToParts((std::string)"SECURITY", requestParts);
+    SendParts(requestParts);
     std::string data= RecieveMessage(writeSocket);
     std::vector<std::string> keyN = server_protocol::SplitString(data, '|');
     serverKey = std::stoi(keyN.at(0));
@@ -71,19 +76,25 @@ void ServerClient::CreateConnection()
     return;
 }
 
-std::tuple<bool, std::string> ServerClient::SendRecieve(std::string cmd, std::string message)
+void ServerClient::SendParts(const std::vector<std::string>& requestParts)
 {
     int res = 0;
+    for (auto& part : requestParts) {
+        res = send(writeSocket, part.c_str(), part.size(), 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if (res == SOCKET_ERROR)
+        {
+            CreateConnection();
+        }
+    }
+}
+
+std::tuple<bool, std::string> ServerClient::SendRecieve(std::string cmd, std::string message)
+{
     std::tuple<bool, std::string, bool, std::string> info;
     do {
         std::vector<std::string> requestParts = BUILD_REQUEST(cmd, message);
-        for (auto& part : requestParts) {
-            res = send(writeSocket, part.c_str(), part.size(), 0);
-            if (res == SOCKET_ERROR)
-            {
-                CreateConnection();
-            }
-        }
+        SendParts(requestParts);
         std::string data = RecieveMessage(writeSocket);
         info = PARSE_RESPONSE(data);
     } while (!std::get<0>(info));
@@ -131,6 +142,12 @@ void ServerClient::Logout()
 void ServerClient::PullInfo()
 {
 }
+
+bool ServerClient::IsValidId()
+{
+    return this->userId != INVALID_USER_ID;
+}
+
 
 void ServerClient::Connect(SOCKET& sock)
 {

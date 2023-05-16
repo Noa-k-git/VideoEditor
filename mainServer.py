@@ -15,7 +15,7 @@ class MainServer(Server):
         """All client's requests end up here. 
         Args:
             current_socket (socket.socket): the client
-            data (str): client request
+            data (bytes): client request
         """
 
         def client_in_project(user_client: Client, project_id: int):
@@ -32,6 +32,13 @@ class MainServer(Server):
             return False
 
         # handling clients requests
+        def send_rsa_keys():
+            #time.sleep(0.1)
+            # sending to client the server public key
+            response_fields = [self.public_key, self.n]
+            res = Protocol.join_response_fields(response_fields)
+            return Protocol.chunk_response(res)
+
         def rsa_key(user_client: Client, info: bytes) -> Tuple[bool, str]:
             """
             The client public key, n
@@ -64,7 +71,7 @@ class MainServer(Server):
             u_id = self.db.select(self.db.tables['users']['id_'], database.User(email=email, password=password))
 
             if u_id:
-                user_client.id = int(u_id)
+                user_client.id = int(u_id[0][0])
                 return True, f"{u_id[0][0]}"
             return False, "Email in use"
 
@@ -84,7 +91,7 @@ class MainServer(Server):
                 return False, "Message arguments"
             u_id = self.db.select(self.db.tables['users']['id_'], database.User(email=email, password=password))
             if u_id:
-                user_client.id = int(u_id)
+                user_client.id = int(u_id[0][0])
                 return True, f"{u_id[0][0]}"
             return False, "Incorrect email or password"
 
@@ -212,28 +219,32 @@ class MainServer(Server):
             'PUSHPROJECT': push_project,
             'PULLPROJECT': pull_project,
         }
-        k, cmd, message = Protocol.parse_data(data, self.private_key, self.n)
-        logging.info(f"{cmd}, {message}")
-        response_parts = []
-        client = self.clients.get_client(current_socket)
-        key_par = (client.rsa_key, client.rsa_n,)
 
-        try:
-            if k:
-                code, r_message = commands[cmd](client, message)
-                key_par = (client.rsa_key, client.rsa_n,)
+        if data == b'SECURITY':
+            response_parts = send_rsa_keys()
+        else:
+            k, cmd, message = Protocol.parse_data(data, self.private_key, self.n)
+            logging.info(f"{cmd}, {message}")
+            response_parts = []
+            client = self.clients.get_client(current_socket)
+            key_par = (client.rsa_key, client.rsa_n,)
 
-                logging.info(f"{code}, {r_message}")
+            try:
+                if k:
+                    code, r_message = commands[cmd](client, message)
+                    key_par = (client.rsa_key, client.rsa_n,)
 
-                response_parts = Protocol.build_response(cmd, code, Protocol.build_message(r_message),
-                                                         *key_par)
-            else:
-                response_parts = Protocol.build_response(cmd, False, message.decode(), *key_par)
-        except KeyError as e:
-            response_parts = Protocol.build_response(cmd, False, "Command doesn't exist", *key_par)
-        finally:
-            for part in response_parts:
-                self.messages_to_send.put((current_socket, part))  # command that does not exists
+                    logging.info(f"{code}, {r_message}")
+
+                    response_parts = Protocol.build_response(cmd, code, Protocol.build_message(r_message),
+                                                             *key_par)
+                else:
+                    response_parts = Protocol.build_response(cmd, False, message.decode(), *key_par)
+            except KeyError as e:
+                response_parts = Protocol.build_response(cmd, False, "Command doesn't exist", *key_par)
+
+        for part in response_parts:
+            self.messages_to_send.put((current_socket, part))  # command that does not exists
 
 
 if __name__ == '__main__':

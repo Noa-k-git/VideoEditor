@@ -66,7 +66,18 @@ std::string server_protocol::PadField(const std::string& field, const int length
 		return buffer + field;
 	return field + buffer;
 }
+void server_protocol::StringToParts(std::string fullMsg, std::vector<std::string>& res) {
+	fullMsg = shift_cipher::encrypt(fullMsg, SHIFT_KEY);
+	int counter = 1;
+	while (fullMsg != "") {
+		int slicer = fmin(fullMsg.length(), PART_SIZE - NUM_FIELD_LENGTH);
+		res.push_back(PadField(std::to_string(counter), NUM_FIELD_LENGTH, '0') + fullMsg.substr(0, slicer));
+		fullMsg = fullMsg.substr(slicer);
+		counter++;
+	}
+	res.push_back(PadField(std::to_string(counter), NUM_FIELD_LENGTH, '0'));
 
+}
 std::vector<std::string> server_protocol::BuildRequest(const std::string& cmd, const std::string& message, int serverKey, int serverN)
 {
 	std::vector<std::string> headerElm;
@@ -81,16 +92,9 @@ std::vector<std::string> server_protocol::BuildRequest(const std::string& cmd, c
 	requestElm.push_back(CreateHeader(headerElm, serverKey, serverN));
 	requestElm.push_back(message);
 	std::string fullMsg = JoinRequestFields(requestElm);
-	fullMsg = shift_cipher::encrypt(fullMsg, SHIFT_KEY);
 	std::vector<std::string> parts;
-	int counter = 1;
-	while (fullMsg != "") {
-		int slicer = fmin(fullMsg.length(), PART_SIZE - NUM_FIELD_LENGTH);
-		parts.push_back(PadField(std::to_string(counter), NUM_FIELD_LENGTH, '0') + fullMsg.substr(0, slicer));
-		fullMsg = fullMsg.substr(slicer);
-		counter++;
-	}
-	parts.push_back(PadField(std::to_string(counter), NUM_FIELD_LENGTH, '0'));
+	StringToParts(fullMsg, parts);
+
 	return parts;
 }
 

@@ -11,23 +11,28 @@ UserDialog::UserDialog(ServerClient* c, wxWindow* parent) : wxDialog(parent, wxI
 	
 	sizer = new wxBoxSizer(wxVERTICAL);
 	title = new wxStaticText(this, wxID_ANY, loginString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
-	wxFont font(20, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_MAX, wxFONTWEIGHT_BOLD);
-	title->SetFont(font);
+	wxFont titleFont(20, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_MAX, wxFONTWEIGHT_BOLD);
+	title->SetFont(titleFont);
 	sizer->Add(title, 1, wxEXPAND|wxTOP, 40);	
 	mainSizer->SetMinSize(wxSize(450, 650));
 	// Set the sizer for the dialog
 	SetBackgroundColour(ORANGE_BACKGROUND);
+	
+	wxFont textFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_MAX, wxFONTWEIGHT_BOLD);
 
 	// username
 	usernameLabel = new wxStaticText(this, wxID_ANY, "Full Name");
+	usernameLabel->SetFont(textFont);
 	usernameInput = new wxTextCtrl(this, wxID_ANY, wxEmptyString);
 
 	// mail
 	mailLabel = new wxStaticText(this, wxID_ANY, "Email");
+	mailLabel->SetFont(textFont);
 	mailInput = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
 
 	// password
 	passwordLabel = new wxStaticText(this, wxID_ANY, "Password");
+	passwordLabel->SetFont(textFont);
 	passwordInput = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
 	wxBitmap eyeIcon("passwordeye.png", wxBITMAP_TYPE_PNG);
 	wxSize eyeSize(passwordInput->GetSize().GetHeight() - 5, passwordInput->GetSize().GetHeight() - 5);
@@ -66,6 +71,7 @@ UserDialog::UserDialog(ServerClient* c, wxWindow* parent) : wxDialog(parent, wxI
 	wxButton* sendButton = new wxButton(this, wxID_ANY, loginString, wxDefaultPosition, wxDefaultSize);
 	sendButton->SetMinSize(wxSize(sendButton->GetSize().GetWidth(), sendButton->GetSize().GetHeight() + 10));
 	sendButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent& event_) {
+		statusText->SetLabel("Sending request to server..");
 		std::tuple<bool, std::string> loged;
 		if (sendButton->GetLabel() == loginString) {
 			loged = client->Login(mailInput->GetLineText(0).ToStdString(), passwordInput->GetLineText(0).ToStdString());
@@ -128,8 +134,21 @@ UserDialog::UserDialog(ServerClient* c, wxWindow* parent) : wxDialog(parent, wxI
 	usernameLabel->Hide();
 	
 	mainSizer->Add(sizer, 0, wxALIGN_CENTER_HORIZONTAL);
-	statusText = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
-	mainSizer->Add(statusText, 1, wxEXPAND|wxRIGHT|wxLEFT, ENTER_SPACE*2);
+	
+	// status text
+	statusText = new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+	wxFont statusFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_LIGHT);
+	statusText->SetFont(statusFont);
+
+	statusText->SetForegroundColour(wxColour(100, 100, 100));
+	if (client->IsValidId())
+	{
+		wxString status((std::string)"You are already LOGED :)");
+		statusText->SetLabel(status);
+	}
+	statusText->SetSize(wxSize(mainSizer->GetSize().GetWidth(), -1));
+
+	mainSizer->Add(statusText, 1, wxEXPAND|wxRIGHT|wxLEFT, ENTER_SPACE*3);
 
 	wxBitmap logouticon("logout_icon.png", wxBITMAP_TYPE_PNG);
 	logoutButton = new SmallBitmapButton(this, wxID_ANY, logouticon, wxDefaultPosition, wxSize(30, 30), wxSize(30, 30));
