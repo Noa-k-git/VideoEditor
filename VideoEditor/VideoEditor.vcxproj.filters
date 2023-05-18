@@ -117,12 +117,12 @@
     <ClCompile Include="UserDialog.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
+    <ClCompile Include="RotateEffect.cpp">
+      <Filter>Source Files\Effects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceID.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IEffect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bezier.h">
@@ -223,6 +223,15 @@
     </ClInclude>
     <ClInclude Include="UserDialog.h">
       <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="IEffect.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="RotateEffect.h">
+      <Filter>Header Files\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="image_helpers.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

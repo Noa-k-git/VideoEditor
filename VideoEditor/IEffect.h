@@ -1,6 +1,3 @@
-#include<opencv2/opencv.hpp>
-#include <vector>
-
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -11,11 +8,9 @@ extern "C" {
 	// types
 #include <inttypes.h>
 }
-using std::vector;
-using cv::Mat;
 
 class IEffect
 {
 public:
-	virtual void Apply(std::vector<AVFrame*>*&) = 0;
+	virtual void Apply(AVFrame*&) = 0;
 };

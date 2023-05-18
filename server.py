@@ -126,7 +126,7 @@ class Server(ABC):
                 logging.info(f"Connection with client {p_id} closed.")
 
             else:
-                time.sleep(0.1)
+                time.sleep(0.2)
                 self.handle_client(current_socket, data)
 
         except (ConnectionResetError, ConnectionAbortedError, OSError):  # handling a client randomly closed

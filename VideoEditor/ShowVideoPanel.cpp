@@ -1,4 +1,5 @@
 #include "ShowVideoPanel.h"
+#include <stdexcept>
 #undef av_err2str
 
 #define av_err2str(errnum) \
@@ -17,6 +18,7 @@ ShowVideoPanel::ShowVideoPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
 	//wxBitmap frameBitmap(image);
 	SetMinSize(wxSize(50, 100));
 	paused = true;
+	deleted = false;
 	m_playablePtr = nullptr;
 	m_vidName = "";
 	wxBitmap frameBitmap(wxSize(1, 1));
@@ -88,17 +90,42 @@ ShowVideoPanel::ShowVideoPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
 	//refreshTimer->Start(100000);
 }
 
+ShowVideoPanel::~ShowVideoPanel()
+{
+	wxGetApp().CallAfter([this]() {
+		PauseVideo();
+		deleted = true;
+		m_playablePtr = nullptr;
+
+		for (auto& t : showThreads) {
+			if (t.joinable())
+			t.join();
+
+		}
+		showThreads.clear();
+		std::this_thread::sleep_for(std::chrono::milliseconds(60));
+		});
+	
+	//delete m_playablePtr;
+}
+
 void ShowVideoPanel::PauseVideo() {
 	paused.store(true);
 	wxBitmap playIcon("play.png", wxBITMAP_TYPE_PNG);
-	m_pausePlay->ChangeBitmap(playIcon);
-	m_pausePlay->SetToolTip(new wxToolTip(_("Play")));
+
+	wxGetApp().CallAfter([=]() {
+		if (!deleted) {
+			m_pausePlay->ChangeBitmap(playIcon);
+			m_pausePlay->SetToolTip(new wxToolTip(_("Play")));
+		}
+		});
 }
 void ShowVideoPanel::PlayVideo() {
 	paused.store(false);
 	wxBitmap pauseIcon("pause.png", wxBITMAP_TYPE_PNG);
-	m_pausePlay->ChangeBitmap(pauseIcon);
-	m_pausePlay->SetToolTip(new wxToolTip(_("Pause")));
+	if (m_pausePlay)
+		m_pausePlay->ChangeBitmap(pauseIcon);
+		m_pausePlay->SetToolTip(new wxToolTip(_("Pause")));
 }
 void ShowVideoPanel::SetVideo() {
 	m_playablePtr = nullptr;
@@ -126,6 +153,7 @@ void ShowVideoPanel::SetVideoName(wxCommandEvent& event_)
 	if (m_playablePtr) {
 		timeline->SetMax(m_playablePtr->GetSize());
 		std::thread t(&ShowVideoPanel::ShowVideo, this);
+		//showThreads.push_back(std::move(t));
 		t.detach();
 	}
 }
@@ -177,14 +205,17 @@ void ShowVideoPanel::ShowVideo()
 		SWS_BILINEAR, NULL, NULL, NULL
 	);
 	constexpr std::chrono::duration<double> minSleepDuration(0);
-	while (pos < videoLength - 1) {
+	bool firstTime = true;
+	while (pos < videoLength - 1 && (!paused.load() || firstTime)) {
+		firstTime = false;
+		wxMessageOutputDebug().Printf(_(std::to_string(paused.load())));
 		pos = timeline->GetValue();
 		AVFrame* frame = nullptr;
 		SetVideo();
 		if (m_playablePtr) {
 			SyncObject<AVFrame*>* syncframe = m_playablePtr->GetChunk(pos);
 			if (syncframe)
-			frame = syncframe->GetObject();
+				frame = syncframe->GetObject();
 			else
 				break;
 		}
@@ -210,14 +241,16 @@ void ShowVideoPanel::ShowVideo()
 
 		wxGetApp().CallAfter([this, image]() {
 			wxBitmap bitmap(image);
-			m_frameBufferedBitmap->SetBitmap(bitmap);
-			Layout();
+			if (!deleted)
+				m_frameBufferedBitmap->SetBitmap(bitmap);
+			//Layout();
 			});
-		if (paused.load())
-			break;
+
 	}
+
 	// Clean up
 	sws_freeContext(swsContext);
+	return;
 }
 
 void ShowVideoPanel::OnZoomIn(wxCommandEvent& event)
@@ -236,6 +269,7 @@ void ShowVideoPanel::OnPausePlay(wxCommandEvent& event)
 	if (x) {
 		PlayVideo();
 		std::thread t(&ShowVideoPanel::ShowVideo, this);
+		//showThreads.push_back(std::move(t));
 		t.detach();
 	}
 	else {
@@ -248,6 +282,7 @@ void ShowVideoPanel::OnTimelineScroll(wxCommandEvent& event)
 {
 	PauseVideo();
 	std::thread t(&ShowVideoPanel::ShowVideo, this);
+	//showThreads.push_back(std::move(t));
 	t.detach();
 }
 

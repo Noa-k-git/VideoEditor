@@ -42,7 +42,7 @@ public:
     static Records<VideoSource*> videoSources;
     VideoSource(std::string, std::string);
     VideoSource(std::string);
-    virtual ~VideoSource();
+    ~VideoSource() override;
     int GetSize() override;
     SyncObject<AVFrame*>* GetChunk(int at) override;
     void Show() override;

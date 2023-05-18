@@ -173,6 +173,8 @@ MainWindow::MainWindow(wxWindow* parent,
 
 MainWindow::~MainWindow()
 {
+    ogShowVideoPanel->PauseVideo();
+    finalVideoPanel->PauseVideo();
 }
 
 void MainWindow::onNew(wxCommandEvent& WXUNUSED(event_))

@@ -3,10 +3,16 @@
 BufferedBitmap::BufferedBitmap(wxWindow* parent, const wxBitmap& bitmap)
     : wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE|wxVSCROLL|wxHSCROLL)
 {
+    deletedPtr = new bool(false);
 	this->SetBackgroundStyle(wxBG_STYLE_PAINT); // needed for windows
 
 	this->Bind(wxEVT_PAINT, &BufferedBitmap::OnPaint, this);
 	this->SetBitmap(bitmap);
+}
+
+BufferedBitmap::~BufferedBitmap()
+{
+    *deletedPtr = true;
 }
 
 void BufferedBitmap::OnPaint(wxPaintEvent& evt)
@@ -41,9 +47,8 @@ void BufferedBitmap::OnPaint(wxPaintEvent& evt)
 void BufferedBitmap::SetBitmap(const wxBitmap bitmap)
 {
     this->m_bitmap = bitmap;
-
     SetScrollRate(FromDIP(10), FromDIP(10));
-    
+
     SetVirtualSize(FromDIP(GetScaledBitmapSize()));
     auto a = GetVirtualSize();
     this->Refresh();

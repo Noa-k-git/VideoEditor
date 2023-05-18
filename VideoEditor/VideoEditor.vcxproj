@@ -146,6 +146,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="BufferedBitmap.cpp" />
+    <ClCompile Include="RotateEffect.cpp" />
     <ClCompile Include="ShiftCipher.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClipItemPanel.cpp" />
@@ -175,6 +176,8 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="BufferedBitmap.h" />
+    <ClInclude Include="image_helpers.h" />
+    <ClInclude Include="RotateEffect.h" />
     <ClInclude Include="ShiftCipher.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClipItemPanel.h" />

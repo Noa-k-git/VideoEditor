@@ -8,6 +8,7 @@ class BufferedBitmap : public wxScrolledWindow
 {
 public:
 	BufferedBitmap(wxWindow* parent, const wxBitmap& bitmap);
+	virtual ~BufferedBitmap();
 	void OnPaint(wxPaintEvent& evt);
 	void SetBitmap(const wxBitmap bitmap);
 	const wxBitmap& GetBitmap() const;
@@ -16,6 +17,7 @@ public:
 	void ZoomIn();
 	void ZoomOut();
 private:
+	bool* deletedPtr;
 	wxBitmap m_bitmap;
 	const double ZOOM_FACTOR = 1.1;
 	int zoomLevel = 0;

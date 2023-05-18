@@ -30,7 +30,7 @@ public:
 	//Info info; // struct that contains all the clips configurations
 	ISource(std::string, std::string);
 	ISource(std::string);
-	virtual ~ISource() {}
+	~ISource() override {}
 	inline std::vector<SyncObject<T>>& GetSource() {
 		return source_;
 	}

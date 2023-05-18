@@ -28,6 +28,7 @@ bool VideoClip::SetStart(int start)
 {
 	if (start < edges[1]) {
 		edges[0] = std::max(start, 0);
+		updated = false;
 		return true;
 	}
 	return false;
@@ -37,6 +38,7 @@ bool VideoClip::SetEnd(int end)
 {
 	if (end > edges[0]) {
 		edges[1] = std::min(end, (int)(videoSource->GetSource().size() - 1));
+		updated = false;
 		return true;
 	}
 	return false;
@@ -50,7 +52,12 @@ void VideoClip::ApplyEffects()
 	auto lock = videoSource->LockSource();
 	std::vector<SyncObject<AVFrame*>> sourceFrames = videoSource->GetSource();
 	for (auto i = sourceFrames.begin() + edges[0]; i < sourceFrames.begin() + edges[1]; i++) {
-		clip->push_back(SyncObject<AVFrame*>(av_frame_clone(i->GetObject())));
+		AVFrame* frame = av_frame_clone(i->GetObject());
+		for (IEffect& effect : effects)
+		{
+			effect.Apply(frame);
+		}
+		clip->push_back(SyncObject<AVFrame*>(frame));
 	}
 	//std::vector<AVFrame*> framesCopy(sourceFrames.begin()+edges[0], sourceFrames.begin()+edges[1]);
 	// Apply effects to framesCopy

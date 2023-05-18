@@ -17,8 +17,10 @@ class ShowVideoPanel : public wxPanel
 {
 public:
 	ShowVideoPanel(wxWindow* parent);
-	~ShowVideoPanel() {};
+	virtual ~ShowVideoPanel();
+	void PauseVideo();
 private:
+	std::vector<std::thread> showThreads;
 	BufferedBitmap* m_frameBufferedBitmap; // the video window
 	
 	//Sizers
@@ -43,10 +45,10 @@ private:
 	//wxTimer* refreshTimer;
 
 	std::atomic<bool> paused;
+	bool deleted;
 	std::string m_vidName;
 	IPlayable<AVFrame*>* m_playablePtr;
 
-	void PauseVideo();
 	void PlayVideo();
 	void SetVideoName(wxCommandEvent& event);
 	void SetVideo();
