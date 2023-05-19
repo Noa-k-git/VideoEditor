@@ -86,6 +86,7 @@ class Server(ABC):
         self.public_key, self.private_key, self.n = rsa_crypto.setkeys()
 
         self.sending_messages_thread = threading.Thread(target=self.send_waiting_messages, )
+        self.lock_get_client = threading.Lock()
 
     def create_server(self):
         # Creating a server
@@ -113,8 +114,10 @@ class Server(ABC):
         """
         self.create_server()
         while True:
+            self.lock_get_client.acquire()
             self.rlist, self.wlist, _ = select.select([self.server_socket] + self.clients.get_sockets(),
-                                                               self.clients.get_sockets(), [])
+                                                      self.clients.get_sockets(), [])
+            self.lock_get_client.release()
 
             for current_socket in self.rlist:
                 if current_socket is self.server_socket:
@@ -180,6 +183,8 @@ class Server(ABC):
     def connection_closed(self, current_socket: socket.socket):
         """ removing client from requests.
         """
+        self.lock_get_client.acquire()
+        logging.debug("Closing connection...")
         client = self.clients.get_client(current_socket)
         self.clients.remove(client)
         current_socket.close()
@@ -187,3 +192,5 @@ class Server(ABC):
             client.update_conn.close()
         except AttributeError:
             pass
+        logging.info("Connection Closed!!!")
+        self.lock_get_client.release()
