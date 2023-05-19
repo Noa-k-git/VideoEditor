@@ -28,11 +28,17 @@
     <Filter Include="Source Files\Design">
       <UniqueIdentifier>{5d4bcf9d-13b7-45db-931f-5c627cf68ca6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Encryption">
-      <UniqueIdentifier>{e41e3246-cb95-441a-a838-19b5d5c7de85}</UniqueIdentifier>
+    <Filter Include="Header Files\Server Connection">
+      <UniqueIdentifier>{d7158978-6f80-438e-a294-c26dc205c912}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Encryption">
+    <Filter Include="Header Files\Server Connection\Encryption">
       <UniqueIdentifier>{28cfb0f8-f541-4fae-89b1-3c64617d175b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Connection">
+      <UniqueIdentifier>{71f2fa21-a877-467e-b654-3393e8ed4b10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Connection\Encryption">
+      <UniqueIdentifier>{e41e3246-cb95-441a-a838-19b5d5c7de85}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,16 +66,10 @@
     <ClCompile Include="SubWindows.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
-    <ClCompile Include="Client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VideoClip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Sequence.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Records.cpp">
@@ -102,17 +102,14 @@
     <ClCompile Include="SeqSourcePanel.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
-    <ClCompile Include="ServerProtocol.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SHA256.cpp">
-      <Filter>Source Files\Encryption</Filter>
+      <Filter>Source Files\Server Connection\Encryption</Filter>
     </ClCompile>
     <ClCompile Include="rsa.cpp">
-      <Filter>Source Files\Encryption</Filter>
+      <Filter>Source Files\Server Connection\Encryption</Filter>
     </ClCompile>
     <ClCompile Include="ShiftCipher.cpp">
-      <Filter>Source Files\Encryption</Filter>
+      <Filter>Source Files\Server Connection\Encryption</Filter>
     </ClCompile>
     <ClCompile Include="UserDialog.cpp">
       <Filter>Source Files\Design</Filter>
@@ -125,6 +122,12 @@
     </ClCompile>
     <ClCompile Include="ProjectsDialog.cpp">
       <Filter>Source Files\Design</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerProtocol.cpp">
+      <Filter>Source Files\Server Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>Source Files\Server Connection</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -155,9 +158,6 @@
     <ClInclude Include="ScaleEffect.h">
       <Filter>Header Files\Effects</Filter>
     </ClInclude>
-    <ClInclude Include="Client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SubWindows.h">
       <Filter>Header Files\Design</Filter>
     </ClInclude>
@@ -174,9 +174,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="globals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Records.h">
@@ -215,17 +212,14 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ServerProtocol.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SHA256.h">
-      <Filter>Header Files\Encryption</Filter>
+      <Filter>Header Files\Server Connection\Encryption</Filter>
     </ClInclude>
     <ClInclude Include="rsa.h">
-      <Filter>Header Files\Encryption</Filter>
+      <Filter>Header Files\Server Connection\Encryption</Filter>
     </ClInclude>
     <ClInclude Include="ShiftCipher.h">
-      <Filter>Header Files\Encryption</Filter>
+      <Filter>Header Files\Server Connection\Encryption</Filter>
     </ClInclude>
     <ClInclude Include="UserDialog.h">
       <Filter>Header Files\Design</Filter>
@@ -244,6 +238,12 @@
     </ClInclude>
     <ClInclude Include="ProjectsDialog.h">
       <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>Header Files\Server Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerProtocol.h">
+      <Filter>Header Files\Server Connection</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

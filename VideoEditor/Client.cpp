@@ -6,14 +6,16 @@
 #include <thread>
 #include <chrono>
 
-#ifndef PROTOCOL_FUNC
-#define PROTOCOL_FUNC
+#ifndef CLIENT_MACROS
+#define CLIENT_MACROS
 #define PARSE_RESPONSE(data) server_protocol::ParseResponse(data, privateKey, myN)
 #define BUILD_REQUEST(cmd, msg) server_protocol::BuildRequest(cmd, msg, serverKey, serverN)
+#define W_SEND_RECEIVE(cmd, msg) SendRecieve(writeSocket, cmd, msg)
+#define L_SEND_RECEIVE(cmd, msg) SendRecieve(listenSocket, cmd, msg)
 #endif
 ServerClient::ServerClient()
 {
-    listeningSocket = INVALID_SOCKET;
+    listenSocket = INVALID_SOCKET;
     writeSocket = INVALID_SOCKET;
     userId = INVALID_USER_ID;
     projectPath = "";
@@ -54,7 +56,7 @@ void ServerClient::CreateConnection()
     }
     std::vector<std::string> requestParts;
     server_protocol::StringToParts((std::string)"SECURITY", requestParts);
-    SendParts(requestParts);
+    SendParts(writeSocket, requestParts);
     std::string data= RecieveMessage(writeSocket);
     std::vector<std::string> keyN = SplitString(data, '|');
     serverKey = std::stoi(keyN.at(0));
@@ -81,11 +83,11 @@ void ServerClient::CreateConnection()
     return;
 }
 
-void ServerClient::SendParts(const std::vector<std::string>& requestParts)
+void ServerClient::SendParts(SOCKET& sock, const std::vector<std::string>& requestParts)
 {
     int res = 0;
     for (auto& part : requestParts) {
-        res = send(writeSocket, part.c_str(), part.size(), 0);
+        res = send(sock, part.c_str(), part.size(), 0);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         if (res == SOCKET_ERROR)
         {
@@ -94,12 +96,12 @@ void ServerClient::SendParts(const std::vector<std::string>& requestParts)
     }
 }
 
-std::tuple<bool, std::string> ServerClient::SendRecieve(std::string cmd, std::string message)
+std::tuple<bool, std::string> ServerClient::SendRecieve(SOCKET& sock, std::string cmd, std::string message)
 {
     std::tuple<bool, std::string, bool, std::string> info;
     do {
         std::vector<std::string> requestParts = BUILD_REQUEST(cmd, message);
-        SendParts(requestParts);
+        SendParts(sock, requestParts);
         std::string data = RecieveMessage(writeSocket);
         info = PARSE_RESPONSE(data);
     } while (!std::get<0>(info));
@@ -110,7 +112,7 @@ void ServerClient::SendKeys()
 {
     std::string msg = server_protocol::BuildMessage({ std::to_string(publicKey), std::to_string(myN) });
     std::tuple<bool, std::string> info;
-    do { info = SendRecieve("RSAKEY", msg); } while (!std::get<0>(info));
+    do { info = W_SEND_RECEIVE("RSAKEY", msg); } while (!std::get<0>(info));
 }
 
 std::tuple<bool, std::string> ServerClient::Signup(const std::string& username, const std::string& email, std::string password)
@@ -118,7 +120,7 @@ std::tuple<bool, std::string> ServerClient::Signup(const std::string& username, 
     std::tuple<bool, std::string> info;
     EncryptPassword(password);
     std::string msg = server_protocol::BuildMessage({ username, email, password });
-    info = SendRecieve("SIGNUP", msg);
+    info = W_SEND_RECEIVE("SIGNUP", msg);
     if (std::get<0>(info)) {
         userId = std::stoi(std::get<1>(info));
     }
@@ -130,7 +132,7 @@ std::tuple<bool, std::string> ServerClient::Login(const std::string& mail, std::
     std::tuple<bool, std::string> info;
     EncryptPassword(password);
     std::string msg = server_protocol::BuildMessage({ mail, password });
-    info = SendRecieve("LOGIN", msg);
+    info = W_SEND_RECEIVE("LOGIN", msg);
 
     if (std::get<0>(info)) {
         userId = std::stoi(std::get<1>(info));
@@ -138,9 +140,17 @@ std::tuple<bool, std::string> ServerClient::Login(const std::string& mail, std::
     return info;
 }
 
+std::tuple<bool, std::string> ServerClient::ConnectProject()
+{
+    std::tuple<bool, std::string> info;
+    info = W_SEND_RECEIVE("CONNECTPROJ", projId);
+
+    return info;
+}
+
 void ServerClient::Logout()
 {
-    SendRecieve("LOGOUT", "");
+    W_SEND_RECEIVE("LOGOUT", "");
     userId = INVALID_USER_ID;
 }
 
@@ -148,7 +158,7 @@ std::tuple<bool, std::string> ServerClient::PullInfo()
 {
     std::tuple<bool, std::string> info;
     std::string msg = std::to_string(userId);
-    info = SendRecieve("PULLINFO", msg);
+    info = W_SEND_RECEIVE("PULLINFO", msg);
     return info;
 }
 
@@ -168,23 +178,24 @@ void ServerClient::PushProject()
 
         // Close the file
         file.close();
-        SendRecieve("PUSHPROJECT", server_protocol::BuildMessage({ projId, project }));
+        W_SEND_RECEIVE("PUSHPROJECT", server_protocol::BuildMessage({ projId, project }));
     }
 }
 
 std::tuple<bool, std::string> ServerClient::PullProject(std::string msg)
 {
     std::tuple<bool, std::string> info;
-    return SendRecieve("PULLPROJECT", msg);
+    return W_SEND_RECEIVE("PULLPROJECT", msg);
     
 }
 
 void ServerClient::Listener()
 {
-    if (listeningSocket != INVALID_SOCKET)
+    if (listenSocket != INVALID_SOCKET)
         return;
-    Connect(listeningSocket);
-    if (listeningSocket == INVALID_SOCKET)
+    Connect(listenSocket);
+    L_SEND_RECEIVE("LISTEN", "");
+    if (listenSocket == INVALID_SOCKET)
     {
         wxLocale local(wxLANGUAGE_ENGLISH, wxLOCALE_DONT_LOAD_DEFAULT);
         wxMessageBox(wxT("Could not connect to server"), wxT("FATAL ERROR"), wxICON_ERROR);
@@ -193,9 +204,9 @@ void ServerClient::Listener()
         exit(EXIT_FAILURE);
     }
     std::tuple<bool, std::string, bool, std::string> info;
-    while (listeningSocket != INVALID_SOCKET) {
+    while (listenSocket != INVALID_SOCKET) {
         std::string msg = std::to_string(userId);
-        std::string data = RecieveMessage(listeningSocket);
+        std::string data = RecieveMessage(listenSocket);
         info = PARSE_RESPONSE(data);
         bool succeed = std::get<0>(info);
         if (succeed)
@@ -211,6 +222,12 @@ void ServerClient::Listener()
 bool ServerClient::IsValidId()
 {
     return this->userId != INVALID_USER_ID;
+}
+
+inline void ServerClient::SetProjId(std::string id_)
+{
+    projId = id_;
+    ConnectProject();
 }
 
 

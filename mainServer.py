@@ -250,7 +250,7 @@ class MainServer(Server):
             client_ip = user_client.conn.getpeername()[0]
             for s in self.clients:
                 if s.conn.getpeername()[0] == client_ip:
-                    self.clients.remove(user_client.conn)
+                    self.clients.remove(user_client)
                     s.update_conn = user_client.conn
                     return True, ''
             return False, "Could not find client"

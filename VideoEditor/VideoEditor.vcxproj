@@ -154,7 +154,6 @@
     <ClCompile Include="EffectProperty.cpp" />
     <ClCompile Include="InputDialog.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Records.cpp" />
     <ClCompile Include="rsa.cpp" />
     <ClCompile Include="ScaleEffect.cpp" />
@@ -194,7 +193,6 @@
     <ClInclude Include="IPlayable.h" />
     <ClInclude Include="ISource.h" />
     <ClInclude Include="MainWindow.h" />
-    <ClInclude Include="Map.h" />
     <ClInclude Include="Records.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="rsa.h" />

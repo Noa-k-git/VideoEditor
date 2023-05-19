@@ -17,8 +17,6 @@ public:
 	~ServerClient();
 	// @brief Creates a connection with the server and return the connected socket
 	void CreateConnection();
-	void SendParts(const std::vector<std::string>& requestParts);
-	std::tuple<bool, std::string> SendRecieve(std::string, std::string);
 	void SendKeys();
 	/// <summary>
 	/// Signup request to the server
@@ -35,6 +33,7 @@ public:
 	/// <param name="password">The user's password, unencrypted</param>
 	/// <returns> If Login succeed </returns>
 	std::tuple<bool, std::string> Login(const std::string& mail, std::string password);
+	std::tuple<bool, std::string> ConnectProject();
 
 	/// <summary>
 	/// Logout from the server, thus logout from the project
@@ -46,13 +45,13 @@ public:
 	std::tuple<bool, std::string> PullProject(std::string);
 	bool IsValidId();
 	inline std::string GetProjId() { return projId; }
-	inline void SetProjId(std::string id_) { projId = id_; }
+	inline void SetProjId(std::string id_);
 	inline std::string GetPrName() { return projectName; }
 	inline void SetPrName(std::string name) { projectName = name; }
 	inline std::string GetPath() { return projectPath; }
 	inline void SetPath(std::string projPath) { projectPath = projPath; }
 private:
-	SOCKET listeningSocket;
+	SOCKET listenSocket;
 	SOCKET writeSocket;
 
 	int userId;
@@ -67,6 +66,8 @@ private:
 
 	void Connect(SOCKET &sock);
 	void Listener();
+	void SendParts(SOCKET &sock, const std::vector<std::string>& requestParts);
+	std::tuple<bool, std::string> SendRecieve(SOCKET &sock, std::string, std::string);
 
 	/// <summary>
 	/// Recieves the full message from a given socket
@@ -76,36 +77,3 @@ private:
 	std::string RecieveMessage(SOCKET& sock);
 	void EncryptPassword(std::string& password);
 };
-
-//
-//int main() {
-//	// Generate public and private keys
-//	mpuint d(32), e(32), n(32);
-//	GenerateKeys(d, e, n);
-//
-//	// Convert string to numerical representation
-//	std::string message = "This should be encrypted";
-//	mpuint m(message.length() * 8);
-//	for (int i = 0; i < message.length(); i++) {
-//		m.value[i] = message[i];
-//	}
-//
-//	// Encrypt message using public key
-//	mpuint c(m.length);
-//	EncryptDecrypt(c, m, e, n);
-//
-//	// Decrypt message using private key
-//	mpuint decrypted(m.length);
-//	EncryptDecrypt(decrypted, c, d, n);
-//
-//	// Convert decrypted message back to string
-//	std::string decryptedMessage;
-//	for (int i = 0; i < decrypted.length; i++) {
-//		decryptedMessage += decrypted.value[i];
-//	}
-//
-//	std::cout << "Original message: " << message << std::endl;
-//	std::cout << "Decrypted message: " << decryptedMessage << std::endl;
-//
-//	return 0;
-//}
