@@ -44,7 +44,6 @@ public:
 	std::tuple<bool, std::string> PullInfo();
 	void PushProject();
 	std::tuple<bool, std::string> PullProject(std::string);
-
 	bool IsValidId();
 	inline std::string GetProjId() { return projId; }
 	inline void SetProjId(std::string id_) { projId = id_; }

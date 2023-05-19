@@ -16,26 +16,57 @@ class Client:
         self.conn = conn
         self.rsa_key = -1
         self.rsa_n = -1
-        self.id = -1
+        self.u_id = -1
+        self.p_id = -1
         self.update_conn = None
 
 
 class Clients(list):
-    def remove(self, __value: socket.socket) -> None:
-        value = None
-        for client in self:
-            if client.conn == __value:
-                value = client
-        if value is not None:
-            super().remove(value)
+    def __init__(self):
+        super().__init__()
+        self.lock = threading.Lock()
+
+    def append(self, item):
+        self.lock.acquire()
+        try:
+            super().append(item)
+        except (Exception,) as e:
+            self.lock.release()
+            raise e
+        self.lock.release()
+
+    def __add__(self, other):
+        self.lock.acquire()
+        try:
+            res = super().__add__(other)
+        except (Exception,) as e:
+            self.lock.release()
+            raise e
+        self.lock.release()
+        return res
+
+    def remove(self, item) -> None:
+        self.lock.acquire()
+        try:
+            super().remove(item)
+        except (Exception,) as e:
+            self.lock.release()
+            raise e
+        self.lock.release()
 
     def get_client(self, conn: socket.socket):
+        self.lock.acquire()
         for client in self:
             if client.conn == conn:
+                self.lock.release()
                 return client
+        self.lock.release()
 
     def get_sockets(self):
-        return [client.conn for client in self]
+        self.lock.acquire()
+        li = [client.conn for client in self]
+        self.lock.release()
+        return li
 
 
 class Server(ABC):
@@ -48,12 +79,14 @@ class Server(ABC):
         self.server_socket = None
         self.clients = Clients()
         self.messages_to_send = queue.Queue()  # [socket, data], ...
-        self.rlist, self.wlist = [], []
+        self.rlist, self.wlist, = [], []
+
+        self.active_projects = {}
 
         self.public_key, self.private_key, self.n = rsa_crypto.setkeys()
 
-        self.sending_messages_thread = threading.Thread(target=self.send_waiting_messages,)
-    
+        self.sending_messages_thread = threading.Thread(target=self.send_waiting_messages, )
+
     def create_server(self):
         # Creating a server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
@@ -68,21 +101,21 @@ class Server(ABC):
         Args:
                 """
         while True:
-            current_socket, data = self.messages_to_send.get() 
+            current_socket, data = self.messages_to_send.get()
             try:
                 current_socket.send(data)
                 logging.debug(f"sending data: {data} to {current_socket.getpeername()}")
             except (Exception,) as e:
                 logging.warning(f"Failed to send: {data} to {current_socket}\n{e}")
-    
+
     def activate(self):
         """Handling clients
         """
         self.create_server()
         while True:
             self.rlist, self.wlist, _ = select.select([self.server_socket] + self.clients.get_sockets(),
-                                                      self.clients.get_sockets(), [])
-            
+                                                               self.clients.get_sockets(), [])
+
             for current_socket in self.rlist:
                 if current_socket is self.server_socket:
                     (new_socket, address) = self.server_socket.accept()
@@ -98,6 +131,8 @@ class Server(ABC):
             parts = []
             while True:
                 part = current_socket.recv(1024)
+                if part == b'':
+                    raise ConnectionAbortedError
                 # if it is an empty packet then it is the last packet
                 if len(part) == Protocol.NUM_FIELD_LENGTH:
                     logging.debug(f'new data from client {current_socket.getpeername()}: {parts}')
@@ -139,13 +174,16 @@ class Server(ABC):
         Args:
             current_socket (socket.socket): the client's socket
             data (str): data received from client
-        """ 
+        """
         pass
-    
+
     def connection_closed(self, current_socket: socket.socket):
         """ removing client from requests.
         """
-        self.clients.remove(current_socket)
+        client = self.clients.get_client(current_socket)
+        self.clients.remove(client)
         current_socket.close()
-
-
+        try:
+            client.update_conn.close()
+        except AttributeError:
+            pass

@@ -25,7 +25,7 @@ class MainServer(Server):
             :param project_id: the project id
             :return: True if yes, False of no
             """
-            res = self.db.select(self.db.tables['project_users'], item=database.ProjectUser(user_id=user_client.id,
+            res = self.db.select(self.db.tables['project_users'], item=database.ProjectUser(user_id=user_client.u_id,
                                                                                             project_id=project_id))
             if res:
                 return True
@@ -33,7 +33,7 @@ class MainServer(Server):
 
         # handling clients requests
         def send_rsa_keys():
-            #time.sleep(0.1)
+            # time.sleep(0.1)
             # sending to client the server public key
             response_fields = [self.public_key, self.n]
             res = Protocol.join_response_fields(response_fields)
@@ -71,7 +71,7 @@ class MainServer(Server):
             u_id = self.db.select(self.db.tables['users']['id_'], database.User(email=email, password=password))
 
             if u_id:
-                user_client.id = int(u_id[0][0])
+                user_client.u_id = int(u_id[0][0])
                 return True, f"{u_id[0][0]}"
             return False, "Email in use"
 
@@ -91,22 +91,22 @@ class MainServer(Server):
                 return False, "Message arguments"
             u_id = self.db.select(self.db.tables['users']['id_'], database.User(email=email, password=password))
             if u_id:
-                user_client.id = int(u_id[0][0])
+                user_client.u_id = int(u_id[0][0])
                 return True, f"{u_id[0][0]}"
             return False, "Incorrect email or password"
 
         def logout(user_client: Client, info: bytes) -> Tuple[bool, str]:
-            user_client.id = -1
+            user_client.u_id = -1
             return True, ""
 
-        def pull_info(user_client: Client, info: bytes) -> Tuple[bool, str]:
+        def pull_info(user_client: Client, info: bytes) -> Tuple[bool, list or str]:
 
             projects = self.db.join_select(og=self.db.tables['project_users'],
                                            columns=self.db.tables['projects']['id_', 'name'],
                                            join={self.db.tables['projects']['id_']: [
                                                self.db.tables['project_users']['project_id'], ]},
                                            where=[(self.db.tables['project_users'],
-                                                   database.ProjectUser(user_id=int(user_client.id))), ])
+                                                   database.ProjectUser(user_id=int(user_client.u_id))), ])
 
             if not projects:
                 return True, ''
@@ -131,7 +131,7 @@ class MainServer(Server):
             result = [(p_id, p_name, projects_users[p_id]) for p_id, p_name in projects]
             return True, result
 
-        def _add_users_by_mail(user_client: Client, emails, p_id, my_id=None):
+        def _add_users_by_mail(emails, p_id: int, my_id=None):
             if not isinstance(emails, list):
                 emails = [emails]
             if emails:
@@ -147,65 +147,113 @@ class MainServer(Server):
             for id_ in users_id:
                 self.db.insert(self.db.tables['project_users'], database.ProjectUser(project_id=p_id, user_id=id_[0]))
 
-        def create(user_client: Client, info: bytes) -> Tuple[bool, str]:
-            u_id, p_name, emails = "", "", ""
+        def connect_proj(user_client: Client, info: bytes) -> [bool, str]:
             try:
-                u_id, p_name, emails = Protocol.parse_message(info.decode())
+                p_id = int(info.decode())
             except ValueError:
                 return False, 'Message arguments'
-            self.db.insert(self.db.tables['projects'], database.Project(name=p_name, admin_id=u_id))
+            res = self.db.select(self.db.tables['project_users'], database.ProjectUser(user_id=user_client.u_id,
+                                                                                       project_id=p_id))
+            if res[0]:
+                # appending user active projects, changing user current project
+                if user_client.p_id != -1:
+                    self.active_projects[user_client.p_id].remove(user_client)
+
+                user_client.p_id = int(p_id)
+
+                try:
+                    self.active_projects[user_client.p_id] += user_client
+                except KeyError:
+                    self.active_projects[user_client.p_id] = [user_client, ]
+
+                return True, ''
+
+            return False, 'Access Denied'
+
+        def create(user_client: Client, info: bytes) -> Tuple[bool, str]:
+            p_name, emails = "", ""
+            try:
+                p_name, *emails = Protocol.parse_message(info.decode())
+            except ValueError:
+                return False, 'Message arguments'
+            self.db.insert(self.db.tables['projects'], database.Project(name=p_name, admin_id=user_client.u_id))
             p_id = self.db.select(self.db.tables['projects']['id_'], database.Project(name=p_name))[0][0]
-            _add_users_by_mail(emails, p_id, u_id)
+            _add_users_by_mail(emails, p_id, user_client.u_id)
+
+            connect_proj(user_client, str(p_id).encode())
             return True, p_id
 
         def add_users(user_client: Client, info: bytes) -> Tuple[bool, str]:
-            p_id, emails = "", ""
+            emails = ""
             try:
-                p_id, emails = Protocol.parse_message(info.decode())
+                emails = Protocol.parse_message(info.decode())
             except ValueError:
                 return False, 'Message arguments'
             if self.db.select(self.db.tables['projects']['admin_id'],
-                              database.Project(id_=p_id, admin_id=user_client.id)):
+                              database.Project(id_=user_client.p_id, admin_id=user_client.u_id)):
 
-                _add_users_by_mail(emails, p_id)
+                _add_users_by_mail(emails, user_client.p_id)
             else:
                 return False, 'Permission'
             return True, ''
 
         def remove_user(user_client: Client, info: bytes) -> Tuple[bool, str]:
-            u_id, p_id, email = "", "", ""
+            email = ""
             try:
-                u_id, p_id, email = Protocol.parse_message(info.decode())
-            except ValueError:
+                email_lst = Protocol.parse_message(info.decode())
+                email = email_lst[0]
+            except (ValueError, IndexError):
                 return False, 'Message arguments'
+
+            # the id of the user to be removed
             remove_user_id = self.db.select(self.db.tables['users']['id_'], database.User(email=email))[0][0]
-            admin_id = self.db.select(self.db.tables['projects']['admin_id'], database.Project(id_=p_id))[0][0]
-            int_u_id = int(u_id)
-            if (remove_user_id == int_u_id or int_u_id == admin_id) and remove_user_id != admin_id:
+
+            # The project admin id
+            admin_id = \
+                self.db.select(self.db.tables['projects']['admin_id'], database.Project(id_=user_client.p_id))[0][0]
+
+            # if the user asking to remove is the admin or himself && the admin can't remove himself.
+            if (remove_user_id == user_client.u_id or user_client.u_id == admin_id) and remove_user_id != admin_id:
                 self.db.delete(self.db.tables['project_users'],
-                               database.ProjectUser(user_id=remove_user_id, project_id=int(p_id)))
+                               database.ProjectUser(user_id=remove_user_id, project_id=int(user_client.p_id)))
             else:
                 return False, 'Permission'
             return True, ''
 
         def push_project(user_client: Client, info: bytes) -> Tuple[bool, str]:
-            p_id, content = "", ""
+            content = ""
             try:
-                p_id, content = Protocol.parse_message(info.decode())
-            except ValueError:
+                content_lst = Protocol.parse_message(info.decode())
+                content = content_lst[0]
+            except (ValueError, IndexError):
                 return False, 'Message arguments'
             admin_id = self.db.select(self.db.tables['projects']['admin_id'],
-                                      database.Project(id_=user_client.id))[0][0]
+                                      database.Project(id_=user_client.u_id))[0][0]
             approved = None
-            if user_client.id == admin_id:
+            if user_client.u_id == admin_id:
                 approved = content
 
             self.db.update(self.db.tables['projects'], database.Project(content=content, approved=approved),
-                           database.Project(id_=int(p_id)))
+                           database.Project(id_=user_client.p_id))
             return True, ''
 
         def pull_project(user_client: Client, info: bytes) -> Tuple[bool, str]:
-            pass
+            select_res = self.db.select(self.db.tables['projects']['content'], database.Project(id_=user_client.p_id))
+            try:
+                content = select_res[0]
+            except IndexError:
+                return False, "ERROR"
+
+            return True, content
+
+        def listen_conn(user_client: Client, info: bytes) -> Tuple[bool, str]:
+            client_ip = user_client.conn.getpeername()[0]
+            for s in self.clients:
+                if s.conn.getpeername()[0] == client_ip:
+                    self.clients.remove(user_client.conn)
+                    s.update_conn = user_client.conn
+                    return True, ''
+            return False, "Could not find client"
 
         commands = {
             'RSAKEY': rsa_key,
@@ -213,11 +261,13 @@ class MainServer(Server):
             'LOGIN': login,
             'LOGOUT': logout,
             'PULLINFO': pull_info,
+            'CONNECTPROJ': connect_proj,
             'CREATE': create,
             'ADDUSERS': add_users,
             'REMOVEUSER': remove_user,
             'PUSHPROJECT': push_project,
             'PULLPROJECT': pull_project,
+            'LISTEN': listen_conn
         }
 
         if data == b'SECURITY':

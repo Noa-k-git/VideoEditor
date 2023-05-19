@@ -60,6 +60,8 @@ void ServerClient::CreateConnection()
     serverKey = std::stoi(keyN.at(0));
     serverN = std::stoi(keyN.at(1));
     SendKeys();
+    std::thread listen(&ServerClient::Listener, this);
+    listen.detach();
     //int iResult;
 
     // Send and receive data
@@ -166,7 +168,7 @@ void ServerClient::PushProject()
 
         // Close the file
         file.close();
-        SendRecieve("PUSHPROJECT", server_protocol::BuildMessage({ projectId, project }));
+        SendRecieve("PUSHPROJECT", server_protocol::BuildMessage({ projId, project }));
     }
 }
 
@@ -175,6 +177,35 @@ std::tuple<bool, std::string> ServerClient::PullProject(std::string msg)
     std::tuple<bool, std::string> info;
     return SendRecieve("PULLPROJECT", msg);
     
+}
+
+void ServerClient::Listener()
+{
+    if (listeningSocket != INVALID_SOCKET)
+        return;
+    Connect(listeningSocket);
+    if (listeningSocket == INVALID_SOCKET)
+    {
+        wxLocale local(wxLANGUAGE_ENGLISH, wxLOCALE_DONT_LOAD_DEFAULT);
+        wxMessageBox(wxT("Could not connect to server"), wxT("FATAL ERROR"), wxICON_ERROR);
+        //wxMessageDialog dialog(nullptr, "Could not connect to server", wxT("FATAL ERROR"), wxICON_ERROR);
+        //dialog.ShowModal();
+        exit(EXIT_FAILURE);
+    }
+    std::tuple<bool, std::string, bool, std::string> info;
+    while (listeningSocket != INVALID_SOCKET) {
+        std::string msg = std::to_string(userId);
+        std::string data = RecieveMessage(listeningSocket);
+        info = PARSE_RESPONSE(data);
+        bool succeed = std::get<0>(info);
+        if (succeed)
+        {
+            std::string cmd = std::get<1>(info);
+            std::string message = std::get<3>(info);
+
+            //TODO: handle changes
+        }
+    }
 }
 
 bool ServerClient::IsValidId()
@@ -214,23 +245,9 @@ void ServerClient::Connect(SOCKET& sock)
         std::cout << "Error connecting to server: " << WSAGetLastError() << std::endl;
         closesocket(sock);
         sock = INVALID_SOCKET;
+
         return;
     }
-}
-
-void ServerClient::Listener()
-{
-    Connect(listeningSocket);
-    std::string data = RecieveMessage(listeningSocket);
-    auto info = server_protocol::ParseResponse(data, privateKey, myN);
-    bool succeed = std::get<0>(info);
-    if (succeed)
-    {
-        std::string cmd = std::get<1>(info);
-        std::string message = std::get<3>(info);
-        // Handle cmd
-    }
-
 }
 
 std::string ServerClient::RecieveMessage(SOCKET& sock)
