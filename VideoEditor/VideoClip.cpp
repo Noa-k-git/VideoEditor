@@ -1,6 +1,8 @@
 #pragma once
 #include "VideoClip.h"
 #include<algorithm>
+#include "string_utils.h"
+using namespace string_utils;
 VideoClip::VideoClip(VideoSource* videoSource) : IPlayable(videoSource->GetName())
 {
 	this->videoSource = videoSource;

@@ -40,9 +40,11 @@ class VideoSource :
 {
 public:
     static Records<VideoSource*> videoSources;
-    VideoSource(std::string, std::string);
-    VideoSource(std::string);
+    VideoSource(std::string path, std::string name);
+    VideoSource(std::string, std::string data, bool load = false);
     ~VideoSource() override;
+    void Load(std::string, std::string);
+    std::string Write(std::string);
     int GetSize() override;
     SyncObject<AVFrame*>* GetChunk(int at) override;
     void Show() override;

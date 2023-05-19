@@ -1,7 +1,16 @@
+#include <fstream>
 #include "MainWindow.h"
 #include "DesignConstatns.h"
+#include "string_utils.h"
+
+using namespace string_utils;
+
+
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
     EVT_MENU(wxID_SAVE, MainWindow::OnSave)
+    EVT_MENU(wxID_OPEN, MainWindow::OnOpenProject)
+    EVT_MENU(wxID_NEW, MainWindow::OnOpenProject)
+    
     //EVT_MENU(wxID_NEW, MainWindow::onNew)
     //EVT_MENU(wxID_EXIT, MainWindow::onQuit)
     //EVT_TOOL(wxID_HELP, MainWindow::onHelp)
@@ -45,6 +54,15 @@ MainWindow::MainWindow(wxWindow* parent,
     wxBoxSizer* menuSizer = new wxBoxSizer(wxHORIZONTAL);
     layoutSizer->SetDimension(GetSize().x, GetSize().y, GetSize().GetWidth(), GetSize().GetHeight());
     layoutSizer->Add(menuSizer, 0, wxEXPAND);
+
+    wxButton* pushProjBtn = new wxButton(this, wxID_ANY, "PUSH PROJECT");
+    pushProjBtn->Bind(wxEVT_BUTTON, &MainWindow::OnPushProject, this);
+    menuSizer->Add(pushProjBtn, 0.1, wxEXPAND | wxALL, 5);
+
+
+    wxButton* pullProjectsBtn = new wxButton(this, wxID_ANY, "PULL My Projects");
+    pullProjectsBtn->Bind(wxEVT_BUTTON, &MainWindow::OnPullProjects, this);
+    menuSizer->Add(pullProjectsBtn, 0.1, wxEXPAND|wxALL, 5);
 
     wxBitmap userIcon((std::string)"user4.png", wxBITMAP_TYPE_PNG);
     SmallBitmapButton* loginButton = new SmallBitmapButton(this, wxID_ANY, userIcon, wxDefaultPosition, wxSize(32, 32), wxSize(26, 26), wxBU_AUTODRAW);
@@ -101,6 +119,7 @@ MainWindow::MainWindow(wxWindow* parent,
     addMenu->Append(newSeqItem_);
     newObjectButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent& event) {
         // show the menu
+        m_sourcesWindow->Refresh();
         PopupMenu(addMenu);
         });
 
@@ -162,13 +181,22 @@ MainWindow::MainWindow(wxWindow* parent,
     statusBar->PushStatusText(_("Ready!"));
     
     this->Bind(WIDGET_DELETED_EVT, &MainWindow::OnRefresh, this);
-    wxAcceleratorEntry entries[1];
+    wxAcceleratorEntry entries[2];
     entries[0].Set(wxACCEL_CTRL, (int)'S', wxID_SAVE);
-    wxAcceleratorTable accel(1, entries);
+    entries[1].Set(wxACCEL_CTRL, (int)'O', wxID_OPEN);
+    wxAcceleratorTable accel(2, entries);
     SetAcceleratorTable(accel);
     SetSizer(layoutSizer);
 
     clientPtr = new ServerClient();
+    clientPtr->SetPath("");
+    SetProjectName("Project.vprojn");
+    Show();
+    CreateStartDlg();
+    while (clientPtr->GetPath() == "")
+    {
+        startupDlg->ShowModal();
+    }
 }
 
 MainWindow::~MainWindow()
@@ -177,19 +205,167 @@ MainWindow::~MainWindow()
     finalVideoPanel->PauseVideo();
 }
 
-void MainWindow::onNew(wxCommandEvent& WXUNUSED(event_))
+void MainWindow::SetProjectName(std::string name)
 {
-    wxMessageBox("MainWindow::onNew");
-    PushStatusText(_("MainWinsow::onNew"));
+    clientPtr->SetPrName(name);
+    wxGetApp().CallAfter([=]() {
+        SetTitle(SplitString(name, '.').at(0));
+        });
+}
 
-    wxSleep(5);
-    PopStatusText();
+void MainWindow::CreateStartDlg()
+{
+    startupDlg = new wxDialog(this, wxID_ANY, "Startup Menu");
+    wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
+    mainSizer->SetMinSize(600, 400);
+
+    wxFont font(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_LIGHT);
+    wxButton* newProjectBtn = new wxButton(startupDlg, wxID_ANY, "Create New Project");
+    newProjectBtn->SetFont(font);
+    newProjectBtn->SetMinSize(wxSize(-1, 50));
+    newProjectBtn->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event_) {
+        OnNew(event_);
+        startupDlg->Close(); 
+        });
+
+    mainSizer->Add(newProjectBtn, 1, wxEXPAND | wxRIGHT | wxLEFT | wxTOP, 30);
+    mainSizer->AddSpacer(30);
+
+    wxButton* openProjBtn = new wxButton(startupDlg, wxID_ANY, "Open Existing Project");
+    openProjBtn->SetFont(font);
+    openProjBtn->SetMinSize(wxSize(-1, 50));
+    openProjBtn->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event_) {
+        OnOpenProject(event_);
+        startupDlg->Close();
+    });
+
+    mainSizer->Add(openProjBtn, 1, wxEXPAND | wxRIGHT|wxLEFT|wxBOTTOM, 30);
+
+
+    startupDlg->SetSizerAndFit(mainSizer);
+    wxPoint parentCenter((int)((this->GetPosition().x + this ->GetSize().GetWidth()) / 2),
+        (int)((this->GetPosition().y + this->GetSize().GetHeight()) / 2));
+    wxPoint thisCenter((int)(startupDlg->GetSize().GetWidth() / 2), (int)(startupDlg->GetSize().GetHeight() / 2));
+    startupDlg->SetPosition(wxPoint(parentCenter.x - thisCenter.x, parentCenter.y - thisCenter.y));
+    if (startupDlg->GetPosition().x < 0 || startupDlg->GetPosition().y < 0)
+        startupDlg->SetPosition(wxDefaultPosition);
+
+}
+
+void MainWindow::OnOpenProject(wxCommandEvent& event_)
+{
+    wxFileDialog fileDialog(this, "Open Project", "", "", "*.vprojn", wxFD_OPEN| wxFD_FILE_MUST_EXIST);
+    if (fileDialog.ShowModal() == wxID_OK)
+    {
+        std::vector<std::string> p = SplitString(fileDialog.GetPath().ToStdString(), '\\');
+        SetProjectName(p.at(p.size() - 1));
+        p.pop_back();
+        clientPtr->SetPath(JoinString(p, '\\') + '\\');
+    }
+    else
+        return;
+
+    Sequence::sequences.RemoveAllRecords();
+    VideoSource::videoSources.RemoveAllRecords();
+    m_sourcesWindow->DestroyChildren();
+    m_sequenceControlWindow->DestroyChildren();    
+    
+    Layout();
+
+    std::ifstream file(clientPtr->GetPath() + clientPtr->GetPrName());
+    std::string data;
+    
+    // read the file line by line
+    if (std::getline(file, data)) {
+        SetProjectName(data);
+    }
+    else {
+        return;
+    }
+    if (std::getline(file, data)) {
+        std::vector<std::string> vsElems = SplitString(data, '|');
+        for (std::string& vsData : vsElems) {
+            ImportSourceVid(vsData, true);
+        }
+        for (std::thread& t : importThreads) { t.join(); }
+        importThreads.clear();
+    } else {
+        file.close();
+        return;
+    }
+    
+    if (std::getline(file, data)) {
+        std::vector<std::string> seqElms = SplitString(data, '|');
+        for (std::string& seqData : seqElms) {
+            Sequence* s = new Sequence(seqData, true);
+            AddSequence(s);
+        }
+    }
+    
+    file.close();
+    Layout();
+}
+
+void MainWindow::OnSave(wxCommandEvent& event_)
+{
+    if (clientPtr->GetPath() == "")
+    {
+        wxFileDialog fileDialog(this, "Save Project", "", clientPtr->GetPrName(), "*.vprojn", wxFD_SAVE);
+        if (fileDialog.ShowModal() == wxID_OK)
+        {
+            std::vector<std::string> p = SplitString(fileDialog.GetPath().ToStdString(), '\\');
+            SetProjectName(p.at(p.size() - 1));
+            p.pop_back();
+            clientPtr->SetPath(JoinString(p, '\\') + '\\');
+        }
+        else
+            return;
+    }
+    std::ofstream file(clientPtr->GetPath() + clientPtr->GetPrName());
+    file << clientPtr->GetPrName() << std::endl;
+    std::vector<VideoSource*>& vSources = *VideoSource::videoSources.GetRecords();
+    int x = vSources.size() - 1;
+    bool a = 0 < x;
+    for (int i = 0; i < x; i++) {
+        file << vSources.at(i)->Write(clientPtr->GetPath()) << '|';
+    }
+    if (x >= 0)
+        file << vSources.at(vSources.size() - 1)->Write(clientPtr->GetPath()) << std::endl;
+
+    std::vector<Sequence*>& allSeq = *Sequence::sequences.GetRecords();
+    x = allSeq.size() - 1;
+    for (int i = 0; i < x; i++) {
+        file << allSeq.at(i)->Write() << '|';
+    }
+    if (x >= 0)
+        file << allSeq.at(allSeq.size() - 1)->Write() << std::endl;
+    file.close();
+}
+
+void MainWindow::OnPushProject(wxCommandEvent& event_)
+{
+    OnSave(event_);
+    clientPtr->PushProject();
+}
+
+void MainWindow::OnPullProjects(wxCommandEvent& event_)
+{
+    ProjectDialog* dlg = new ProjectDialog(clientPtr, this);
+    wxButton* button = dynamic_cast<wxButton*>(event_.GetEventObject());
+    if (button) {
+        dlg->SetPosition(wxPoint(button->GetPosition().x, button->GetPosition().y + button->GetSize().GetHeight()+20));
+    }
+    dlg->ShowModal();
+}
+
+void MainWindow::OnNew(wxCommandEvent& event_)
+{
+    OnSave(event_);
 }
 
 void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event_))
 {
-    //wxMessageBox("Start Import");
-    wxFileDialog fileDialog(this, "Open File", "", "", "*.mp4", wxFD_OPEN);
+    wxFileDialog fileDialog(this, "Open Source File", clientPtr->GetPath(), "", "*.mp4", wxFD_OPEN);
     std::string filePath;
     if (fileDialog.ShowModal() == wxID_OK)
     {
@@ -197,93 +373,8 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event_))
     }
     else
         return;
-    
-    //VideoSource* vs = new VideoSource("C:\\Users\\cyber\\source\\repos\\Noa-k-git\\VideoEditor\\video.mp4");
-    //wxMessageBox("Processing video");
-    //VideoSource* vs = new VideoSource(filePath);
-    //for (auto& thread : *ISource<std::vector<AVFrame*>>::readingThreads) {
-    //    if (thread.joinable())
-    //        thread.join();
-    //}
-    //VideoClip* vc = new VideoClip(vs);
-    //
-    //Sequence* s = new Sequence();
-    //s->AddClip(vc);
-    //std::string fname = "withhelp.mp4";
-    //s->SaveVideo(fname);
-    //delete s;
-    ////delete vc;
-    //delete vs;
-    //wxMessageBox("Processing video");
-    //auto processVideoLambda = 
-    std::thread t([this, filePath]() {
-        wxGetApp().CallAfter([this]() {
-            std::lock_guard<std::mutex> lock(statusBarMutex);
-            for (int i = 0; i < statusBar->GetFieldsCount(); i++)
-            {
-                wxString text = statusBar->GetStatusText(i);
-                wxMessageOutputDebug().Printf("\t+\tb Status bar field %d: %s", i, text);
-                wxMessageOutputDebug().Printf("%d", statusBar->GetFieldsCount());
-            }
-            statusBar->PushStatusText(_("Processing Video ") + std::to_string(VideoSource::videoSources.GetRecords()->size()) + _("0..."));
-            //statusBar->PushStatusText(_("Processing Video ") + std::to_string(VideoSource::videoSources.GetRecords()->size()) + _("1..."));
-            //statusBar->PushStatusText(_("Processing Video ") + std::to_string(VideoSource::videoSources.GetRecords()->size()) + _("2..."));
-            for (int i = 0; i < statusBar->GetFieldsCount(); i++)
-            {
-                wxString text = statusBar->GetStatusText(i);
-                wxMessageOutputDebug().Printf("%d", statusBar->GetFieldsCount());
-                wxMessageOutputDebug().Printf("\t+\ta Status bar field %d: %s", i, text);
-            }
-            wxMessageOutputDebug().Printf("Processing Video: %d", statusBar->GetFieldsCount());
-            });
-        VideoSource* v = new VideoSource(filePath);
-        wxGetApp().CallAfter([this]() {
-            for (int i = 0; i < statusBar->GetFieldsCount(); i++)
-            {
-                wxString text = statusBar->GetStatusText(i);
-                wxMessageOutputDebug().Printf("\t-\tStatus bar field %d: %s", i, text);
-            }
-            std::lock_guard<std::mutex> lock(statusBarMutex);
-            statusBar->PopStatusText();
-            wxMessageOutputDebug().Printf("Remove Processing Video: %d", statusBar->GetFieldsCount());
-            
-            //statusBar->PopStatusText();
-            });
-        if (v->GetCreated())
-        {
-
-            /*for (auto& thread : *ISource<std::vector<SyncObject<AVFrame*>>>::readingThreads) {
-                if (thread.joinable())
-                {
-                    thread.join();
-                }
-            }*/
-            wxGetApp().CallAfter([this, v]() {
-                auto vsPanel = new VideoSourcePanel(m_sourcesWindow, v, ogShowVideoPanel->GetId(), m_sequenceControlWindow->GetId());
-                //statusBar->SetStatusText(_("Finished"));
-                m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
-                m_sourcesSizer->Layout();
-                });
-        }
-        else {
-            delete v;
-            wxGetApp().CallAfter([&]() {
-                wxMessageBox(_("Video is already defined... If not try first to change the video name"), _("Error in importing video"));
-                });
-        }
-        });
-
-    t.detach();
-
-    //for (auto vs : *VideoSource::videoSources.GetRecords()) {
-    //    auto x = new VideoSourcePanel(sourcesPanel, vs);
-    //    m_sourcesSizer->Add(x);
-    //}
-    //new VideoClip()
-    //new Sequence("a");
-    //(*Sequence::sequences.Contains("a").first)->AddClip(new VideoClip(*VideoSource::videoSources.Contains("v").first));
-    //std::string fname = "RecordVideo.mp4";
-    //(*Sequence::sequences.Contains("a").first)->SaveVideo(fname);
+    ImportSourceVid(FindDifference(clientPtr->GetPath(), filePath), false);
+   
 }
 
 void MainWindow::OnUser(wxCommandEvent& event_)
@@ -295,27 +386,91 @@ void MainWindow::OnUser(wxCommandEvent& event_)
 void MainWindow::OnNewSequence(wxCommandEvent& WXUNUSED(event_))
 {
     Sequence* s = new Sequence();
-    if (s->GetCreated()) {
-        wxGetApp().CallAfter([this, s]() {
-            auto vsPanel = new SeqSourcePanel(m_sourcesWindow, s, finalVideoPanel->GetId(), m_sequenceControlWindow->GetId());
+    AddSequence(s);
+
+}
+
+void MainWindow::OnRefresh(wxCommandEvent& event_)
+{
+    this->m_sourcesWindow->Layout();
+}
+
+void MainWindow::ImportSourceVid(std::string sourcePath, bool load)
+{
+    if (sourcePath != "") {
+        std::thread t([=]() {
+            wxGetApp().CallAfter([=]() {
+                std::lock_guard<std::mutex> lock(statusBarMutex);
+                for (int i = 0; i < statusBar->GetFieldsCount(); i++)
+                {
+                    wxString text = statusBar->GetStatusText(i);
+                    wxMessageOutputDebug().Printf("\t+\tb Status bar field %d: %s", i, text);
+                    wxMessageOutputDebug().Printf("%d", statusBar->GetFieldsCount());
+                }
+                statusBar->PushStatusText(_("Processing Video...")); // +std::to_string(VideoSource::videoSources.GetRecords()->size()) + _("0..."));
+                //statusBar->PushStatusText(_("Processing Video ") + std::to_string(VideoSource::videoSources.GetRecords()->size()) + _("1..."));
+                //statusBar->PushStatusText(_("Processing Video ") + std::to_string(VideoSource::videoSources.GetRecords()->size()) + _("2..."));
+                for (int i = 0; i < statusBar->GetFieldsCount(); i++)
+                {
+                    wxString text = statusBar->GetStatusText(i);
+                    wxMessageOutputDebug().Printf("%d", statusBar->GetFieldsCount());
+                    wxMessageOutputDebug().Printf("\t+\ta Status bar field %d: %s", i, text);
+                }
+                wxMessageOutputDebug().Printf("Processing Video: %d", statusBar->GetFieldsCount());
+                });
+            VideoSource* v = new VideoSource(clientPtr->GetPath(), sourcePath, load);
+            wxGetApp().CallAfter([this]() {
+                for (int i = 0; i < statusBar->GetFieldsCount(); i++)
+                {
+                    wxString text = statusBar->GetStatusText(i);
+                    wxMessageOutputDebug().Printf("\t-\tStatus bar field %d: %s", i, text);
+                }
+                std::lock_guard<std::mutex> lock(statusBarMutex);
+                statusBar->PopStatusText();
+                wxMessageOutputDebug().Printf("Remove Processing Video: %d", statusBar->GetFieldsCount());
+
+                //statusBar->PopStatusText();
+                });
+            if (v->GetCreated())
+            {
+
+                /*for (auto& thread : *ISource<std::vector<SyncObject<AVFrame*>>>::readingThreads) {
+                    if (thread.joinable())
+                    {
+                        thread.join();
+                    }
+                }*/
+                wxGetApp().CallAfter([this, v]() {
+                    auto vsPanel = new VideoSourcePanel(m_sourcesWindow, v, ogShowVideoPanel->GetId(), m_sequenceControlWindow->GetId());
+                    //statusBar->SetStatusText(_("Finished"));
+                    m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
+                    m_sourcesSizer->Layout();
+                    });
+            }
+            else {
+                delete v;
+                wxGetApp().CallAfter([&]() {
+                    wxMessageBox(_("Video is already defined... If not try first to change the video name"), _("Error in importing video"));
+                    });
+            }
+            });
+        importThreads.push_back(std::move(t));
+    }
+}
+
+void MainWindow::AddSequence(Sequence* seq)
+{
+    if (seq->GetCreated()) {
+        wxGetApp().CallAfter([this, seq]() {
+            auto vsPanel = new SeqSourcePanel(m_sourcesWindow, seq, finalVideoPanel->GetId(), m_sequenceControlWindow->GetId());
             //statusBar->SetStatusText(_("Finished"));
             m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
             m_sourcesSizer->Layout();
             });
     }
     else {
-        delete s;
+        delete seq;
     }
-
-}
-
-void MainWindow::OnSave(wxCommandEvent& event_)
-{
-}
-
-void MainWindow::OnRefresh(wxCommandEvent& event_)
-{
-    this->m_sourcesWindow->Layout();
 }
 
 //void MainWindow::OnWindowSize(wxSizeEvent& event)

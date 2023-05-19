@@ -12,6 +12,7 @@ public:
     std::pair<typename std::vector<T>::iterator, bool> AddRecord(T record);
     std::pair<typename std::vector<T>::iterator, bool> UpdateName(std::string);
     void RemoveRecord(std::string name);
+    void RemoveAllRecords();
     std::pair <typename std::vector<T>::iterator, bool > Contains(std::string name);
     std::vector<T>* GetRecords() const;
 private:
@@ -87,6 +88,12 @@ void Records<T>::RemoveRecord(std::string name) {
 
     if (result.second)
         videoSources->erase(result.first);
+}
+
+template<typename T>
+inline void Records<T>::RemoveAllRecords()
+{
+    videoSources->clear();
 }
 
 template <typename T>

@@ -5,6 +5,7 @@
 #include <wx/app.h>
 #include <thread>
 #include <chrono>
+
 #ifndef PROTOCOL_FUNC
 #define PROTOCOL_FUNC
 #define PARSE_RESPONSE(data) server_protocol::ParseResponse(data, privateKey, myN)
@@ -15,6 +16,8 @@ ServerClient::ServerClient()
     listeningSocket = INVALID_SOCKET;
     writeSocket = INVALID_SOCKET;
     userId = INVALID_USER_ID;
+    projectPath = "";
+    projectName = "";
     privateKey = 0, publicKey = 0, serverKey = 0, myN = 0, serverN = 0;
     rsa_cipher::setkeys(privateKey, publicKey, myN);
     WSADATA wsaData;
@@ -53,7 +56,7 @@ void ServerClient::CreateConnection()
     server_protocol::StringToParts((std::string)"SECURITY", requestParts);
     SendParts(requestParts);
     std::string data= RecieveMessage(writeSocket);
-    std::vector<std::string> keyN = server_protocol::SplitString(data, '|');
+    std::vector<std::string> keyN = SplitString(data, '|');
     serverKey = std::stoi(keyN.at(0));
     serverN = std::stoi(keyN.at(1));
     SendKeys();
@@ -139,8 +142,39 @@ void ServerClient::Logout()
     userId = INVALID_USER_ID;
 }
 
-void ServerClient::PullInfo()
+std::tuple<bool, std::string> ServerClient::PullInfo()
 {
+    std::tuple<bool, std::string> info;
+    std::string msg = std::to_string(userId);
+    info = SendRecieve("PULLINFO", msg);
+    return info;
+}
+
+void ServerClient::PushProject()
+{
+    if (projectName != "" && projectPath != "")
+    {
+        std::string line;
+        std::string project = "";
+        // Read from the text file
+        std::ifstream file(projectPath + projectName);
+
+        // Use a while loop together with the getline() function to read the file line by line
+        while (std::getline(file, line)) {
+            project += line + '\n';
+        }
+
+        // Close the file
+        file.close();
+        SendRecieve("PUSHPROJECT", server_protocol::BuildMessage({ projectId, project }));
+    }
+}
+
+std::tuple<bool, std::string> ServerClient::PullProject(std::string msg)
+{
+    std::tuple<bool, std::string> info;
+    return SendRecieve("PULLPROJECT", msg);
+    
 }
 
 bool ServerClient::IsValidId()

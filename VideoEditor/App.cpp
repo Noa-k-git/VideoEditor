@@ -26,8 +26,7 @@ bool App::OnInit()
 	
 	MainWindow* main = new MainWindow(nullptr, window::id::MAINWINDOW, _("Main Window"), wxPoint(1,1), display->GetClientArea().GetSize());//, display->GetGeometry().GetPosition(), display->GetGeometry().GetSize());
 	//main->SetSize(display->GetClientArea());
-	
-	main->Show();
+
 	return true;
 }
 

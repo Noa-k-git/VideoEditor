@@ -1,5 +1,6 @@
 #include "VideoSource.h"
-
+#include "string_utils.h"
+using namespace string_utils;
 #undef av_err2str
 char x[AV_ERROR_MAX_STRING_SIZE];
 #define av_err2str(errnum) \
@@ -12,8 +13,11 @@ VideoSource::VideoSource(std::string path, std::string name) : ISource(path, nam
 	UpdateCreated();
 }
 
-VideoSource::VideoSource(std::string path) : ISource(path), IImg()
+VideoSource::VideoSource(std::string sourcePath, std::string data, bool load) : ISource(data), IImg()
 {
+	if (load)
+		Load(sourcePath, data);
+	else path = sourcePath + data;
 	UpdateCreated();
 }
 
@@ -30,6 +34,18 @@ VideoSource::~VideoSource()
 		this->source_.clear();
 	}
 	//std::vector<cv::Mat>().swap(source);
+}
+
+void VideoSource::Load(std::string sourcePath, std::string data)
+{
+	std::vector<std::string> args = SplitString(data, ',');
+	this->SetName(args.at(0));
+	this->path = sourcePath + args.at(1);
+}
+
+std::string VideoSource::Write(std::string defPath)
+{
+	return GetName() + ',' + FindDifference(defPath, path);
 }
 
 void VideoSource::UpdateCreated() {
@@ -81,11 +97,13 @@ void VideoSource::ReadSource()
 	// Open the file using libavformat
 	AVFormatContext* av_format_ctx = avformat_alloc_context();
 	if (!av_format_ctx) {
-		wxMessageBox("Couldn't create AVFormatContext\n");
-		return; 
+		//wxMessageBox("Couldn't create AVFormatContext\n");
+		created = false;
+		return;
 	}
 	if (avformat_open_input(&av_format_ctx, path.c_str(), NULL, NULL) != 0) {
-		wxMessageBox("Couldn't open video file\n");
+		//wxMessageBox("Couldn't open video file\n");
+		created = false;
 		return;
 	}
 
@@ -108,35 +126,44 @@ void VideoSource::ReadSource()
 	}
 
 	if (video_stream_index == -1) {
-		wxMessageBox("Couldn't find valid video stream inside file\n");
+		//wxMessageBox("Couldn't find valid video stream inside file\n");
+		created = false;
 		return;
 	}
 
 	// Set up a codec context for the decoder
 	AVCodecContext* av_codec_ctx = avcodec_alloc_context3(av_codec);
 	if (!av_codec_ctx) {
-		wxMessageBox("Couldn't create AVCpdecContext\n");
+		//wxMessageBox("Couldn't create AVCpdecContext\n");
+		created = false;
 		return;
 	}
 
 	if (avcodec_parameters_to_context(av_codec_ctx, av_codec_params) < 0)
 	{
-		wxMessageBox("Couldn't initialize AVCodecContext\n");
+		//wxMessageBox("Couldn't initialize AVCodecContext\n");
+		created = false;
 		return;
 	}
 	if (avcodec_open2(av_codec_ctx, av_codec, NULL) < 0) {
-		wxMessageBox("Couldn't open codec\n");
+		//wxMessageBox("Couldn't open codec\n");
+
+		created = false;
 		return;
 	}
 
 	AVFrame* av_frame = av_frame_alloc();
 	if (!av_frame) {
-		wxMessageBox("Couldn't allocate AVFrame\n");
+		//wxMessageBox("Couldn't allocate AVFrame\n");
+
+		created = false;
 		return;
 	}
 	AVPacket* av_packet = av_packet_alloc();
 	if (!av_packet) {
-		wxMessageBox("Couldn't allocate AVPacket\n");
+		//wxMessageBox("Couldn't allocate AVPacket\n");
+
+		created = false;
 		return;
 	}
 	int response;
@@ -148,7 +175,9 @@ void VideoSource::ReadSource()
 		}
 		response = avcodec_send_packet(av_codec_ctx, av_packet);
 		if (response < 0) {
-			wxMessageBox("Failed to decode packet: %s\n", av_err2str(response));
+			//wxMessageBox("Failed to decode packet: %s\n", av_err2str(response));
+
+			created = false;
 			return;
 		}
 		response = avcodec_receive_frame(av_codec_ctx, av_frame);
@@ -157,7 +186,9 @@ void VideoSource::ReadSource()
 			continue;
 		}
 		else if (response < 0) {
-			wxMessageBox("Failed to decode frame: %s\n", av_err2str(response));
+			//wxMessageBox("Failed to decode frame: %s\n", av_err2str(response));
+
+			created = false;
 			return;
 		}
 		counter++;
@@ -185,7 +216,7 @@ void VideoSource::ReadSource()
 		}*/
 		av_frame_unref(av_frame);
 	}
-	
+
 
 	avformat_close_input(&av_format_ctx);
 	avformat_free_context(av_format_ctx);
@@ -258,6 +289,7 @@ void VideoSource::ReadSource(std::string path)
 
 SyncObject<AVFrame*>* VideoSource::GetChunk(int idx)
 {
+	if (GetSize() == 0) return nullptr;
 	if (idx < GetSize())
 		return &source_.at(idx);
 	return &source_.at(GetSize() - 1);

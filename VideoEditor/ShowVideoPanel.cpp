@@ -226,6 +226,11 @@ void ShowVideoPanel::ShowVideo()
 		timeline->SetValue(pos);
 
 
+		SwsContext* swsContext = sws_getContext(
+			frame->width, frame->height, (AVPixelFormat)frame->format,
+			rgbFrame->width, rgbFrame->height, AV_PIX_FMT_RGB24,
+			SWS_BILINEAR, NULL, NULL, NULL);
+
 		// Convert the frame from YUV to RGB
 		sws_scale(swsContext, frame->data, frame->linesize, 0,
 			frame->height, rgbFrame->data, rgbFrame->linesize);

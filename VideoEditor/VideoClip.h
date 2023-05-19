@@ -21,6 +21,9 @@ private:
 public:
 	VideoClip(VideoSource*);
 	virtual ~VideoClip();
+	inline int GetStart() { return edges[0]; }
+	inline int GetEnd() { return edges[1]; }
+	
 	bool SetStart(int);
 	bool SetEnd(int);
 	void ApplyEffects();

@@ -105,24 +105,11 @@ std::string server_protocol::CreateHeader(const std::vector<std::string>& header
 	std::transform(encodedIntVec.begin(), encodedIntVec.end(), encodedStrVec.begin(), [](const int& i) {
 		return std::to_string(i);
 		});
-	return server_protocol::JoinString(encodedStrVec, ',');
+	return JoinString(encodedStrVec, ',');
 }
 std::string server_protocol::JoinRequestFields(const std::vector<std::string>& fields)
 {
 	return JoinString(fields, DELIMITER);
 }
 
-std::vector<std::string> server_protocol::SplitString(std::string str, char ch)
-{
-	std::vector<std::string> result;
-	size_t pos = 0;
-	std::string token;
-	while ((pos = str.find(ch)) != std::string::npos) {
-		token = str.substr(0, pos);
-		result.push_back(token);
-		str.erase(0, pos + 1);
-	}
-	result.push_back(str);
-	return result;
-}
 

@@ -1,7 +1,9 @@
 #pragma once
 #include "Sequence.h"
+#include "string_utils.h"
 #include <algorithm>
 
+using namespace string_utils;
 #undef av_err2str
 //extern char x[AV_ERROR_MAX_STRING_SIZE];
 #define av_err2str(errnum) \
@@ -34,15 +36,32 @@ Records<Sequence*> Sequence::sequences;
 
 Sequence::Sequence(std::string name) : IPlayable<AVFrame*>(name)
 {
-    if (Sequence::sequences.AddRecord(this).second)
-        created = true;
-    else
-        created = false;
-    
+    UpdateCreated();
 }
 
 Sequence::Sequence() : Sequence("My Sequence")
 {
+}
+
+Sequence::Sequence(std::string data, bool load) : IPlayable<AVFrame*>("this is a dummy name")
+{
+    std::vector<std::string> args = SplitString(data, ',');
+    this->SetName(args.at(0));
+    UpdateCreated();
+    if (!created) return;
+    args.erase(args.begin());
+    for (std::string& clipData : args) {
+        std::vector<std::string> clipArgs = SplitString(clipData, '=');
+        if (clipArgs.size() == 3) {
+            auto res = VideoSource::videoSources.Contains(clipArgs.at(0));
+            if (res.second) {
+                VideoClip* newClip = new VideoClip(*res.first);
+                newClip->SetStart(std::stoi(clipArgs.at(1)));
+                newClip->SetEnd(std::stoi(clipArgs.at(2)));
+                this->AddClip(newClip);
+            }
+        }
+    }
 }
 
 Sequence::~Sequence()
@@ -50,6 +69,23 @@ Sequence::~Sequence()
     for (auto& clip : video) {
         delete clip;
     }
+}
+
+void Sequence::UpdateCreated()
+{
+    if (Sequence::sequences.AddRecord(this).second)
+        created = true;
+    else
+        created = false;
+}
+
+std::string Sequence::Write()
+{
+    std::string res = GetName();
+    for (VideoClip*& oneClip : video) {
+        res += ',' + oneClip->GetName() + '=' + std::to_string(oneClip->GetStart()) + '=' + std::to_string(oneClip->GetEnd());
+    }
+    return res;
 }
 
 void Sequence::SaveVideo(std::string& output_filename)

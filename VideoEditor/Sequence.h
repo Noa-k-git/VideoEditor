@@ -20,7 +20,10 @@ public:
 	static Records<Sequence*> sequences;
 	Sequence(std::string);
 	Sequence();
+	Sequence(std::string data, bool load);
 	virtual ~Sequence();
+	void UpdateCreated();
+	std::string Write();
 	void SaveVideo(std::string&);
 	void AddClip(VideoClip*, int);
 	void AddClip(VideoClip*);

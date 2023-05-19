@@ -120,6 +120,12 @@
     <ClCompile Include="RotateEffect.cpp">
       <Filter>Source Files\Effects</Filter>
     </ClCompile>
+    <ClCompile Include="string_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectsDialog.cpp">
+      <Filter>Source Files\Design</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceID.h">
@@ -232,6 +238,12 @@
     </ClInclude>
     <ClInclude Include="image_helpers.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="string_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectsDialog.h">
+      <Filter>Header Files\Design</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

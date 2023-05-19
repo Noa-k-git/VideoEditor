@@ -2,6 +2,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
+#include <fstream>
 #include "ServerProtocol.h"
 #include "SHA256.h"
 #include "rsa.h"
@@ -40,15 +41,25 @@ public:
 	/// </summary>
 	void Logout();
 
-	void PullInfo();
+	std::tuple<bool, std::string> PullInfo();
+	void PushProject();
+	std::tuple<bool, std::string> PullProject(std::string);
 
-	bool IsValidId();	
+	bool IsValidId();
+	inline std::string GetProjId() { return projId; }
+	inline void SetProjId(std::string id_) { projId = id_; }
+	inline std::string GetPrName() { return projectName; }
+	inline void SetPrName(std::string name) { projectName = name; }
+	inline std::string GetPath() { return projectPath; }
+	inline void SetPath(std::string projPath) { projectPath = projPath; }
 private:
 	SOCKET listeningSocket;
 	SOCKET writeSocket;
 
 	int userId;
-
+	std::string projId;
+	std::string projectName;
+	std::string projectPath;
 	int publicKey;
 	int privateKey;
 	int myN;
