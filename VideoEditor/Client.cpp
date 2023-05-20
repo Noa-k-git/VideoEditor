@@ -1,10 +1,5 @@
 #pragma once
 #include "Client.h"
-#include <wx/wx.h>
-#include <wx/msgdlg.h>
-#include <wx/app.h>
-#include <thread>
-#include <chrono>
 
 #ifndef CLIENT_MACROS
 #define CLIENT_MACROS
@@ -13,8 +8,12 @@
 #define W_SEND_RECEIVE(cmd, msg) SendRecieve(writeSocket, cmd, msg)
 #define L_SEND_RECEIVE(cmd, msg) SendRecieve(listenSocket, cmd, msg)
 #endif
-ServerClient::ServerClient()
+
+wxDEFINE_EVENT(SWAP_CLIP_SERVER_EVT, wxCommandEvent);
+
+ServerClient::ServerClient(wxWindow* swWindow)
 {
+    swapWindow = swWindow;
     listenSocket = INVALID_SOCKET;
     writeSocket = INVALID_SOCKET;
     userId = INVALID_USER_ID;
@@ -214,7 +213,12 @@ void ServerClient::HandleUpdate(std::vector<std::string> updateParms)
     if (cmd == "switch")
     {
         if (updateParms.size() == 3)
-
+        {
+            wxCommandEvent swapEvt_(SWAP_CLIP_SERVER_EVT);
+            swapEvt_.SetString(updateParms.at(0));
+            swapEvt_.SetInt(std::stoi(updateParms.at(1)));
+            swapEvt_.SetExtraLong(std::stoi(updateParms.at(2)));
+        }
     }
         
 }

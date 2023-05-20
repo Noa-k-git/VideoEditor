@@ -3,6 +3,11 @@
 #include <ws2tcpip.h>
 #include <iostream>
 #include <fstream>
+#include <wx/wx.h>
+#include <wx/msgdlg.h>
+#include <wx/app.h>
+#include <thread>
+#include <chrono>
 #include "ServerProtocol.h"
 #include "SHA256.h"
 #include "rsa.h"
@@ -11,9 +16,12 @@
 #define CLIENT_CONSTANTS
 #define INVALID_USER_ID -1
 #endif
+
+wxDECLARE_EVENT(SWAP_CLIP_SERVER_EVT, wxCommandEvent);
+
 class ServerClient {
 public:
-	ServerClient();
+	ServerClient(wxWindow* swapWindow);
 	~ServerClient();
 	// @brief Creates a connection with the server and return the connected socket
 	void CreateConnection();
@@ -61,6 +69,7 @@ private:
 	SOCKET listenSocket;
 	SOCKET writeSocket;
 
+	wxWindow* swapWindow;
 	int userId;
 	std::string projId;
 	std::string projectName;

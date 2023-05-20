@@ -157,7 +157,7 @@ MainWindow::MainWindow(wxWindow* parent,
     wxMessageOutputDebug().Printf("\t\t\t%d", m_sequenceWindow->GetId());
     wxMessageOutputDebug().Printf("\t\t\t%d", seqNameText_->GetId());
 
-    m_sequenceControlWindow = new SeqControlWindow(m_sequenceWindow, seqNameText_);
+    m_sequenceControlWindow = new SeqControlWindow(clientPtr, m_sequenceWindow, seqNameText_);
     sequenceWindowSizer_->Add(m_sequenceControlWindow, 1, wxEXPAND|wxALL, 10);
 
     sequenceWindowSizer_->Layout();
@@ -190,7 +190,7 @@ MainWindow::MainWindow(wxWindow* parent,
     SetAcceleratorTable(accel);
     SetSizer(layoutSizer);
 
-    clientPtr = new ServerClient();
+    clientPtr = new ServerClient(m_sequenceControlWindow);
     clientPtr->SetPath("");
     SetProjectName("Project.vprojn");
     Show();

@@ -1,8 +1,9 @@
 #include "SeqControlWindow.h"
 
-SeqControlWindow::SeqControlWindow(wxWindow* parent, wxStaticText* title, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name) :
+SeqControlWindow::SeqControlWindow(ServerClient* clientPtr, wxWindow* parent, wxStaticText* title, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name) :
 	wxScrolledWindow(parent, id, pos, size, style, name)
 {
+	client = clientPtr;
 	this->SetScrollRate(FromDIP(5), FromDIP(5));
 	m_title = title;
 	m_clipsSizer = new wxBoxSizer(wxVERTICAL);
@@ -20,6 +21,18 @@ SeqControlWindow::SeqControlWindow(wxWindow* parent, wxStaticText* title, wxWind
 	//	}, this);
 	Bind(SWAP_CLIP_WITH_PREV_EVT, &SeqControlWindow::OnSwapWithPrev, this);
 	Bind(SWAP_CLIP_WITH_NEXT_EVT, &SeqControlWindow::OnSwapWithNext, this);
+	Bind(SWAP_CLIP_SERVER_EVT, [=](wxCommandEvent& event_) {
+		int idx1 = event_.GetInt(), idx2 = event_.GetExtraLong();
+		if (m_sequencePtr && event_.GetString().ToStdString() == m_sequencePtr->GetName()) {
+			this->SwapClips(event_.GetInt(), event_.GetExtraLong());
+		} else {
+			auto findSeq = Sequence::sequences.Contains(event_.GetString().ToStdString());
+			if (findSeq.second)
+				(*findSeq.first)->SwapClipsAt(idx1, idx2);
+			else
+				wxMessageBox("Message", "Please Pull Changes", wxICON_INFORMATION);
+		}
+		});
 
 }
 
@@ -78,23 +91,11 @@ void SeqControlWindow::SwapClips(int idx1, int idx2)
 		ClipItemPanel* clip2 = new ClipItemPanel(m_sequencePtr->GetClipAt(idx2), idx2, this);
 		m_clipsSizer->Replace(item1->GetWindow(), clip1);
 		m_clipsSizer->Replace(item2->GetWindow(), clip2);
-		//m_clipsSizer->Detach(idx1);
-		//m_clipsSizer->Detach(idx1);
-		//if (item1->GetWindow()) {
-		//	item1->GetWindow()->Destroy();
-		//	RemoveChild(item1->GetWindow());
-		//}
-		//if (item2->GetWindow()) {
-		//	item2->GetWindow()->Destroy();
-		//	RemoveChild(item2->GetWindow());
-		//}
-		//m_clipsSizer->Insert(idx1, clip1);
-		//m_clipsSizer->Insert(idx2, clip2);
-
 
 		m_clipsSizer->Layout();
 		Layout();
 		Refresh();
+		client->Switch(m_seqName, idx1, idx2);
 	}
 }
 
@@ -125,5 +126,7 @@ void SeqControlWindow::OnSwapWithNext(wxCommandEvent& event_)
 	SeqControlWindow::SwapClips(event_.GetInt() + 1, event_.GetInt());
 
 }
+
+
 
 
