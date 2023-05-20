@@ -218,6 +218,7 @@ void ServerClient::HandleUpdate(std::vector<std::string> updateParms)
             swapEvt_.SetString(updateParms.at(0));
             swapEvt_.SetInt(std::stoi(updateParms.at(1)));
             swapEvt_.SetExtraLong(std::stoi(updateParms.at(2)));
+            wxPostEvent(swapWindow, swapEvt_);
         }
     }
         
