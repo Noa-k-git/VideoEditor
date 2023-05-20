@@ -74,7 +74,7 @@ void SeqControlWindow::SetSequence()
 
 }
 
-void SeqControlWindow::SwapClips(int idx1, int idx2, bool isource = true)
+void SeqControlWindow::SwapClips(int idx1, int idx2, bool isource)
 {
 	if (m_sequencePtr) {
 		if (idx1 > idx2) {
