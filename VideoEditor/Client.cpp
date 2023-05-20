@@ -17,6 +17,7 @@ ServerClient::ServerClient()
     listenSocket = INVALID_SOCKET;
     writeSocket = INVALID_SOCKET;
     userId = INVALID_USER_ID;
+    projId = "";
     projectPath = "";
     projectName = "";
     privateKey = 0, publicKey = 0, serverKey = 0, myN = 0, serverN = 0;
@@ -173,6 +174,7 @@ std::tuple<bool, std::string> ServerClient::PullInfo()
 
 void ServerClient::PushProject()
 {
+    if (projId == "") return;
     if (projectName != "" && projectPath != "")
     {
         std::string line;
@@ -200,6 +202,7 @@ std::tuple<bool, std::string> ServerClient::PullProject()
 
 void ServerClient::SendUpdateProject(std::string data)
 {
+    if (projId != "")
     W_SEND_RECEIVE("UPDATEPROJ", data);
 }
 
@@ -217,11 +220,13 @@ void ServerClient::HandleUpdate(std::vector<std::string> updateParms)
     {
         if (updateParms.size() == 3)
         {
-            wxCommandEvent swapEvt_(SWAP_CLIP_SERVER_EVT);
-            swapEvt_.SetString(updateParms.at(0));
-            swapEvt_.SetInt(std::stoi(updateParms.at(1)));
-            swapEvt_.SetExtraLong(std::stoi(updateParms.at(2)));
-            wxPostEvent(swapWindow, swapEvt_);
+            wxGetApp().CallAfter([=]() {
+                wxCommandEvent swapEvt_(SWAP_CLIP_SERVER_EVT);
+                swapEvt_.SetString(updateParms.at(0));
+                swapEvt_.SetInt(std::stoi(updateParms.at(1)));
+                swapEvt_.SetExtraLong(std::stoi(updateParms.at(2)));
+                wxPostEvent(swapWindow, swapEvt_);
+            });
         }
     }
         

@@ -12,6 +12,7 @@
 #include "SHA256.h"
 #include "rsa.h"
 #include "ShiftCipher.h"
+#include "App.h"
 #ifndef CLIENT_CONSTANTS
 #define CLIENT_CONSTANTS
 #define INVALID_USER_ID -1

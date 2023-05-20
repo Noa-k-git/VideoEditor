@@ -262,7 +262,11 @@ class MainServer(Server):
             return False, "Could not find client"
 
         def update_project(user_client: Client, info: bytes) -> Tuple[bool, str]:
-            for p_client in self.active_projects[user_client.p_id]:
+            try:
+                project = self.active_projects[user_client.p_id]
+            except KeyError:
+                return False, "Not Connected To Project"
+            for p_client in project:
                 if p_client != user_client:
                     key_params = (p_client.rsa_key, p_client.rsa_n,)
 
