@@ -263,12 +263,13 @@ class MainServer(Server):
 
         def update_project(user_client: Client, info: bytes) -> Tuple[bool, str]:
             for p_client in self.active_projects[user_client.p_id]:
-                key_params = (p_client.rsa_key, p_client.rsa_n,)
+                if p_client != user_client:
+                    key_params = (p_client.rsa_key, p_client.rsa_n,)
 
-                send_parts = Protocol.build_response('UPDATEPROJ', True, info.decode(), *key_params)
+                    send_parts = Protocol.build_response('UPDATEPROJ', True, info.decode(), *key_params)
 
-                for s_part in send_parts:
-                    self.messages_to_send.put((p_client.update_conn, s_part))
+                    for s_part in send_parts:
+                        self.messages_to_send.put((p_client.update_conn, s_part))
 
             return True, ''
 

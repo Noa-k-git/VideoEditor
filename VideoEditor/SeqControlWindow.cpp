@@ -24,7 +24,7 @@ SeqControlWindow::SeqControlWindow(ServerClient* clientPtr, wxWindow* parent, wx
 	Bind(SWAP_CLIP_SERVER_EVT, [=](wxCommandEvent& event_) {
 		int idx1 = event_.GetInt(), idx2 = event_.GetExtraLong();
 		if (m_sequencePtr && event_.GetString().ToStdString() == m_sequencePtr->GetName()) {
-			this->SwapClips(event_.GetInt(), event_.GetExtraLong());
+			this->SwapClips(event_.GetInt(), event_.GetExtraLong(), false);
 		} else {
 			auto findSeq = Sequence::sequences.Contains(event_.GetString().ToStdString());
 			if (findSeq.second)
@@ -74,7 +74,7 @@ void SeqControlWindow::SetSequence()
 
 }
 
-void SeqControlWindow::SwapClips(int idx1, int idx2)
+void SeqControlWindow::SwapClips(int idx1, int idx2, bool isource = true)
 {
 	if (m_sequencePtr) {
 		if (idx1 > idx2) {
@@ -95,8 +95,10 @@ void SeqControlWindow::SwapClips(int idx1, int idx2)
 		m_clipsSizer->Layout();
 		Layout();
 		Refresh();
-		client->SetSwapWindow(this);
-		client->Switch(m_seqName, idx1, idx2);
+		if (isource) {
+			client->SetSwapWindow(this);
+			client->Switch(m_seqName, idx1, idx2);
+		}
 	}
 }
 
