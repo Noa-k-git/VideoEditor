@@ -326,7 +326,7 @@ class DataBase():
 db_path = r"mydb.db"
 import os
 
-os.remove(db_path)
+# os.remove(db_path)
 
 if __name__ == "__main__":
     database = DataBase(db_path)
