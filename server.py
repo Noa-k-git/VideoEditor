@@ -134,8 +134,6 @@ class Server(ABC):
             parts = []
             while True:
                 part = current_socket.recv(1024)
-                if part == b'':
-                    raise ConnectionAbortedError
                 # if it is an empty packet then it is the last packet
                 if len(part) == Protocol.NUM_FIELD_LENGTH:
                     logging.debug(f'new data from client {current_socket.getpeername()}: {parts}')
@@ -156,16 +154,16 @@ class Server(ABC):
             for part in parts:
                 data += part[1]
             data = shift_cipher.decrypt(data.decode(), Protocol.SHIFT_KEY).encode()
-            if data == b'end':
-                p_id = current_socket.getpeername()
-                self.messages_to_send.put((current_socket, b'end'))
-                self.connection_closed(current_socket)
-                current_socket.close()
-                logging.info(f"Connection with client {p_id} closed.")
-
-            else:
-                time.sleep(0.2)
-                self.handle_client(current_socket, data)
+            # if data == b'end':
+            #     p_id = current_socket.getpeername()
+            #     self.messages_to_send.put((current_socket, b'end'))
+            #     self.connection_closed(current_socket)
+            #     current_socket.close()
+            #     logging.info(f"Connection with client {p_id} closed.")
+            #
+            # else:
+            time.sleep(0.2)
+            self.handle_client(current_socket, data)
 
         except (ConnectionResetError, ConnectionAbortedError, OSError):  # handling a client randomly closed
             logging.error("Socket forcibly closed!")
@@ -186,8 +184,9 @@ class Server(ABC):
         self.lock_get_client.acquire()
         logging.debug("Closing connection...")
         client = self.clients.get_client(current_socket)
-        self.clients.remove(client)
-        current_socket.close()
+        if client in self.clients:
+            self.clients.remove(client)
+            current_socket.close()
         try:
             client.update_conn.close()
         except AttributeError:

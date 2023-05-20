@@ -131,7 +131,6 @@ MainWindow::MainWindow(wxWindow* parent,
     m_sourcesSizer = new wxWrapSizer(wxHORIZONTAL);
     m_sourcesWindow->SetSizer(m_sourcesSizer);
     m_sourcesWindow->SetScrollRate(FromDIP(5), FromDIP(5));
-
     // Setting the video panel for the final version
     finalVideoPanel = new ShowVideoPanel(videoWindowSplitter);
     ogShowVideoPanel = new ShowVideoPanel(videoWindowSplitter);
@@ -374,7 +373,8 @@ void MainWindow::OnImport(wxCommandEvent& WXUNUSED(event_))
     else
         return;
     ImportSourceVid(FindDifference(clientPtr->GetPath(), filePath), false);
-   
+    m_sourcesSizer->FitInside(m_sourcesWindow);
+
 }
 
 void MainWindow::OnUser(wxCommandEvent& event_)
@@ -387,6 +387,7 @@ void MainWindow::OnNewSequence(wxCommandEvent& WXUNUSED(event_))
 {
     Sequence* s = new Sequence();
     AddSequence(s);
+    m_sourcesSizer->FitInside(m_sourcesWindow);
 
 }
 

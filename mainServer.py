@@ -2,7 +2,7 @@ from server import *
 import database
 import threading
 
-IP = '127.0.0.1'
+IP = '10.0.0.15'
 PORT = 8989
 
 
@@ -128,7 +128,7 @@ class MainServer(Server):
                     projects_users[project_id] = [name, ]
             for p in projects_users:
                 projects_users[p].sort()
-            result = [(p_id, p_name, projects_users[p_id]) for p_id, p_name in projects]
+            result = [(p_id, p_name, projects_users[p_id]) for p_id, p_name in projects] + list(tuple('-'))
             return True, result
 
         def _add_users_by_mail(emails, p_id: int, my_id=None):
@@ -162,8 +162,8 @@ class MainServer(Server):
                 user_client.p_id = int(p_id)
 
                 try:
-                    self.active_projects[user_client.p_id] += user_client
-                except KeyError:
+                    self.active_projects[user_client.p_id].append(user_client)
+                except (KeyError, TypeError):
                     self.active_projects[user_client.p_id] = [user_client, ]
 
                 return True, ''
@@ -180,7 +180,7 @@ class MainServer(Server):
             p_id = self.db.select(self.db.tables['projects']['id_'], database.Project(name=p_name))[0][0]
             _add_users_by_mail(emails, p_id, user_client.u_id)
 
-            connect_proj(user_client, str(p_id).encode())
+            # connect_proj(user_client, str(p_id).encode())
             return True, p_id
 
         def add_users(user_client: Client, info: bytes) -> Tuple[bool, str]:
@@ -228,7 +228,7 @@ class MainServer(Server):
             except (ValueError, IndexError):
                 return False, 'Message arguments'
             admin_id = self.db.select(self.db.tables['projects']['admin_id'],
-                                      database.Project(id_=user_client.u_id))[0][0]
+                                      database.Project(id_=user_client.p_id))[0][0]
             approved = None
             if user_client.u_id == admin_id:
                 approved = content
@@ -247,6 +247,11 @@ class MainServer(Server):
             return True, content
 
         def listen_conn(user_client: Client, info: bytes) -> Tuple[bool, str]:
+            try:
+                user_client.rsa_key, user_client.rsa_n = [int(x) for x in Protocol.parse_message(info.decode())]
+            except ValueError:
+                return False, "Message arguments"
+
             client_ip = user_client.conn.getpeername()[0]
             for s in self.clients:
                 if s.conn.getpeername()[0] == client_ip:

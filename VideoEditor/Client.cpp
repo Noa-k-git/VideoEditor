@@ -102,7 +102,7 @@ std::tuple<bool, std::string> ServerClient::SendRecieve(SOCKET& sock, std::strin
     do {
         std::vector<std::string> requestParts = BUILD_REQUEST(cmd, message);
         SendParts(sock, requestParts);
-        std::string data = RecieveMessage(writeSocket);
+        std::string data = RecieveMessage(sock);
         info = PARSE_RESPONSE(data);
     } while (!std::get<0>(info));
     return std::tuple<bool, std::string>(std::get<2>(info), std::get<3>(info));
@@ -137,6 +137,13 @@ std::tuple<bool, std::string> ServerClient::Login(const std::string& mail, std::
     if (std::get<0>(info)) {
         userId = std::stoi(std::get<1>(info));
     }
+    return info;
+}
+
+std::tuple<bool, std::string> ServerClient::CreateProject(std::vector<std::string> elems)
+{
+    std::tuple<bool, std::string> info;
+    info = W_SEND_RECEIVE("CREATE", server_protocol::BuildMessage(elems));
     return info;
 }
 
@@ -178,14 +185,14 @@ void ServerClient::PushProject()
 
         // Close the file
         file.close();
-        W_SEND_RECEIVE("PUSHPROJECT", server_protocol::BuildMessage({ projId, project }));
+        W_SEND_RECEIVE("PUSHPROJECT", server_protocol::BuildMessage({ project }));
     }
 }
 
-std::tuple<bool, std::string> ServerClient::PullProject(std::string msg)
+std::tuple<bool, std::string> ServerClient::PullProject()
 {
     std::tuple<bool, std::string> info;
-    return W_SEND_RECEIVE("PULLPROJECT", msg);
+    return W_SEND_RECEIVE("PULLPROJECT", "");
     
 }
 
@@ -194,7 +201,10 @@ void ServerClient::Listener()
     if (listenSocket != INVALID_SOCKET)
         return;
     Connect(listenSocket);
-    L_SEND_RECEIVE("LISTEN", "");
+    std::tuple<bool, std::string> tempInfo;
+    do { tempInfo = L_SEND_RECEIVE("LISTEN", server_protocol::BuildMessage({ std::to_string(publicKey), std::to_string(myN) })); }
+    while(!std::get<0>(tempInfo));
+
     if (listenSocket == INVALID_SOCKET)
     {
         wxLocale local(wxLANGUAGE_ENGLISH, wxLOCALE_DONT_LOAD_DEFAULT);
@@ -224,7 +234,7 @@ bool ServerClient::IsValidId()
     return this->userId != INVALID_USER_ID;
 }
 
-inline void ServerClient::SetProjId(std::string id_)
+void ServerClient::SetProjId(std::string id_)
 {
     projId = id_;
     ConnectProject();

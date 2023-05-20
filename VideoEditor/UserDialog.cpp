@@ -18,7 +18,7 @@ UserDialog::UserDialog(ServerClient* c, wxWindow* parent) : wxDialog(parent, wxI
 	// Set the sizer for the dialog
 	SetBackgroundColour(ORANGE_BACKGROUND);
 	
-	wxFont textFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_MAX, wxFONTWEIGHT_BOLD);
+	wxFont textFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL);
 
 	// username
 	usernameLabel = new wxStaticText(this, wxID_ANY, "Full Name");

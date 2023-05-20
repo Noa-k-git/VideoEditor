@@ -146,6 +146,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="BufferedBitmap.cpp" />
+    <ClCompile Include="CreateProjectDlg.cpp" />
     <ClCompile Include="ProjectsDialog.cpp" />
     <ClCompile Include="RotateEffect.cpp" />
     <ClCompile Include="ShiftCipher.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="BufferedBitmap.h" />
+    <ClInclude Include="CreateProjectDlg.h" />
     <ClInclude Include="image_helpers.h" />
     <ClInclude Include="ProjectsDialog.h" />
     <ClInclude Include="RotateEffect.h" />

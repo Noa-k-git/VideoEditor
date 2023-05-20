@@ -33,6 +33,8 @@ public:
 	/// <param name="password">The user's password, unencrypted</param>
 	/// <returns> If Login succeed </returns>
 	std::tuple<bool, std::string> Login(const std::string& mail, std::string password);
+	
+	std::tuple<bool, std::string> CreateProject(std::vector <std::string>);
 	std::tuple<bool, std::string> ConnectProject();
 
 	/// <summary>
@@ -42,10 +44,12 @@ public:
 
 	std::tuple<bool, std::string> PullInfo();
 	void PushProject();
-	std::tuple<bool, std::string> PullProject(std::string);
+	std::tuple<bool, std::string> PullProject();
+
+
 	bool IsValidId();
 	inline std::string GetProjId() { return projId; }
-	inline void SetProjId(std::string id_);
+	void SetProjId(std::string id_);
 	inline std::string GetPrName() { return projectName; }
 	inline void SetPrName(std::string name) { projectName = name; }
 	inline std::string GetPath() { return projectPath; }

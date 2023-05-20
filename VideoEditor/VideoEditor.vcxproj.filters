@@ -129,6 +129,9 @@
     <ClCompile Include="Client.cpp">
       <Filter>Source Files\Server Connection</Filter>
     </ClCompile>
+    <ClCompile Include="CreateProjectDlg.cpp">
+      <Filter>Source Files\Design</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceID.h">
@@ -244,6 +247,9 @@
     </ClInclude>
     <ClInclude Include="ServerProtocol.h">
       <Filter>Header Files\Server Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="CreateProjectDlg.h">
+      <Filter>Header Files\Design</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

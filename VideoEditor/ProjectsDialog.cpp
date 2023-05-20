@@ -1,11 +1,16 @@
 #include "ProjectsDialog.h"
 #include "ServerProtocol.h"
+#include "CreateProjectDlg.h"
 #include "string_utils.h"
 using namespace string_utils;
 ProjectDialog::ProjectDialog(ServerClient* c, wxWindow* parent) : wxDialog(parent, wxID_ANY, "My Projects")
 {
 	client = c;
+	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
+	
 	wxScrolledWindow* window = new wxScrolledWindow(this, wxID_ANY);
+	mainSizer->Add(window, 1, wxEXPAND);
+
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	window->SetScrollbars(1, 1, 1, 1);
 	window->SetMinSize(wxSize(400, 400));
@@ -14,12 +19,16 @@ ProjectDialog::ProjectDialog(ServerClient* c, wxWindow* parent) : wxDialog(paren
 
 		if (std::get<0>(res))
 		{
-			std::vector<std::string> allInfo = server_protocol::ParseMessage(std::get<1>(res));
+			wxFont textFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL);
+
+			std::vector<std::string> allInfo = server_protocol::ParseMessage(std::get<1>(res)); // TODO: add ';' dummy data at the end of the list
 			for (std::string proj : allInfo)
 			{
 				std::vector <std::string> projElm = server_protocol::ParseMessage(proj);
-				if (proj.size() == 3) {
-					wxButton* b = new wxButton(window, wxID_ANY, proj.at(1) + "\t" + JoinString(server_protocol::ParseMessage(projElm.at(2)), ', '));
+				if (projElm.size() == 3) {
+					wxButton* b = new wxButton(window, wxID_ANY,"Name: " + projElm.at(1) + "\n\n" + "Users: " + JoinString(server_protocol::ParseMessage(projElm.at(2)), ', '),
+						wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL);
+					b->SetFont(textFont);
 					b->SetName(projElm.at(0));
 					b->Bind(wxEVT_BUTTON, &ProjectDialog::OnButtonClicked, this);
 					sizer->Add(b, 1, wxEXPAND | wxTOP | wxLEFT | wxRIGHT, 10);
@@ -31,6 +40,12 @@ ProjectDialog::ProjectDialog(ServerClient* c, wxWindow* parent) : wxDialog(paren
 				text->SetFont(font);
 				sizer->Add(text, 1, wxEXPAND | wxALL, 30);
 			} else sizer->AddSpacer(10);
+			wxButton* createSharedBtn = new wxButton(this, wxID_ANY, "Create Project");
+			createSharedBtn->Bind(wxEVT_BUTTON, [=](wxCommandEvent& event_) {
+				Close();
+				CreateProjectDlg(client, parent).ShowModal();
+				});
+			mainSizer->Add(createSharedBtn, 0, wxEXPAND|wxTOP, 10);
 		}
 	}
 	else {
@@ -42,6 +57,7 @@ ProjectDialog::ProjectDialog(ServerClient* c, wxWindow* parent) : wxDialog(paren
 		sizer->Add(comment, 1, wxEXPAND | wxALL, 15);
 	}
 	window->SetSizer(sizer);
+	SetSizerAndFit(mainSizer);
 }
 
 void ProjectDialog::OnButtonClicked(wxCommandEvent& event_)
@@ -50,7 +66,8 @@ void ProjectDialog::OnButtonClicked(wxCommandEvent& event_)
 	if (button)
 	{
 		SetTitle("My Projects -> Pulling project from server");
-		std::tuple<bool, std::string> info = client->PullProject(button->GetName().ToStdString());
+		client->SetProjId(button->GetName().ToStdString());
+		std::tuple<bool, std::string> info = client->PullProject();
 		if (std::get<0>(info)) {
 			
 		} else wxMessageBox("ERROR", "Error Occured in Pulling Project From Server", wxCANCEL | wxICON_ERROR);
