@@ -95,6 +95,7 @@ void SeqControlWindow::SwapClips(int idx1, int idx2)
 		m_clipsSizer->Layout();
 		Layout();
 		Refresh();
+		client->SetSwapWindow(this);
 		client->Switch(m_seqName, idx1, idx2);
 	}
 }

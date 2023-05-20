@@ -51,6 +51,7 @@ MainWindow::MainWindow(wxWindow* parent,
     --------------------------------|
     
     */
+    clientPtr = new ServerClient();
     SetBackgroundColour(WINDOW_BRIGHT_BACKGOUND_COLOUR);
     wxBoxSizer* layoutSizer = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* menuSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -190,7 +191,6 @@ MainWindow::MainWindow(wxWindow* parent,
     SetAcceleratorTable(accel);
     SetSizer(layoutSizer);
 
-    clientPtr = new ServerClient(m_sequenceControlWindow);
     clientPtr->SetPath("");
     SetProjectName("Project.vprojn");
     Show();

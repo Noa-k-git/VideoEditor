@@ -227,22 +227,6 @@ void VideoSource::ReadSource()
 	source_.swap(newSource);
 }
 
-cv::Mat VideoSource::Avframe2Cvmat(const AVFrame* av_frame)
-{
-	int width = av_frame->width;
-	int height = av_frame->height;
-	cv::Mat image(height, width, CV_8UC3);
-	int cvLinesizes[1];
-	cvLinesizes[0] = image.step1();
-	SwsContext* conversion = sws_getContext(
-		width, height, (AVPixelFormat)av_frame->format, width, height,
-		AVPixelFormat::AV_PIX_FMT_BGR24, SWS_FAST_BILINEAR, NULL, NULL, NULL);
-	sws_scale(conversion, av_frame->data, av_frame->linesize, 0, height, &image.data,
-		cvLinesizes);
-	sws_freeContext(conversion);
-	return image;
-}
-
 const AVFrame* VideoSource::getFirstFrame(){
 	auto lock = this->LockSource();
 	return source_.front().GetObject();
@@ -297,10 +281,6 @@ SyncObject<AVFrame*>* VideoSource::GetChunk(int idx)
 
 void VideoSource::Show()
 {
-    // TODO: add exeption handling for not having anything inside source
-	//cv::imshow("Frame", source[0]);
-	int key = cv::waitKey(1);
-	cv::destroyAllWindows();
 
 
 }

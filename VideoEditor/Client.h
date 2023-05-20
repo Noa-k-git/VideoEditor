@@ -21,8 +21,9 @@ wxDECLARE_EVENT(SWAP_CLIP_SERVER_EVT, wxCommandEvent);
 
 class ServerClient {
 public:
-	ServerClient(wxWindow* swapWindow);
+	ServerClient();
 	~ServerClient();
+	void SetSwapWindow(wxWindow* win);
 	// @brief Creates a connection with the server and return the connected socket
 	void CreateConnection();
 	void SendKeys();
