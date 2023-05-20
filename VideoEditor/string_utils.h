@@ -10,7 +10,8 @@ namespace string_utils {
 	* @param ch The char to split by
 	* @return A vector of substrings
 	*/
-	std::vector<std::string> SplitString(std::string str, char ch);
+	std::vector<std::string> SplitString(std::string str, char ch, int max = -1);
+	std::vector<std::string> SplitString(std::string str, std::string s, int max = -1);
 
 	/**
 	* @brief Finds the difference between string a and string b and returns it

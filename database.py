@@ -195,7 +195,8 @@ class DataBase():
                                      'name': 'text NOT NULL ',
                                      'admin_id': 'int',
                                      'content': 'text',
-                                     'approved': 'text'}
+                                     'approved': 'text',
+                                     'unique': 'name, admin_id'}
 
         create_tables["videos"] = {'id_': 'integer PRIMARY KEY',
                                    'path': 'text NOT NULL'}
@@ -326,48 +327,6 @@ db_path = r"mydb.db"
 import os
 
 os.remove(db_path)
-
-# database.connect()
-
-# create_tables = {}
-# create_tables["users"] = """
-# CREATE TABLE if not EXISTS users (
-#     id integer PRIMARY KEY,
-#     name text NOT NULL,
-#     password text NOT NULL,
-#     email text NOT NULL
-# ); """
-# create_tables["projects"] = """
-# CREATE TABLE if not EXISTS projects (
-#     id integer PRIMARY KEY,
-#     name text NOT NULL,
-#     content text
-# ); """
-# create_tables["videos"] = """
-# CREATE TABLE if not EXISTS videos (
-#     id integer PRIMARY KEY,
-#     path text NOT NULL
-# ); """
-# create_tables["project_videos"] = """
-# CREATE TABLE if not EXISTS project_videos (
-#     project_id integer,
-#     video_id integer,
-#     unique (project_id, video_id)
-# ); """
-# create_tables["project_users"] = """
-# CREATE TABLE if not EXISTS project_users (
-#     project_id integer,
-#     user_id integer,
-#     admin integer,
-#     unique (project_id, user_id)
-# ); """
-
-
-# tables : typing.Dict[str, Table] = {}
-
-# for create in create_tables:
-#     tables[create] = Table(create, database.conn)
-#     tables[create].create(create_tables[create])
 
 if __name__ == "__main__":
     database = DataBase(db_path)

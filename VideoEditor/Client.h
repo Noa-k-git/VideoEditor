@@ -45,7 +45,10 @@ public:
 	std::tuple<bool, std::string> PullInfo();
 	void PushProject();
 	std::tuple<bool, std::string> PullProject();
+	void SendUpdateProject(std::string data);
 
+	void Switch(std::string seqName, int idx1, int idx2);
+	void HandleUpdate(std::vector<std::string> updateParms);
 
 	bool IsValidId();
 	inline std::string GetProjId() { return projId; }

@@ -4,7 +4,9 @@
 #include "Client.h"
 #include "string_utils.h"
 #include "DesignConstatns.h"
+#include "App.h"
 using namespace string_utils;
+wxDECLARE_EVENT(SAVE_PROJECT_EVENT, wxCommandEvent);
 
 class CreateProjectDlg : public wxDialog {
 public:

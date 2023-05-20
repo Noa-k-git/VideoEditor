@@ -177,7 +177,8 @@ class MainServer(Server):
             except ValueError:
                 return False, 'Message arguments'
             self.db.insert(self.db.tables['projects'], database.Project(name=p_name, admin_id=user_client.u_id))
-            p_id = self.db.select(self.db.tables['projects']['id_'], database.Project(name=p_name))[0][0]
+            p_id = self.db.select(self.db.tables['projects']['id_'], database.Project(name=p_name,
+                                                                                      admin_id=user_client.u_id))[0][0]
             _add_users_by_mail(emails, p_id, user_client.u_id)
 
             # connect_proj(user_client, str(p_id).encode())
@@ -238,7 +239,7 @@ class MainServer(Server):
             return True, ''
 
         def pull_project(user_client: Client, info: bytes) -> Tuple[bool, str]:
-            select_res = self.db.select(self.db.tables['projects']['content'], database.Project(id_=user_client.p_id))
+            select_res = self.db.select(self.db.tables['projects']['name', 'content'], database.Project(id_=user_client.p_id))
             try:
                 content = select_res[0]
             except IndexError:
@@ -260,6 +261,17 @@ class MainServer(Server):
                     return True, ''
             return False, "Could not find client"
 
+        def update_project(user_client: Client, info: bytes) -> Tuple[bool, str]:
+            for p_client in self.active_projects[user_client.p_id]:
+                key_params = (p_client.rsa_key, p_client.rsa_n,)
+
+                send_parts = Protocol.build_response('UPDATEPROJ', True, info.decode(), *key_params)
+
+                for s_part in send_parts:
+                    self.messages_to_send.put((p_client.update_conn, s_part))
+
+            return True, ''
+
         commands = {
             'RSAKEY': rsa_key,
             'SIGNUP': signup,
@@ -272,7 +284,8 @@ class MainServer(Server):
             'REMOVEUSER': remove_user,
             'PUSHPROJECT': push_project,
             'PULLPROJECT': pull_project,
-            'LISTEN': listen_conn
+            'LISTEN': listen_conn,
+            'UPDATEPROJ': update_project
         }
 
         if data == b'SECURITY':
@@ -299,7 +312,7 @@ class MainServer(Server):
                 response_parts = Protocol.build_response(cmd, False, "Command doesn't exist", *key_par)
 
         for part in response_parts:
-            self.messages_to_send.put((current_socket, part))  # command that does not exists
+            self.messages_to_send.put((current_socket, part))
 
 
 if __name__ == '__main__':

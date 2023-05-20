@@ -37,11 +37,15 @@ std::tuple<bool, std::string, bool, std::string> server_protocol::ParseResponse(
 }
 
 
-std::vector<std::string> server_protocol::ParseMessage(const std::string& message)
+std::vector<std::string> server_protocol::ParseMessage(const std::string& message, int max)
 {
+	std::vector<std::string> parts;
 	for (auto separator : SEPARATORS) {
 		if (message.find(separator) != std::string::npos) {
-			std::vector<std::string> parts = SplitString(message, separator);
+			if (max!= -1)
+			parts = SplitString(message, separator, max);
+			else
+			parts = SplitString(message, separator);
 			return parts;
 		}
 	}

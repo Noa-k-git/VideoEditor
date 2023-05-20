@@ -196,6 +196,29 @@ std::tuple<bool, std::string> ServerClient::PullProject()
     
 }
 
+void ServerClient::SendUpdateProject(std::string data)
+{
+    W_SEND_RECEIVE("UPDATEPROJ", data);
+}
+
+void ServerClient::Switch(std::string seqName, int idx1, int idx2)
+{
+    std::string msg = server_protocol::BuildMessage({ "switch", seqName, std::to_string(idx1), std::to_string(idx2)});
+    SendUpdateProject(msg);
+}
+
+void ServerClient::HandleUpdate(std::vector<std::string> updateParms)
+{
+    std::string cmd = updateParms.at(0);
+    updateParms.erase(updateParms.begin());
+    if (cmd == "switch")
+    {
+        if (updateParms.size() == 3)
+
+    }
+        
+}
+
 void ServerClient::Listener()
 {
     if (listenSocket != INVALID_SOCKET)
@@ -222,9 +245,15 @@ void ServerClient::Listener()
         if (succeed)
         {
             std::string cmd = std::get<1>(info);
-            std::string message = std::get<3>(info);
-
-            //TODO: handle changes
+            if (cmd == "UPDATEPROJ") {
+                std::vector<std::string> updateParms = server_protocol::ParseMessage(std::get<3>(info));
+                if (updateParms.size() > 0)
+                {
+                    std::thread t(&ServerClient::HandleUpdate, this, updateParms);
+                    t.detach();
+                }
+                //TODO: handle changes
+            }
         }
     }
 }

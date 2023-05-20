@@ -17,7 +17,9 @@
 #include "Map.h"
 #include "UserDialog.h"
 #include "ProjectsDialog.h"
+#include "CreateProjectDlg.h"
 #include "Client.h"
+#include "ProjectsDialog.h"
 
  #ifndef WX_PRECOMP
 	#include <wx/wx.h>
@@ -48,6 +50,7 @@ public:
     void onQuit(wxCommandEvent& event);
     void onClose(wxCloseEvent& event);
     void onHelp(wxCommandEvent& event);
+    void OnLoadProjectFromFile(wxCommandEvent&);
     inline void OnRefresh(wxCommandEvent& event_);
 
     DECLARE_EVENT_TABLE();

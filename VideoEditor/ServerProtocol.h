@@ -71,7 +71,7 @@ namespace server_protocol{
 	* 
 	* @return std::vectorstd::string The args in the request in a form of a vector.
 	*/
-	std::vector<std::string> ParseMessage(const std::string& message);
+	std::vector<std::string> ParseMessage(const std::string& message, int max = -1);
 	
 	void StringToParts(std::string fullMsg, std::vector<std::string>& res);
 

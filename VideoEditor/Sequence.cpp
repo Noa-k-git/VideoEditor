@@ -45,7 +45,7 @@ Sequence::Sequence() : Sequence("My Sequence")
 
 Sequence::Sequence(std::string data, bool load) : IPlayable<AVFrame*>("this is a dummy name")
 {
-    std::vector<std::string> args = SplitString(data, ',');
+    std::vector<std::string> args = SplitString(data, '`');
     this->SetName(args.at(0));
     UpdateCreated();
     if (!created) return;
@@ -83,7 +83,7 @@ std::string Sequence::Write()
 {
     std::string res = GetName();
     for (VideoClip*& oneClip : video) {
-        res += ',' + oneClip->GetName() + '=' + std::to_string(oneClip->GetStart()) + '=' + std::to_string(oneClip->GetEnd());
+        res += '`' + oneClip->GetName() + '=' + std::to_string(oneClip->GetStart()) + '=' + std::to_string(oneClip->GetEnd());
     }
     return res;
 }

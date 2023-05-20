@@ -3,6 +3,9 @@
 #include "CreateProjectDlg.h"
 #include "string_utils.h"
 using namespace string_utils;
+
+wxDEFINE_EVENT(LOAD_PROJECT_EVENT, wxCommandEvent);
+
 ProjectDialog::ProjectDialog(ServerClient* c, wxWindow* parent) : wxDialog(parent, wxID_ANY, "My Projects")
 {
 	client = c;
@@ -69,7 +72,21 @@ void ProjectDialog::OnButtonClicked(wxCommandEvent& event_)
 		client->SetProjId(button->GetName().ToStdString());
 		std::tuple<bool, std::string> info = client->PullProject();
 		if (std::get<0>(info)) {
+			wxWindow* mainWindow = wxGetApp().GetTopWindow();
+			wxCommandEvent loadEvt_(LOAD_PROJECT_EVENT, GetId());
+			loadEvt_.SetEventObject(this);
+
+			std::vector<std::string> nameContent = server_protocol::ParseMessage(std::get<1>(info), 1);
+			client->SetPrName(nameContent.at(0));
 			
+			std::ofstream file(client->GetPath() + client->GetPrName());
+			file << JoinString(SplitString(nameContent.at(1), "\\n"), '\n');
+			file.close();
+
+			if (mainWindow != nullptr) {
+				wxPostEvent(mainWindow, loadEvt_);
+			}
+
 		} else wxMessageBox("ERROR", "Error Occured in Pulling Project From Server", wxCANCEL | wxICON_ERROR);
 
 	}

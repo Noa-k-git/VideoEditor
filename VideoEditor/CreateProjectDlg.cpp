@@ -1,4 +1,5 @@
 #include "CreateProjectDlg.h"
+wxDEFINE_EVENT(SAVE_PROJECT_EVENT, wxCommandEvent);
 
 CreateProjectDlg::CreateProjectDlg(ServerClient* clientPtr, wxWindow* parent) : wxDialog(parent, wxID_ANY, "Create New Shared Project", wxDefaultPosition,
 	wxDefaultSize)
@@ -94,14 +95,22 @@ void CreateProjectDlg::OnCreate(const wxCommandEvent& event_)
 		}
 	}
 	Close();
-	std::tuple<bool, std::string> info = client->CreateProject(reqElems);
-	if (std::get<0>(info)) {
-		client->SetProjId(std::get<1>(info));
-		client->PushProject();
+	wxWindow* mainWindow = wxGetApp().GetTopWindow();
+	wxCommandEvent saveEvt_(SAVE_PROJECT_EVENT, GetId());
+	saveEvt_.SetEventObject(this);
+	if (mainWindow != nullptr) {
+		wxPostEvent(mainWindow, saveEvt_);
 	}
-	else {
-		wxMessageBox("ERROR", std::get<1>(info), wxICON_ERROR);
-	}
+	wxGetActiveWindow()->CallAfter([=]() {
+		std::tuple<bool, std::string> info = client->CreateProject(reqElems);
+		if (std::get<0>(info)) {
+			client->SetProjId(std::get<1>(info));
+			client->PushProject();
+		}
+		else {
+			wxMessageBox("ERROR", std::get<1>(info), wxICON_ERROR);
+		}
+		});
 }
 
 void CreateProjectDlg::Traveler(const wxCommandEvent& event_)

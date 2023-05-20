@@ -38,14 +38,14 @@ VideoSource::~VideoSource()
 
 void VideoSource::Load(std::string sourcePath, std::string data)
 {
-	std::vector<std::string> args = SplitString(data, ',');
+	std::vector<std::string> args = SplitString(data, '`');
 	this->SetName(args.at(0));
 	this->path = sourcePath + args.at(1);
 }
 
 std::string VideoSource::Write(std::string defPath)
 {
-	return GetName() + ',' + FindDifference(defPath, path);
+	return GetName() + '`' + FindDifference(defPath, path);
 }
 
 void VideoSource::UpdateCreated() {

@@ -2,7 +2,6 @@
 #include "MainWindow.h"
 #include "DesignConstatns.h"
 #include "string_utils.h"
-
 using namespace string_utils;
 
 
@@ -37,6 +36,9 @@ MainWindow::MainWindow(wxWindow* parent,
     const wxString& name) :
     wxFrame(parent, id, title, pos, size, style, name)
 {   
+    Bind(SAVE_PROJECT_EVENT, &MainWindow::OnSave, this);
+    Bind(LOAD_PROJECT_EVENT, &MainWindow::OnLoadProjectFromFile, this);
+
    
     /* 
     
@@ -180,10 +182,11 @@ MainWindow::MainWindow(wxWindow* parent,
     statusBar->PushStatusText(_("Ready!"));
     
     this->Bind(WIDGET_DELETED_EVT, &MainWindow::OnRefresh, this);
-    wxAcceleratorEntry entries[2];
+    wxAcceleratorEntry entries[3];
     entries[0].Set(wxACCEL_CTRL, (int)'S', wxID_SAVE);
     entries[1].Set(wxACCEL_CTRL, (int)'O', wxID_OPEN);
-    wxAcceleratorTable accel(2, entries);
+    entries[2].Set(wxACCEL_CTRL, (int)'N', wxID_NEW);
+    wxAcceleratorTable accel(3, entries);
     SetAcceleratorTable(accel);
     SetSizer(layoutSizer);
 
@@ -264,45 +267,7 @@ void MainWindow::OnOpenProject(wxCommandEvent& event_)
     else
         return;
 
-    Sequence::sequences.RemoveAllRecords();
-    VideoSource::videoSources.RemoveAllRecords();
-    m_sourcesWindow->DestroyChildren();
-    m_sequenceControlWindow->DestroyChildren();    
-    
-    Layout();
-
-    std::ifstream file(clientPtr->GetPath() + clientPtr->GetPrName());
-    std::string data;
-    
-    // read the file line by line
-    if (std::getline(file, data)) {
-        SetProjectName(data);
-    }
-    else {
-        return;
-    }
-    if (std::getline(file, data)) {
-        std::vector<std::string> vsElems = SplitString(data, '|');
-        for (std::string& vsData : vsElems) {
-            ImportSourceVid(vsData, true);
-        }
-        for (std::thread& t : importThreads) { t.join(); }
-        importThreads.clear();
-    } else {
-        file.close();
-        return;
-    }
-    
-    if (std::getline(file, data)) {
-        std::vector<std::string> seqElms = SplitString(data, '|');
-        for (std::string& seqData : seqElms) {
-            Sequence* s = new Sequence(seqData, true);
-            AddSequence(s);
-        }
-    }
-    
-    file.close();
-    Layout();
+    OnLoadProjectFromFile(event_);
 }
 
 void MainWindow::OnSave(wxCommandEvent& event_)
@@ -344,7 +309,10 @@ void MainWindow::OnSave(wxCommandEvent& event_)
 void MainWindow::OnPushProject(wxCommandEvent& event_)
 {
     OnSave(event_);
-    clientPtr->PushProject();
+    if (clientPtr->GetProjId() == "-1")
+        wxMessageBox("ERROR", "Project is not Connected", wxICON_ERROR);
+    else
+        clientPtr->PushProject();
 }
 
 void MainWindow::OnPullProjects(wxCommandEvent& event_)
@@ -389,6 +357,51 @@ void MainWindow::OnNewSequence(wxCommandEvent& WXUNUSED(event_))
     AddSequence(s);
     m_sourcesSizer->FitInside(m_sourcesWindow);
 
+}
+
+void MainWindow::OnLoadProjectFromFile(wxCommandEvent& WXUNUSED(event_))
+{
+    Sequence::sequences.RemoveAllRecords();
+    VideoSource::videoSources.RemoveAllRecords();
+    m_sourcesWindow->DestroyChildren();
+    m_sequenceControlWindow->DestroyChildren();
+
+    Layout();
+
+    std::ifstream file(clientPtr->GetPath() + clientPtr->GetPrName());
+    std::string data;
+
+    // read the file line by line
+    if (std::getline(file, data)) {
+        SetProjectName(data);
+    }
+    else {
+        return;
+    }
+    if (std::getline(file, data)) {
+        std::vector<std::string> vsElems = SplitString(data, '|');
+        for (std::string& vsData : vsElems) {
+            ImportSourceVid(vsData, true);
+        }
+        for (std::thread& t : importThreads) { t.join(); }
+        importThreads.clear();
+    }
+    else {
+        file.close();
+        return;
+    }
+
+    if (std::getline(file, data)) {
+        std::vector<std::string> seqElms = SplitString(data, '|');
+        for (std::string& seqData : seqElms) {
+            Sequence* s = new Sequence(seqData, true);
+            AddSequence(s);
+        }
+    }
+
+    file.close();
+    m_sourcesSizer->FitInside(m_sourcesWindow);
+    Layout();
 }
 
 void MainWindow::OnRefresh(wxCommandEvent& event_)
@@ -445,6 +458,7 @@ void MainWindow::ImportSourceVid(std::string sourcePath, bool load)
                     auto vsPanel = new VideoSourcePanel(m_sourcesWindow, v, ogShowVideoPanel->GetId(), m_sequenceControlWindow->GetId());
                     //statusBar->SetStatusText(_("Finished"));
                     m_sourcesSizer->Add(vsPanel, 1, wxALL, 10);
+                    m_sourcesSizer->FitInside(m_sourcesWindow);
                     m_sourcesSizer->Layout();
                     });
             }
