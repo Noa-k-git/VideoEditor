@@ -66,6 +66,12 @@ MainWindow::MainWindow(wxWindow* parent,
     wxButton* pullProjectsBtn = new wxButton(this, wxID_ANY, "PULL My Projects");
     pullProjectsBtn->Bind(wxEVT_BUTTON, &MainWindow::OnPullProjects, this);
     menuSizer->Add(pullProjectsBtn, 0.1, wxEXPAND|wxALL, 5);
+    
+    wxButton* exportBtn = new wxButton(this, wxID_ANY, "Export");
+    exportBtn->Bind(wxEVT_BUTTON, &MainWindow::OnExportSequence, this);
+    wxBoxSizer* exportSizer = new wxBoxSizer(wxVERTICAL);
+    exportSizer->Add(exportBtn, 1, wxALIGN_RIGHT | wxRIGHT, 10);
+    menuSizer->Add(exportSizer, 1, wxEXPAND|wxALL, 5);
 
     wxBitmap userIcon((std::string)"user4.png", wxBITMAP_TYPE_PNG);
     SmallBitmapButton* loginButton = new SmallBitmapButton(this, wxID_ANY, userIcon, wxDefaultPosition, wxSize(32, 32), wxSize(26, 26), wxBU_AUTODRAW);
@@ -324,6 +330,12 @@ void MainWindow::OnPullProjects(wxCommandEvent& event_)
         dlg->SetPosition(wxPoint(button->GetPosition().x, button->GetPosition().y + button->GetSize().GetHeight()+20));
     }
     dlg->ShowModal();
+}
+
+void MainWindow::OnExportSequence(wxCommandEvent& event_)
+{
+    ExportSeqDlg dlg(clientPtr, this);
+    dlg.ShowModal();
 }
 
 void MainWindow::OnNew(wxCommandEvent& event_)

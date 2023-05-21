@@ -19,6 +19,7 @@
 #include "ProjectsDialog.h"
 #include "CreateProjectDlg.h"
 #include "Client.h"
+#include "ExportSeqDlg.h"
 #include "ProjectsDialog.h"
 
  #ifndef WX_PRECOMP
@@ -42,6 +43,7 @@ public:
     void OnSave(wxCommandEvent& event_);
     void OnPushProject(wxCommandEvent& event_);
     void OnPullProjects(wxCommandEvent& event_);
+    void OnExportSequence(wxCommandEvent& event_);
     void OnNew(wxCommandEvent& event_);
     void OnImport(wxCommandEvent& event_);
     void OnUser(wxCommandEvent& event_);

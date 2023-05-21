@@ -132,6 +132,9 @@
     <ClCompile Include="CreateProjectDlg.cpp">
       <Filter>Source Files\Design</Filter>
     </ClCompile>
+    <ClCompile Include="ExportSeqDlg.cpp">
+      <Filter>Source Files\Design</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SourceID.h">
@@ -249,6 +252,9 @@
       <Filter>Header Files\Server Connection</Filter>
     </ClInclude>
     <ClInclude Include="CreateProjectDlg.h">
+      <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="ExportSeqDlg.h">
       <Filter>Header Files\Design</Filter>
     </ClInclude>
   </ItemGroup>

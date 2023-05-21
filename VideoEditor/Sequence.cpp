@@ -88,7 +88,7 @@ std::string Sequence::Write()
     return res;
 }
 
-void Sequence::SaveVideo(std::string& output_filename)
+void Sequence::SaveVideo(const std::string& output_filename)
 {
     // Open the output file context
     AVFormatContext* format_ctx = nullptr;
@@ -255,9 +255,14 @@ void Sequence::SaveVideo(std::string& output_filename)
     int frame_count = 0;
     double pts = 0;
     for (auto& clip : video) {
-        for (int i = 0; i < clip->GetSize(); i ++) {
+        for (int i = 0; i < clip->GetSize(); i++) {
             auto srcFrame = clip->GetChunk(i)->GetObject();
             // Convert the frame to the output format
+            converter = sws_getContext(
+                srcFrame->width, srcFrame->height, (AVPixelFormat)srcFrame->format,
+                codec_ctx->width, codec_ctx->height, AV_PIX_FMT_YUV420P,
+                SWS_BICUBIC, nullptr, nullptr, nullptr
+            );
             sws_scale(converter,
                 srcFrame->data, srcFrame->linesize, 0, srcFrame->height,
                 converted_frame->data, converted_frame->linesize

@@ -24,7 +24,7 @@ public:
 	virtual ~Sequence();
 	void UpdateCreated();
 	std::string Write();
-	void SaveVideo(std::string&);
+	void SaveVideo(const std::string&);
 	void AddClip(VideoClip*, int);
 	void AddClip(VideoClip*);
 	bool SwapClipsAt(int idx1, int idx2);

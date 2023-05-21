@@ -7,7 +7,7 @@ CreateProjectDlg::CreateProjectDlg(ServerClient* clientPtr, wxWindow* parent) : 
 	client = clientPtr;
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 	
-	wxStaticText* title = new wxStaticText(this, wxID_ANY, "Create Shared Project", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
+	wxStaticText* title = new wxStaticText(this, wxID_ANY, "Export:", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 	wxFont titleFont(16, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_MAX, wxFONTWEIGHT_BOLD);
 	title->SetFont(titleFont);
 	mainSizer->Add(title, 0, wxEXPAND);
@@ -15,23 +15,11 @@ CreateProjectDlg::CreateProjectDlg(ServerClient* clientPtr, wxWindow* parent) : 
 	// Set the sizer for the dialog
 	SetBackgroundColour(ORANGE_BACKGROUND);
 
-	wxFont textFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL);
+	wxFont textFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL);
 
-	// name label
-	wxStaticText* nameLabel = new wxStaticText(this, wxID_ANY, "Project Name", wxDefaultPosition, wxDefaultSize);
-	nameLabel->SetFont(textFont);
-	mainSizer->Add(nameLabel, 0, wxEXPAND | wxTOP, ENTER_SPACE*2);
-
-	// name input
-	nameInput = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB|wxTE_READONLY);
-	nameInput->SetLabel(client->GetPrName());
-	nameInput->Bind(wxEVT_TEXT_ENTER, &CreateProjectDlg::Traveler, this);
-	nameInput->Bind(wxEVT_TEXT_ENTER, &CreateProjectDlg::Traveler, this);
-	mainSizer->Add(nameInput, 0, wxEXPAND | wxTOP, SH_ENTER_SPACE);
-	// mail
-	wxStaticText* mailLabel = new wxStaticText(this, wxID_ANY, "Join members (press ENTER to add more fields)");
-	mailLabel->SetFont(textFont);
-	mainSizer->Add(mailLabel, 0, wxEXPAND | wxTOP, ENTER_SPACE*2);
+	wxStaticText* helpLabel = new wxStaticText(this, wxID_ANY, "Choose a sequence to export");
+	helpLabel->SetFont(textFont);
+	mainSizer->Add(helpLabel, 0, wxEXPAND | wxTOP, ENTER_SPACE*2);
 	
 	emailsScrolledWindow = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
 	emailsScrolledWindow->SetScrollRate(FromDIP(10), FromDIP(10));
