@@ -21,11 +21,11 @@ CreateProjectDlg::CreateProjectDlg(ServerClient* clientPtr, wxWindow* parent) : 
 	helpLabel->SetFont(textFont);
 	mainSizer->Add(helpLabel, 0, wxEXPAND | wxTOP, ENTER_SPACE*2);
 	
-	emailsScrolledWindow = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
-	emailsScrolledWindow->SetScrollRate(FromDIP(10), FromDIP(10));
+	seqScrolledWindow = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
+	seqScrolledWindow->SetScrollRate(FromDIP(10), FromDIP(10));
 	emailsSizer = new wxBoxSizer(wxVERTICAL);
-	emailsScrolledWindow->SetSizer(emailsSizer);
-	mainSizer->Add(emailsScrolledWindow, 1, wxEXPAND);
+	seqScrolledWindow->SetSizer(emailsSizer);
+	mainSizer->Add(seqScrolledWindow, 1, wxEXPAND);
 	mainSizer->AddSpacer(ENTER_SPACE+SH_ENTER_SPACE);
 
 	// create button
@@ -52,7 +52,7 @@ CreateProjectDlg::CreateProjectDlg(ServerClient* clientPtr, wxWindow* parent) : 
 
 void CreateProjectDlg::AddMailInput()
 {
-	wxTextCtrl* mailInput = new wxTextCtrl(emailsScrolledWindow, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+	wxTextCtrl* mailInput = new wxTextCtrl(seqScrolledWindow, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
 		wxTE_PROCESS_ENTER|wxTAB_TRAVERSAL);
 	mailInput->SetHint("Enter memeber's email");
 	mailInput->Bind(wxEVT_TEXT_ENTER, &CreateProjectDlg::OnEnter, this);
@@ -63,7 +63,7 @@ void CreateProjectDlg::AddMailInput()
 void CreateProjectDlg::OnEnter(const wxCommandEvent& event_)
 {
 	AddMailInput();
-	emailsSizer->FitInside(emailsScrolledWindow);
+	emailsSizer->FitInside(seqScrolledWindow);
 	Traveler(event_);
 }
 

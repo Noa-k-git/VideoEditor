@@ -14,7 +14,6 @@
 #include <wx/splitter.h>
 #include <wx/statline.h>
 #include <wx/wrapsizer.h>
-#include "Map.h"
 #include "UserDialog.h"
 #include "ProjectsDialog.h"
 #include "CreateProjectDlg.h"

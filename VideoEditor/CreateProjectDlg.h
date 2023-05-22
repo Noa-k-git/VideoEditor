@@ -14,7 +14,7 @@ public:
 private:
 	ServerClient* client;
 	wxTextCtrl* nameInput;
-	wxScrolledWindow* emailsScrolledWindow;
+	wxScrolledWindow* seqScrolledWindow;
 	wxBoxSizer* emailsSizer;
 	wxButton* createBtn;
 	void AddMailInput();

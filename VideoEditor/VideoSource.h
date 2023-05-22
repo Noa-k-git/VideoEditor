@@ -33,7 +33,6 @@ extern "C" {
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 
-#include "Map.h"
 class VideoSource :
     //public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
     public ISource<AVFrame*>, public IImg
