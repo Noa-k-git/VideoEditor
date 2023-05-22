@@ -84,17 +84,22 @@ void SeqControlWindow::SwapClips(int idx1, int idx2, bool isource)
 		}
 		if (!m_sequencePtr->SwapClipsAt(idx1, idx2))
 			return;
-		wxSizerItem* item1 = m_clipsSizer->GetItem(idx1);
-		wxSizerItem* item2 = m_clipsSizer->GetItem(idx2);
 
-		ClipItemPanel* clip1 = new ClipItemPanel(m_sequencePtr->GetClipAt(idx1), idx1, this);
-		ClipItemPanel* clip2 = new ClipItemPanel(m_sequencePtr->GetClipAt(idx2), idx2, this);
-		m_clipsSizer->Replace(item1->GetWindow(), clip1);
-		m_clipsSizer->Replace(item2->GetWindow(), clip2);
+		if (m_clipsSizer->GetItemCount() > idx1 && m_clipsSizer->GetItemCount() > idx2
+			&& m_sequencePtr->GetSize() > idx1 && m_sequencePtr->GetSize() > idx2)
+		{
+			wxSizerItem* item1 = m_clipsSizer->GetItem(idx1);
+			wxSizerItem* item2 = m_clipsSizer->GetItem(idx2);
 
-		m_clipsSizer->Layout();
-		Layout();
-		Refresh();
+			ClipItemPanel* clip1 = new ClipItemPanel(m_sequencePtr->GetClipAt(idx1), idx1, this);
+			ClipItemPanel* clip2 = new ClipItemPanel(m_sequencePtr->GetClipAt(idx2), idx2, this);
+			m_clipsSizer->Replace(item1->GetWindow(), clip1);
+			m_clipsSizer->Replace(item2->GetWindow(), clip2);
+
+			m_clipsSizer->Layout();
+			Layout();
+			Refresh();
+		}
 		if (isource) {
 			client->SetSwapWindow(this);
 			client->Switch(m_seqName, idx1, idx2);
