@@ -6,36 +6,42 @@ CreateProjectDlg::CreateProjectDlg(ServerClient* clientPtr, wxWindow* parent) : 
 {
 	client = clientPtr;
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
-	
-	wxStaticText* title = new wxStaticText(this, wxID_ANY, "Export:", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
+
+	wxStaticText* title = new wxStaticText(this, wxID_ANY, "Create Shared Project", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 	wxFont titleFont(16, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_MAX, wxFONTWEIGHT_BOLD);
 	title->SetFont(titleFont);
 	mainSizer->Add(title, 0, wxEXPAND);
 	mainSizer->SetMinSize(wxSize(300, 430));
 	// Set the sizer for the dialog
 	SetBackgroundColour(ORANGE_BACKGROUND);
+	wxFont textFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL);
+	// name label
+	wxStaticText* nameLabel = new wxStaticText(this, wxID_ANY, "Project Name", wxDefaultPosition, wxDefaultSize);
+	nameLabel->SetFont(textFont);
+	mainSizer->Add(nameLabel, 0, wxEXPAND | wxTOP, ENTER_SPACE * 2);
+	// name input
+	nameInput = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER | wxTE_PROCESS_TAB | wxTE_READONLY);
+	nameInput->SetLabel(client->GetPrName());
+	nameInput->Bind(wxEVT_TEXT_ENTER, &CreateProjectDlg::Traveler, this);
+	nameInput->Bind(wxEVT_TEXT_ENTER, &CreateProjectDlg::Traveler, this);
+	mainSizer->Add(nameInput, 0, wxEXPAND | wxTOP, SH_ENTER_SPACE);
+	// mail
+	wxStaticText* mailLabel = new wxStaticText(this, wxID_ANY, "Join members (press ENTER to add more fields)");
+	mailLabel->SetFont(textFont);
+	mainSizer->Add(mailLabel, 0, wxEXPAND | wxTOP, ENTER_SPACE * 2);
 
-	wxFont textFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL);
-
-	wxStaticText* helpLabel = new wxStaticText(this, wxID_ANY, "Choose a sequence to export");
-	helpLabel->SetFont(textFont);
-	mainSizer->Add(helpLabel, 0, wxEXPAND | wxTOP, ENTER_SPACE*2);
-	
-	seqScrolledWindow = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
-	seqScrolledWindow->SetScrollRate(FromDIP(10), FromDIP(10));
+	emailsScrolledWindow = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
+	emailsScrolledWindow->SetScrollRate(FromDIP(10), FromDIP(10));
 	emailsSizer = new wxBoxSizer(wxVERTICAL);
-	seqScrolledWindow->SetSizer(emailsSizer);
-	mainSizer->Add(seqScrolledWindow, 1, wxEXPAND);
-	mainSizer->AddSpacer(ENTER_SPACE+SH_ENTER_SPACE);
-
+	emailsScrolledWindow->SetSizer(emailsSizer);
+	mainSizer->Add(emailsScrolledWindow, 1, wxEXPAND);
+	mainSizer->AddSpacer(ENTER_SPACE + SH_ENTER_SPACE);
 	// create button
 	createBtn = new wxButton(this, wxID_ANY, "Create Project");
 	createBtn->SetMinSize(wxSize(createBtn->GetSize().GetWidth(), createBtn->GetSize().GetHeight() * 2));
 	createBtn->Bind(wxEVT_BUTTON, &CreateProjectDlg::OnCreate, this);
 	mainSizer->Add(createBtn, 1, wxEXPAND | wxTOP, ENTER_SPACE);
-
 	AddMailInput();
-
 	wxBoxSizer* borderSizer = new wxBoxSizer(wxVERTICAL);
 	borderSizer->Add(mainSizer, 1, wxALL, 40);
 	SetSizerAndFit(borderSizer);
@@ -47,12 +53,11 @@ CreateProjectDlg::CreateProjectDlg(ServerClient* clientPtr, wxWindow* parent) : 
 	SetPosition(wxPoint(parentCenter.x - thisCenter.x, parentCenter.y - thisCenter.y));
 	if (GetPosition().x < 0 || GetPosition().y < 0)
 		SetPosition(wxDefaultPosition);
-
 }
 
 void CreateProjectDlg::AddMailInput()
 {
-	wxTextCtrl* mailInput = new wxTextCtrl(seqScrolledWindow, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+	wxTextCtrl* mailInput = new wxTextCtrl(emailsScrolledWindow, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
 		wxTE_PROCESS_ENTER|wxTAB_TRAVERSAL);
 	mailInput->SetHint("Enter memeber's email");
 	mailInput->Bind(wxEVT_TEXT_ENTER, &CreateProjectDlg::OnEnter, this);
@@ -63,7 +68,7 @@ void CreateProjectDlg::AddMailInput()
 void CreateProjectDlg::OnEnter(const wxCommandEvent& event_)
 {
 	AddMailInput();
-	emailsSizer->FitInside(seqScrolledWindow);
+	emailsSizer->FitInside(emailsScrolledWindow);
 	Traveler(event_);
 }
 
