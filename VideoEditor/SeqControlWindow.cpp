@@ -101,7 +101,6 @@ void SeqControlWindow::SwapClips(int idx1, int idx2, bool isource)
 			Refresh();
 		}
 		if (isource) {
-			client->SetSwapWindow(this);
 			client->Switch(m_seqName, idx1, idx2);
 		}
 	}

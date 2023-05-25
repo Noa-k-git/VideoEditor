@@ -211,6 +211,8 @@ MainWindow::~MainWindow()
 {
     ogShowVideoPanel->PauseVideo();
     finalVideoPanel->PauseVideo();
+    for (int i = 0; i < importThreads.size(); i++)
+        importThreads.at(i).join();
 }
 
 void MainWindow::SetProjectName(std::string name)
@@ -475,10 +477,19 @@ void MainWindow::ImportSourceVid(std::string sourcePath, bool load)
                     });
             }
             else {
-                delete v;
+                if (v->GetError())
+                {
+                    VideoSource::videoSources.RemoveRecord(v->GetName());
+                    wxGetApp().CallAfter([&]() {
+                        wxMessageBox(_("ERROR IN IMPORTING VIDEO"), _("Error in importing video"), wxICON_ERROR);
+                        });
+                }
+                else {
+                    delete v;
                 wxGetApp().CallAfter([&]() {
                     wxMessageBox(_("Video is already defined... If not try first to change the video name"), _("Error in importing video"));
                     });
+                }
             }
             });
         importThreads.push_back(std::move(t));

@@ -26,7 +26,6 @@ private:
 
 template <typename T>
 Records<T>::Records() {
-    //static_assert(std::, std::remove_pointer_t<T>>::value, "Derived not derived from UniqueName");
     this->videoSources = new std::vector<T>();
 }
 template <typename T>

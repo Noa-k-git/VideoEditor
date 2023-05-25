@@ -49,10 +49,11 @@ public:
     void Show() override;
     //void Play() override;
     inline bool GetCreated();
-
+    inline bool GetError();
     const AVFrame* getFirstFrame();
 private:
     bool created;
+    bool read_error;
     void ReadSource() override;
     void UpdateCreated();
 
@@ -62,4 +63,9 @@ extern Records<VideoSource*> videoSources;
 inline bool VideoSource::GetCreated()
 {
     return created;
+}
+
+inline bool VideoSource::GetError()
+{
+    return read_error;
 }
