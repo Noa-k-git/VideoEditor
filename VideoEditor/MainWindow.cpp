@@ -212,6 +212,7 @@ MainWindow::~MainWindow()
     ogShowVideoPanel->PauseVideo();
     finalVideoPanel->PauseVideo();
     for (int i = 0; i < importThreads.size(); i++)
+        if (importThreads.at(i).joinable())
         importThreads.at(i).join();
 }
 
