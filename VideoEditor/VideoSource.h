@@ -53,7 +53,7 @@ public:
     const AVFrame* getFirstFrame();
 private:
     bool created;
-    bool read_error;
+    bool read;
     void ReadSource() override;
     void UpdateCreated();
 
@@ -67,5 +67,5 @@ inline bool VideoSource::GetCreated()
 
 inline bool VideoSource::GetError()
 {
-    return read_error;
+    return read;
 }

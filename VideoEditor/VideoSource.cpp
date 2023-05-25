@@ -49,6 +49,8 @@ std::string VideoSource::Write(std::string defPath)
 }
 
 void VideoSource::UpdateCreated() {
+	created = true;
+	read = true;
 	if (!VideoSource::videoSources.AddRecord(this).second) {
 		created = false;
 	}
@@ -98,12 +100,12 @@ void VideoSource::ReadSource()
 	AVFormatContext* av_format_ctx = avformat_alloc_context();
 	if (!av_format_ctx) {
 		//wxMessageBox("Couldn't create AVFormatContext\n");
-		created = false;
+		read = false;
 		return;
 	}
 	if (avformat_open_input(&av_format_ctx, path.c_str(), NULL, NULL) != 0) {
 		//wxMessageBox("Couldn't open video file\n");
-		created = false;
+		read = false;
 		return;
 	}
 
@@ -127,7 +129,7 @@ void VideoSource::ReadSource()
 
 	if (video_stream_index == -1) {
 		//wxMessageBox("Couldn't find valid video stream inside file\n");
-		read_error = false;
+		read = false;
 		return;
 	}
 
@@ -135,20 +137,20 @@ void VideoSource::ReadSource()
 	AVCodecContext* av_codec_ctx = avcodec_alloc_context3(av_codec);
 	if (!av_codec_ctx) {
 		//wxMessageBox("Couldn't create AVCpdecContext\n");
-		read_error = false;
+		read = false;
 		return;
 	}
 
 	if (avcodec_parameters_to_context(av_codec_ctx, av_codec_params) < 0)
 	{
 		//wxMessageBox("Couldn't initialize AVCodecContext\n");
-		read_error = false;
+		read = false;
 		return;
 	}
 	if (avcodec_open2(av_codec_ctx, av_codec, NULL) < 0) {
 		//wxMessageBox("Couldn't open codec\n");
 
-		read_error = false;
+		read = false;
 		return;
 	}
 
@@ -156,14 +158,14 @@ void VideoSource::ReadSource()
 	if (!av_frame) {
 		//wxMessageBox("Couldn't allocate AVFrame\n");
 
-		read_error = false;
+		read = false;
 		return;
 	}
 	AVPacket* av_packet = av_packet_alloc();
 	if (!av_packet) {
 		//wxMessageBox("Couldn't allocate AVPacket\n");
 
-		read_error = false;
+		read = false;
 		return;
 	}
 	int response;
@@ -177,7 +179,7 @@ void VideoSource::ReadSource()
 		if (response < 0) {
 			//wxMessageBox("Failed to decode packet: %s\n", av_err2str(response));
 
-			read_error = false;
+			read = false;
 			return;
 		}
 		response = avcodec_receive_frame(av_codec_ctx, av_frame);
@@ -188,7 +190,7 @@ void VideoSource::ReadSource()
 		else if (response < 0) {
 			//wxMessageBox("Failed to decode frame: %s\n", av_err2str(response));
 
-			read_error = false;
+			read = false;
 			return;
 		}
 		counter++;
