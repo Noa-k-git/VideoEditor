@@ -13,6 +13,7 @@
 #include "rsa.h"
 #include "ShiftCipher.h"
 #include "App.h"
+#include "id.h"
 #ifndef CLIENT_CONSTANTS
 #define CLIENT_CONSTANTS
 #define INVALID_USER_ID -1
@@ -24,7 +25,6 @@ class ServerClient {
 public:
 	ServerClient();
 	~ServerClient();
-	void SetSwapWindow(wxWindow* win);
 	// @brief Creates a connection with the server and return the connected socket
 	void CreateConnection();
 	void SendKeys();
@@ -71,7 +71,6 @@ private:
 	SOCKET listenSocket;
 	SOCKET writeSocket;
 
-	wxWindow* swapWindow;
 	int userId;
 	std::string projId;
 	std::string projectName;

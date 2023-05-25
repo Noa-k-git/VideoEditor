@@ -13,7 +13,6 @@ wxDEFINE_EVENT(SWAP_CLIP_SERVER_EVT, wxCommandEvent);
 
 ServerClient::ServerClient()
 {
-    swapWindow = nullptr;
     listenSocket = INVALID_SOCKET;
     writeSocket = INVALID_SOCKET;
     userId = INVALID_USER_ID;
@@ -43,9 +42,6 @@ ServerClient::~ServerClient()
     WSACleanup();
 }
 
-void ServerClient::SetSwapWindow(wxWindow* win) {
-    this->swapWindow = win;
-}
 void ServerClient::CreateConnection()
 {
     Connect(writeSocket);
@@ -225,6 +221,7 @@ void ServerClient::HandleUpdate(std::vector<std::string> updateParms)
                 swapEvt_.SetString(updateParms.at(0));
                 swapEvt_.SetInt(std::stoi(updateParms.at(1)));
                 swapEvt_.SetExtraLong(std::stoi(updateParms.at(2)));
+                wxWindow* swapWindow = wxWindow::FindWindowById(window::id::SEQ_CONTROL_WINDOW);
                 wxPostEvent(swapWindow, swapEvt_);
             });
         }

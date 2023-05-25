@@ -165,7 +165,6 @@ MainWindow::MainWindow(wxWindow* parent,
     wxMessageOutputDebug().Printf("\t\t\t%d", seqNameText_->GetId());
 
     m_sequenceControlWindow = new SeqControlWindow(clientPtr, m_sequenceWindow, seqNameText_);
-    clientPtr->SetSwapWindow(m_sequenceControlWindow);
     sequenceWindowSizer_->Add(m_sequenceControlWindow, 1, wxEXPAND|wxALL, 10);
 
     sequenceWindowSizer_->Layout();

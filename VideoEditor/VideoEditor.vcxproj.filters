@@ -143,9 +143,6 @@
     <ClInclude Include="Bezier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="id.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VideoSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -255,6 +252,9 @@
       <Filter>Header Files\Design</Filter>
     </ClInclude>
     <ClInclude Include="ExportSeqDlg.h">
+      <Filter>Header Files\Design</Filter>
+    </ClInclude>
+    <ClInclude Include="id.h">
       <Filter>Header Files\Design</Filter>
     </ClInclude>
   </ItemGroup>

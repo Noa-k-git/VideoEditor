@@ -40,7 +40,6 @@ void ClipItemPanel::OnUpArrow(wxCommandEvent& event_)
 	wxCommandEvent newEvt(SWAP_CLIP_WITH_PREV_EVT, GetId());
 	newEvt.SetEventObject(this);
 	newEvt.SetInt(m_idx);
-
 	wxWindow* window = GetParent();
 	if (window != nullptr) {
 		wxPostEvent(window, newEvt);

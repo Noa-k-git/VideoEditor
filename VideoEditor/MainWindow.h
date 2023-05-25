@@ -20,6 +20,7 @@
 #include "Client.h"
 #include "ExportSeqDlg.h"
 #include "ProjectsDialog.h"
+#include "id.h"
 
  #ifndef WX_PRECOMP
 	#include <wx/wx.h>
