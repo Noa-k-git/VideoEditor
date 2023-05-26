@@ -192,7 +192,6 @@
     <ClInclude Include="globals.h" />
     <ClInclude Include="id.h" />
     <ClInclude Include="IEffect.h" />
-    <ClInclude Include="IImg.h" />
     <ClInclude Include="InputDialog.h" />
     <ClInclude Include="IPlayable.h" />
     <ClInclude Include="ISource.h" />

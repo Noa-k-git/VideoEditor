@@ -8,12 +8,12 @@ char x[AV_ERROR_MAX_STRING_SIZE];
 
 Records<VideoSource*> VideoSource::videoSources;
 
-VideoSource::VideoSource(std::string path, std::string name) : ISource(path, name), IImg()
+VideoSource::VideoSource(std::string path, std::string name) : ISource(path, name)
 {
 	UpdateCreated();
 }
 
-VideoSource::VideoSource(std::string sourcePath, std::string data, bool load) : ISource(data), IImg()
+VideoSource::VideoSource(std::string sourcePath, std::string data, bool load) : ISource(data)
 {
 	if (load)
 		Load(sourcePath, data);
@@ -280,12 +280,6 @@ SyncObject<AVFrame*>* VideoSource::GetChunk(int idx)
 	if (idx < GetSize())
 		return &source_.at(idx);
 	return &source_.at(GetSize() - 1);
-}
-
-void VideoSource::Show()
-{
-
-
 }
 
 //void VideoSource::Play()

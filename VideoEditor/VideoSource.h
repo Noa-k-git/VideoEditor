@@ -1,7 +1,6 @@
 #pragma once
 #include "globals.h"
 #include "ISource.h"
-#include "IImg.h"
 #include "IPlayable.h"
 #include "Records.h"
 #include "SyncObject.h"
@@ -35,7 +34,7 @@ extern "C" {
 
 class VideoSource :
     //public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
-    public ISource<AVFrame*>, public IImg
+    public ISource<AVFrame*>
 {
 public:
     static Records<VideoSource*> videoSources;
@@ -46,7 +45,6 @@ public:
     std::string Write(std::string);
     int GetSize() override;
     SyncObject<AVFrame*>* GetChunk(int at) override;
-    void Show() override;
     //void Play() override;
     inline bool GetCreated();
     inline bool GetError();
