@@ -1,6 +1,6 @@
 #include "ExportSeqDlg.h"
 
-ExportSeqDlg::ExportSeqDlg(ServerClient* c, wxWindow* parent) : wxDialog(parent, wxID_ANY, "Create New Shared Project", wxDefaultPosition,
+ExportSeqDlg::ExportSeqDlg(ServerClient* c, wxWindow* parent) : wxDialog(parent, wxID_ANY, "Export Sequence", wxDefaultPosition,
 	wxDefaultSize)
 {
 	client = c;

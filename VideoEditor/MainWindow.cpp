@@ -299,12 +299,16 @@ void MainWindow::OnSave(wxCommandEvent& event_)
     std::vector<VideoSource*>& vSources = *VideoSource::videoSources.GetRecords();
     int x = vSources.size() - 1;
     bool a = 0 < x;
-    for (int i = 0; i < x; i++) {
-        file << vSources.at(i)->Write(clientPtr->GetPath()) << '|';
+    if (x == -1)
+        file << '\n';
+    else
+    {
+        for (int i = 0; i < x; i++) {
+            file << vSources.at(i)->Write(clientPtr->GetPath()) << '|';
+        }
+        if (x >= 0)
+            file << vSources.at(vSources.size() - 1)->Write(clientPtr->GetPath()) << std::endl;
     }
-    if (x >= 0)
-        file << vSources.at(vSources.size() - 1)->Write(clientPtr->GetPath()) << std::endl;
-
     std::vector<Sequence*>& allSeq = *Sequence::sequences.GetRecords();
     x = allSeq.size() - 1;
     for (int i = 0; i < x; i++) {

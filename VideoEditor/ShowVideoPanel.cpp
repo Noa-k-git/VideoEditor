@@ -180,7 +180,7 @@ void ShowVideoPanel::ShowVideo()
 	SetVideo();
 	if (m_playablePtr) {
 		auto chunk = m_playablePtr->GetChunk(0);
-		if (chunk)
+		if (chunk && chunk->GetObject())
 		{
 			firstFrame = av_frame_clone(chunk->GetObject());
 			av_frame_copy(firstFrame, chunk->GetObject());
@@ -219,7 +219,7 @@ void ShowVideoPanel::ShowVideo()
 		SetVideo();
 		if (m_playablePtr) {
 			SyncObject<AVFrame*>* syncframe = m_playablePtr->GetChunk(pos);
-			if (syncframe)
+			if (syncframe && syncframe->GetObject())
 			{
 				frame = av_frame_clone(syncframe->GetObject());
 				av_frame_copy(frame, syncframe->GetObject());
@@ -243,9 +243,9 @@ void ShowVideoPanel::ShowVideo()
 		sws_scale(swsContext, frame->data, frame->linesize, 0,
 			frame->height, rgbFrame->data, rgbFrame->linesize);
 
-		//wxImage image(rgbFrame->width, rgbFrame->height, rgbFrame->data[0], true);
-		wxImage image(rgbFrame->width, rgbFrame->height);
-		image.SetData(rgbFrame->data[0], true, rgbFrame->width, rgbFrame->height);
+		wxImage image(rgbFrame->width, rgbFrame->height, rgbFrame->data[0], true);
+		//wxImage image(rgbFrame->width, rgbFrame->height);
+		//image.SetData(rgbFrame->data[0], true, rgbFrame->width, rgbFrame->height);
 		while (duration<double>(std::chrono::steady_clock::now() - startTime).count() < timeInterval.count())
 		{
 			auto d = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - startTime);
@@ -262,12 +262,12 @@ void ShowVideoPanel::ShowVideo()
 			});
 		av_frame_free(&frame);
 		av_frame_unref(frame);
+		sws_freeContext(swsContext);
 
 	}
 
 	// Clean up
 	//av_frame_unref(rgbFrame);
-	sws_freeContext(swsContext);
 	return;
 }
 

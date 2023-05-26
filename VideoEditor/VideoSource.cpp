@@ -29,6 +29,7 @@ VideoSource::~VideoSource()
 			auto syncPair = element.GetObjectForUpdate();
 			av_frame_free(&syncPair.second);
 			av_frame_unref(syncPair.second);
+			syncPair.second == nullptr;
 			//av_freep(element);
 		}
 		this->source_.clear();
