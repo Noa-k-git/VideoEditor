@@ -47,7 +47,7 @@ public:
     SyncObject<AVFrame*>* GetChunk(int at) override;
     //void Play() override;
     inline bool GetCreated();
-    inline bool GetError();
+    inline bool GetRead();
     const AVFrame* getFirstFrame();
 private:
     bool created;
@@ -63,7 +63,7 @@ inline bool VideoSource::GetCreated()
     return created;
 }
 
-inline bool VideoSource::GetError()
+inline bool VideoSource::GetRead()
 {
     return read;
 }

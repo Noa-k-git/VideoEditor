@@ -30,9 +30,7 @@ public:
 	SyncObject<AVFrame*>* GetChunk(int) override;
 	int GetSize() override;
 	std::string SourceName();
-	std::string ToString() const {
-		
-	}
+
 	//void AddEffect(IEffect); // changes the updated to false
 };
 

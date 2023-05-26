@@ -169,7 +169,6 @@
     <ClCompile Include="string_utils.cpp" />
     <ClCompile Include="SubWindows.cpp" />
     <ClCompile Include="SyncObject.cpp" />
-    <ClCompile Include="SourceID.cpp" />
     <ClCompile Include="UserDialog.cpp" />
     <ClCompile Include="VideoClip.cpp" />
     <ClCompile Include="VideoSource.cpp" />
@@ -210,7 +209,6 @@
     <ClInclude Include="string_utils.h" />
     <ClInclude Include="SubWindows.h" />
     <ClInclude Include="SyncObject.h" />
-    <ClInclude Include="SourceID.h" />
     <ClInclude Include="UserDialog.h" />
     <ClInclude Include="VideoClip.h" />
     <ClInclude Include="VideoSource.h" />

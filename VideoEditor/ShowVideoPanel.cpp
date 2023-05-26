@@ -169,10 +169,8 @@ void ShowVideoPanel::ShowVideo()
 	//int pos = timeline->GetValue();
 	int pos = timeline->GetValue();
 	auto startTime = std::chrono::steady_clock::now();
-	//const int fps = 30;
-	const double fps = 30;
+	const int fps = 30;
 	auto timeInterval = duration<double>(1.0 / fps);
-	//const int sleep_time_us = 1000000 / fps;  // sleep time in microseconds
 
 	AVFrame* rgbFrame = av_frame_alloc(); // a copy frame of the first frame in the videoSource
 	// set the properties of the copy to match the og frame

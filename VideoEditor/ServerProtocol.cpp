@@ -71,7 +71,9 @@ std::string server_protocol::PadField(const std::string& field, const int length
 	return field + buffer;
 }
 void server_protocol::StringToParts(std::string fullMsg, std::vector<std::string>& res) {
+	//encrypt the message
 	fullMsg = shift_cipher::encrypt(fullMsg, SHIFT_KEY);
+	// split message into smaller parts
 	int counter = 1;
 	while (fullMsg != "") {
 		int slicer = fmin(fullMsg.length(), PART_SIZE - NUM_FIELD_LENGTH);
@@ -93,18 +95,21 @@ std::vector<std::string> server_protocol::BuildRequest(const std::string& cmd, c
 	}
 	headerElm.push_back(PadField(std::to_string(length), SIZE_FIELD_LENGTH));
 	std::vector<std::string> requestElm;
-	requestElm.push_back(CreateHeader(headerElm, serverKey, serverN));
+	requestElm.push_back(CreateHeader(headerElm, serverKey, serverN)); // create the header by the protocol
 	requestElm.push_back(message);
 	std::string fullMsg = JoinRequestFields(requestElm);
 	std::vector<std::string> parts;
-	StringToParts(fullMsg, parts);
+	StringToParts(fullMsg, parts); // encrypt & devide to smaller parts by the protocol
 
 	return parts;
 }
 
 std::string server_protocol::CreateHeader(const std::vector<std::string>& headerFields, int publicKey, int n) {
+	// create decoded header string
 	std::string decoded = server_protocol::JoinRequestFields(headerFields);
+	// encdoed int array
 	std::vector<int> encodedIntVec = rsa_cipher::encoder(decoded, publicKey, n);
+	// convert array to string
 	std::vector<std::string> encodedStrVec (encodedIntVec.size());
 	std::transform(encodedIntVec.begin(), encodedIntVec.end(), encodedStrVec.begin(), [](const int& i) {
 		return std::to_string(i);

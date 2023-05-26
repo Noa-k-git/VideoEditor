@@ -29,12 +29,11 @@ VideoSource::~VideoSource()
 			auto syncPair = element.GetObjectForUpdate();
 			av_frame_free(&syncPair.second);
 			av_frame_unref(syncPair.second);
-			syncPair.second == nullptr;
-			//av_freep(element);
+			syncPair.second = nullptr;
+			// the lock of in the syncPair release
 		}
 		this->source_.clear();
 	}
-	//std::vector<cv::Mat>().swap(source);
 }
 
 void VideoSource::Load(std::string sourcePath, std::string data)
@@ -114,7 +113,7 @@ void VideoSource::ReadSource()
 	int video_stream_index = -1;
 	AVCodecParameters* av_codec_params = NULL;
 	const AVCodec* av_codec = NULL;
-	for (int i = 0; i < av_format_ctx->nb_streams; i)
+	for (uint i = 0; i < av_format_ctx->nb_streams; i)
 	{
 		av_codec_params = av_format_ctx->streams[i]->codecpar;
 		av_codec = avcodec_find_decoder(av_codec_params->codec_id);

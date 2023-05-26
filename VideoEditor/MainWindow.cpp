@@ -482,7 +482,7 @@ void MainWindow::ImportSourceVid(std::string sourcePath, bool load)
                     });
             }
             else {
-                if (v->GetError())
+                if (!v->GetRead())
                 {
                     VideoSource::videoSources.RemoveRecord(v->GetName());
                     wxGetApp().CallAfter([&]() {

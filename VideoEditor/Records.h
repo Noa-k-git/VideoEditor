@@ -17,7 +17,7 @@ public:
     std::vector<T>* GetRecords() const;
 private:
     std::pair<typename std::vector<T>::iterator, bool> NameInput(std::string&);
-    std::vector<T> * videoSources;
+    std::vector<T> * list;
 };
 
 //#include "records.h"
@@ -26,13 +26,13 @@ private:
 
 template <typename T>
 Records<T>::Records() {
-    this->videoSources = new std::vector<T>();
+    this->list = new std::vector<T>();
 }
 template <typename T>
 std::pair<typename std::vector<T>::iterator, bool> Records<T>::AddRecord(T record) {
     auto result = Contains(record->GetName());
     if (!result.second)
-        videoSources->push_back(record);
+        list->push_back(record);
     //result.second ? result.second = false : result.second = true;
     result.second = !(result.second);
     return result;
@@ -81,24 +81,24 @@ void Records<T>::RemoveRecord(std::string name) {
     auto result = Contains(name);
 
     if (result.second)
-        videoSources->erase(result.first);
+        list->erase(result.first);
 }
 
 template<typename T>
 inline void Records<T>::RemoveAllRecords()
 {
-    videoSources->clear();
+    list->clear();
 }
 
 template <typename T>
 std::pair<typename std::vector<T>::iterator, bool> Records<T>::Contains(std::string name) {
-    auto it = std::find_if(videoSources->begin(), videoSources->end(), [&](const T record) {
+    auto it = std::find_if(list->begin(), list->end(), [&](const T record) {
         return record->GetName() == name;
         });
-    return std::pair<typename std::vector<T>::iterator, bool>(it, it != videoSources->end());
+    return std::pair<typename std::vector<T>::iterator, bool>(it, it != list->end());
 }
 
 template <typename T>
 std::vector<T>* Records<T>::GetRecords() const {
-    return videoSources;
+    return list;
 }

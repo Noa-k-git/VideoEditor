@@ -92,6 +92,7 @@ std::string VideoClip::SourceName()
 {
 	if (videoSource)
 	return videoSource->GetName();
+	return "";
 }
 //
 //vector<SyncObject<AVFrame*>>& VideoClip::GetClip()

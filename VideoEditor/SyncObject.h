@@ -20,12 +20,16 @@ public:
 		m_object = obj;
 	}
 	T GetObject() {
+		// waits for the source to be available
 		std::shared_lock<std::shared_mutex> lock(m_objectMutex);
+		// returns source
 		return m_object;
 	}
 
 	std::pair<std::unique_lock<std::shared_mutex>, T> GetObjectForUpdate() {
+		// waits for the source to be available
 		std::unique_lock<std::shared_mutex> lock(m_objectMutex);
+		// returns lock&source
 		return std::make_pair(std::move(lock), std::ref(m_object));
 	}
 private:
