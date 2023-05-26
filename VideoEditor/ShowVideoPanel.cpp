@@ -181,7 +181,10 @@ void ShowVideoPanel::ShowVideo()
 	if (m_playablePtr) {
 		auto chunk = m_playablePtr->GetChunk(0);
 		if (chunk)
-			firstFrame = chunk->GetObject();
+		{
+			firstFrame = av_frame_clone(chunk->GetObject());
+			av_frame_copy(firstFrame, chunk->GetObject());
+		}
 		else
 			firstFrame = Sequence::CreateBlackFrame(1, 1, AV_PIX_FMT_RGB24);
 	}
@@ -204,6 +207,8 @@ void ShowVideoPanel::ShowVideo()
 		rgbFrame->width, rgbFrame->height, AV_PIX_FMT_RGB24,
 		SWS_BILINEAR, NULL, NULL, NULL
 	);
+	av_frame_free(&firstFrame);
+	av_frame_unref(firstFrame);
 	constexpr std::chrono::duration<double> minSleepDuration(0);
 	bool firstTime = true;
 	while (pos < videoLength - 1 && (!paused.load() || firstTime)) {
@@ -215,7 +220,10 @@ void ShowVideoPanel::ShowVideo()
 		if (m_playablePtr) {
 			SyncObject<AVFrame*>* syncframe = m_playablePtr->GetChunk(pos);
 			if (syncframe)
-				frame = syncframe->GetObject();
+			{
+				frame = av_frame_clone(syncframe->GetObject());
+				av_frame_copy(frame, syncframe->GetObject());
+			}
 			else
 				break;
 		}
@@ -235,7 +243,9 @@ void ShowVideoPanel::ShowVideo()
 		sws_scale(swsContext, frame->data, frame->linesize, 0,
 			frame->height, rgbFrame->data, rgbFrame->linesize);
 
-		wxImage image(rgbFrame->width, rgbFrame->height, rgbFrame->data[0], true);
+		//wxImage image(rgbFrame->width, rgbFrame->height, rgbFrame->data[0], true);
+		wxImage image(rgbFrame->width, rgbFrame->height);
+		image.SetData(rgbFrame->data[0], true, rgbFrame->width, rgbFrame->height);
 		while (duration<double>(std::chrono::steady_clock::now() - startTime).count() < timeInterval.count())
 		{
 			auto d = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - startTime);
@@ -250,10 +260,13 @@ void ShowVideoPanel::ShowVideo()
 				m_frameBufferedBitmap->SetBitmap(bitmap);
 			//Layout();
 			});
+		av_frame_free(&frame);
+		av_frame_unref(frame);
 
 	}
 
 	// Clean up
+	//av_frame_unref(rgbFrame);
 	sws_freeContext(swsContext);
 	return;
 }
