@@ -13,7 +13,6 @@ public:
 	ExportSeqDlg(ServerClient* c, wxWindow* parent);
 private:
 	ServerClient* client;
-	wxTextCtrl* nameInput;
 	wxScrolledWindow* seqScrolledWindow;
 	wxBoxSizer* seqSizer;
 	void AddSequence(std::string);
