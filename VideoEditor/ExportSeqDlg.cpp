@@ -65,10 +65,10 @@ void ExportSeqDlg::OnExport(const wxCommandEvent& event_)
 	auto res = Sequence::sequences.Contains(name);
 	if (res.second) {
 		(*res.first)->SaveVideo(client->GetPath() + name+ ".mp4");
-		wxMessageBox("INFO", "Export Finished!", wxICON_INFORMATION);
+		wxMessageBox("Export Finished!", "INFO", wxICON_INFORMATION);
 	}
 	else {
-		wxMessageBox("ERROR", "Sequence is not available!", wxICON_ERROR);
+		wxMessageBox("Sequence is not available!", "ERROR", wxICON_ERROR);
 	}
 	Close();
 }
