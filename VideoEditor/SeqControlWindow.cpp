@@ -27,8 +27,9 @@ SeqControlWindow::SeqControlWindow(ServerClient* clientPtr, wxWindow* parent, wx
 		}
 		});
 	Bind(ADD_CLIP_SERVER_EVT, [=](wxCommandEvent& event_) {
-		std::string vidName = *static_cast<std::string*>(event_.GetClientData());
-		std::string seqName =  event_.GetString().ToStdString();
+		std::vector<std::string> params = server_protocol::ParseMessage(event_.GetString().ToStdString());
+		std::string seqName =  params.at(0);
+		std::string vidName = params.at(1);
 		if (seqName == m_seqName) {
 			this->AddClip(seqName, vidName, false);
 		}

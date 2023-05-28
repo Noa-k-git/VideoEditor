@@ -238,9 +238,7 @@ void ServerClient::HandleUpdate(std::vector<std::string> updateParms)
         {
             wxGetApp().CallAfter([=]() {
                 wxCommandEvent addclipEvt_(ADD_CLIP_SERVER_EVT);
-                addclipEvt_.SetString(updateParms.at(0));
-                
-                addclipEvt_.SetClientData(const_cast<void*>(static_cast<const void*>(updateParms.at(1).c_str())));
+                addclipEvt_.SetString(server_protocol::BuildMessage(updateParms));
                 wxWindow* swapWindow = wxWindow::FindWindowById(window::id::SEQ_CONTROL_WINDOW);
                 wxPostEvent(swapWindow, addclipEvt_);
                 });
