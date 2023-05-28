@@ -122,19 +122,20 @@ void SeqControlWindow::OnAddClip(wxCommandEvent& event_)
 
 void SeqControlWindow::AddClip(std::string seqName, std::string vidName, bool isource) {
 	auto findVid = VideoSource::videoSources.Contains(vidName);
-	if (findVid.second) {
-		m_sequencePtr->AddClip(new VideoClip(*findVid.first));
-	}
-	SetSequencePtr();
-	if (m_sequencePtr && seqName==m_seqName) {
+	auto seqPtr = Sequence::sequences.Contains(seqName);
+	if (findVid.second && seqPtr.second) {
+		(*seqPtr.first)->AddClip(new VideoClip(*findVid.first));
+		SetSequencePtr();
+		if (m_sequencePtr && seqName == m_seqName) {
 			int idx = m_sequencePtr->GetLength() - 1;
 			m_clipsSizer->Add(new ClipItemPanel(m_sequencePtr->GetClipAt(idx), idx, this, wxID_ANY), 0, wxEXPAND | wxBOTTOM, 10);
 			//SetSequence();
 			m_clipsSizer->Layout();
 			GetParent()->GetSizer()->Layout();
-	}
-	if (isource) {
-		client->AddClip(seqName, vidName);
+		}
+		if (isource) {
+			client->AddClip(seqName, vidName);
+		}
 	}
 }
 void SeqControlWindow::OnSwapWithPrev(wxCommandEvent& event_)
