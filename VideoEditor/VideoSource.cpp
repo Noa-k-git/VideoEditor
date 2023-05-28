@@ -134,19 +134,21 @@ void VideoSource::ReadSource()
 	}
 
 	// Set up a codec context for the decoder
-	AVCodecContext* av_codec_ctx = avcodec_alloc_context3(av_codec);
+	AVCodecContext* av_codec_ctx = avcodec_alloc_context3(av_codec); // allocating memory for the codec context
 	if (!av_codec_ctx) {
 		//wxMessageBox("Couldn't create AVCpdecContext\n");
 		read = false;
 		return;
 	}
 
+	// setting codec context parameters
 	if (avcodec_parameters_to_context(av_codec_ctx, av_codec_params) < 0)
 	{
 		//wxMessageBox("Couldn't initialize AVCodecContext\n");
 		read = false;
 		return;
 	}
+	// open the codec context, initialize the codec 
 	if (avcodec_open2(av_codec_ctx, av_codec, NULL) < 0) {
 		//wxMessageBox("Couldn't open codec\n");
 
@@ -175,7 +177,7 @@ void VideoSource::ReadSource()
 			av_packet_unref(av_packet);
 			continue;
 		}
-		response = avcodec_send_packet(av_codec_ctx, av_packet);
+		response = avcodec_send_packet(av_codec_ctx, av_packet); // the packet is sent to decodeing
 		if (response < 0) {
 			//wxMessageBox("Failed to decode packet: %s\n", av_err2str(response));
 
@@ -200,22 +202,7 @@ void VideoSource::ReadSource()
 
 		response = avcodec_send_frame(av_codec_ctx, av_frame);
 		std::string tmp = av_err2str(response);
-		//source.push_back(*av_frame);
-		//auto mat_frame = Avframe2Cvmat(av_frame);
-
-		//source.push_back(im);
-		//bool isEqual = (cv::sum(Avframe2Cvmat(av_frame) != Avframe2Cvmat(&source[0])) == cv::Scalar(0, 0, 0, 0));
-		//bool isEqual = (cv::sum(im != source[0]) == cv::Scalar(0, 0, 0, 0));
-		//im.release();
 		newSource.push_back(SyncObject<AVFrame*>(av_frame_clone(av_frame)));
-
-		/*
-		if (int iRet = av_frame_copy(&source.back(), av_frame) == 0) {
-			av_log(NULL, AV_LOG_INFO, "Ok");
-		}
-		else {
-			av_log(NULL, AV_LOG_INFO, "Error: %s\n", av_err2str(iRet));
-		}*/
 		av_frame_unref(av_frame);
 	}
 
