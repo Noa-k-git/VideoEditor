@@ -14,7 +14,7 @@ using namespace string_utils;
 #define SERVER_CONSTATNS
 
 #define SERVER_PORT 8989
-#define SERVER_IP "192.168.11.152"
+#define SERVER_IP "10.0.0.15"
 #endif
 
 namespace server_protocol{

@@ -12,13 +12,6 @@ SeqControlWindow::SeqControlWindow(ServerClient* clientPtr, wxWindow* parent, wx
 	m_sequencePtr = nullptr;
 	Bind(SET_WORKING_SEQUENCE_EVT, &SeqControlWindow::SetSeqName, this);
 	Bind(ADD_TO_SEQUENCE_EVT, &SeqControlWindow::OnAddClip, this);
-	//Bind(SWAP_CLIP_WITH_PREV_EVT, [&](wxCommandEvent& event_) {
-	//	wxMessageOutputDebug().Printf("here!");
-	//	SeqControlWindow::SwapClips(event_.GetInt() - 1, event_.GetInt());
-	//	}, this);
-	//Bind(SWAP_CLIP_WITH_PREV_EVT, [&](wxCommandEvent& event_) {
-	//	SeqControlWindow::SwapClips(event_.GetInt() + 1, event_.GetInt());
-	//	}, this);
 	Bind(SWAP_CLIP_WITH_PREV_EVT, &SeqControlWindow::OnSwapWithPrev, this);
 	Bind(SWAP_CLIP_WITH_NEXT_EVT, &SeqControlWindow::OnSwapWithNext, this);
 	Bind(SWAP_CLIP_SERVER_EVT, [=](wxCommandEvent& event_) {
@@ -31,6 +24,22 @@ SeqControlWindow::SeqControlWindow(ServerClient* clientPtr, wxWindow* parent, wx
 				(*findSeq.first)->SwapClipsAt(idx1, idx2);
 			else
 				wxMessageBox("Message", "Please Pull Changes", wxICON_INFORMATION);
+		}
+		});
+	Bind(ADD_CLIP_SERVER_EVT, [=](wxCommandEvent& event_) {
+		std::string vidName = *static_cast<std::string*>(event_.GetClientData());
+		std::string seqName =  event_.GetString().ToStdString();
+		if (seqName == m_seqName) {
+			this->AddClip(seqName, vidName, false);
+		}
+		else {
+			auto findSeq = Sequence::sequences.Contains(seqName);
+			auto findVid = VideoSource::videoSources.Contains(vidName);
+			if (findSeq.second && findVid.second)
+				(*findSeq.first)->AddClip(new VideoClip(*findVid.first));
+			else 
+				wxMessageBox("Message", "Please Pull Changes", wxICON_INFORMATION);
+
 		}
 		});
 
@@ -108,21 +117,26 @@ void SeqControlWindow::SwapClips(int idx1, int idx2, bool isource)
 
 void SeqControlWindow::OnAddClip(wxCommandEvent& event_)
 {
+	SeqControlWindow::AddClip(m_seqName, event_.GetString().ToStdString(), true);
+}
 
+void SeqControlWindow::AddClip(std::string seqName, std::string vidName, bool isource) {
+	auto findVid = VideoSource::videoSources.Contains(vidName);
+	if (findVid.second) {
+		m_sequencePtr->AddClip(new VideoClip(*findVid.first));
+	}
 	SetSequencePtr();
-	if (m_sequencePtr) {
-		auto findVid = VideoSource::videoSources.Contains(event_.GetString().ToStdString());
-		if (findVid.second) {
-			m_sequencePtr->AddClip(new VideoClip(*findVid.first));
+	if (m_sequencePtr && seqName==m_seqName) {
 			int idx = m_sequencePtr->GetLength() - 1;
 			m_clipsSizer->Add(new ClipItemPanel(m_sequencePtr->GetClipAt(idx), idx, this, wxID_ANY), 0, wxEXPAND | wxBOTTOM, 10);
 			//SetSequence();
 			m_clipsSizer->Layout();
 			GetParent()->GetSizer()->Layout();
-		}
+	}
+	if (isource) {
+		client->AddClip(seqName, vidName);
 	}
 }
-
 void SeqControlWindow::OnSwapWithPrev(wxCommandEvent& event_)
 {
 	SeqControlWindow::SwapClips(event_.GetInt() - 1, event_.GetInt());

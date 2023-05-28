@@ -10,6 +10,7 @@
 #endif
 
 wxDEFINE_EVENT(SWAP_CLIP_SERVER_EVT, wxCommandEvent);
+wxDEFINE_EVENT(ADD_CLIP_SERVER_EVT, wxCommandEvent);
 
 ServerClient::ServerClient()
 {
@@ -208,6 +209,12 @@ void ServerClient::Switch(std::string seqName, int idx1, int idx2)
     SendUpdateProject(msg);
 }
 
+void ServerClient::AddClip(std::string seqName, std::string vidName)
+{
+    std::string msg = server_protocol::BuildMessage({ "addclip", seqName, vidName });
+    SendUpdateProject(msg);
+}
+
 void ServerClient::HandleUpdate(std::vector<std::string> updateParms)
 {
     std::string cmd = updateParms.at(0);
@@ -224,6 +231,19 @@ void ServerClient::HandleUpdate(std::vector<std::string> updateParms)
                 wxWindow* swapWindow = wxWindow::FindWindowById(window::id::SEQ_CONTROL_WINDOW);
                 wxPostEvent(swapWindow, swapEvt_);
             });
+        }
+    }
+    else if (cmd == "addclip") {
+        if (updateParms.size() == 2)
+        {
+            wxGetApp().CallAfter([=]() {
+                wxCommandEvent addclipEvt_(ADD_CLIP_SERVER_EVT);
+                addclipEvt_.SetString(updateParms.at(0));
+                
+                addclipEvt_.SetClientData(const_cast<void*>(static_cast<const void*>(updateParms.at(1).c_str())));
+                wxWindow* swapWindow = wxWindow::FindWindowById(window::id::SEQ_CONTROL_WINDOW);
+                wxPostEvent(swapWindow, addclipEvt_);
+                });
         }
     }
         

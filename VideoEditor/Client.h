@@ -20,6 +20,7 @@
 #endif
 
 wxDECLARE_EVENT(SWAP_CLIP_SERVER_EVT, wxCommandEvent);
+wxDECLARE_EVENT(ADD_CLIP_SERVER_EVT, wxCommandEvent);
 
 class ServerClient {
 public:
@@ -58,6 +59,7 @@ public:
 	void SendUpdateProject(std::string data);
 
 	void Switch(std::string seqName, int idx1, int idx2);
+	void AddClip(std::string seqName, std::string vidName);
 	void HandleUpdate(std::vector<std::string> updateParms);
 
 	bool IsValidId();

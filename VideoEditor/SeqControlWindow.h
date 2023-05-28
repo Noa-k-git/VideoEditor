@@ -18,6 +18,7 @@ private:
 
 	void SwapClips(int idx1, int idx2, bool isource = true);
 	void OnAddClip(wxCommandEvent& event_);
+	void AddClip(std::string seqName, std::string vidName, bool isource);
 	void OnSwapWithPrev(wxCommandEvent& event_);
 	void OnSwapWithNext(wxCommandEvent& event_);
 
