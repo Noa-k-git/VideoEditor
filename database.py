@@ -94,7 +94,7 @@ class Table():
             column_names = [column_names]
         return Table(self.name, [c for c in column_names if c in self.columns])
 
-    def create(self, conn, columns: dict[str, str]):
+    def create(self, conn, columns: dict):
         """Creates a table from create_table_sql statement
 
         Args:
@@ -160,7 +160,7 @@ class Table():
         cur = conn.cursor()
         cur.execute(sql, new_item.data + where_item.data)
 
-    def select(self, conn, columns: List[str], item: Item):
+    def select(self, conn, columns: List, item: Item):
         if isinstance(columns, str):
             columns = [columns]
 
@@ -247,8 +247,8 @@ class DataBase():
     def join_select(self, og: Table,
                     func='',
                     columns: List[Table] = [],
-                    join: List[dict[Table: List[Table]]] or dict[Table: List[Table]] = [],
-                    where: List[Tuple[Table, Item]] = None) -> List:
+                    join: List = [],
+                    where: List = None) -> List:
         """The function return the select result, if the select has join in it
 
         Args:
@@ -268,7 +268,7 @@ class DataBase():
         """
 
         def join_list(source: Table,
-                      targets: List[Table]) -> dict[str:str]:
+                      targets: List) -> dict:
             """This function receives a table and a list of other tables to join to
 
             Raises:

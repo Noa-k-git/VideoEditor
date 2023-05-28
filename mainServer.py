@@ -2,7 +2,7 @@ from server import *
 import database
 import threading
 
-IP = '10.0.0.15'
+IP = '192.168.11.152'
 PORT = 8989
 
 
