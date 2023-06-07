@@ -29,8 +29,9 @@ ProjectDialog::ProjectDialog(ServerClient* c, wxWindow* parent) : wxDialog(paren
 			{
 				std::vector <std::string> projElm = server_protocol::ParseMessage(proj);
 				if (projElm.size() == 3) {
-					wxButton* b = new wxButton(window, wxID_ANY,"Name: " + projElm.at(1) + "\n\n" + "Users: " + JoinString(server_protocol::ParseMessage(projElm.at(2)), ', '),
+					wxButton* b = new wxButton(window, wxID_ANY,"Name: " + projElm.at(1) + "\n\n" + "Users: " + JoinString(server_protocol::ParseMessage(projElm.at(2)), ", "),
 						wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL);
+					
 					b->SetFont(textFont);
 					b->SetName(projElm.at(0));
 					b->Bind(wxEVT_BUTTON, &ProjectDialog::OnButtonClicked, this);

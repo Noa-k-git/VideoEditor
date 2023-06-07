@@ -40,7 +40,8 @@ namespace string_utils {
 	* @param delimiter The delimiter between the strings
 	* @return The join string
 	*/
-	inline std::string JoinString(const std::vector<std::string>& elements, char delimiter) {
+
+	inline std::string JoinString(const std::vector<std::string>& elements, std::string delimiter) {
 		if (elements.empty()) {
 			return "";
 		}
@@ -52,5 +53,8 @@ namespace string_utils {
 		}
 
 		return result;
+	}
+	inline std::string JoinString(const std::vector<std::string>& elements, char delimiter) {
+		return JoinString(elements, std::string(1, delimiter));
 	}
 }
