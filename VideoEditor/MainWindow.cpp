@@ -8,7 +8,7 @@ using namespace string_utils;
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
     EVT_MENU(wxID_SAVE, MainWindow::OnSave)
     EVT_MENU(wxID_OPEN, MainWindow::OnOpenProject)
-    EVT_MENU(wxID_NEW, MainWindow::OnOpenProject)
+    EVT_MENU(wxID_NEW, MainWindow::OnNew)
     
     //EVT_MENU(wxID_NEW, MainWindow::onNew)
     //EVT_MENU(wxID_EXIT, MainWindow::onQuit)
@@ -346,6 +346,7 @@ void MainWindow::OnExportSequence(wxCommandEvent& event_)
 
 void MainWindow::OnNew(wxCommandEvent& event_)
 {
+    clientPtr->SetPath("");
     OnSave(event_);
 }
 
