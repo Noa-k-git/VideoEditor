@@ -15,6 +15,7 @@ ProjectDialog::ProjectDialog(ServerClient* c, wxWindow* parent) : wxDialog(paren
 	mainSizer->Add(window, 1, wxEXPAND);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	window->SetBackgroundColour(WINDOW_BRIGHT_BACKGOUND_COLOUR);
 	window->SetScrollbars(1, 1, 1, 1);
 	window->SetMinSize(wxSize(400, 400));
 	if (c->IsValidId()) {
@@ -22,20 +23,22 @@ ProjectDialog::ProjectDialog(ServerClient* c, wxWindow* parent) : wxDialog(paren
 
 		if (std::get<0>(res))
 		{
-			wxFont textFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL);
+			wxFont textFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL);
 
 			std::vector<std::string> allInfo = server_protocol::ParseMessage(std::get<1>(res)); // TODO: add ';' dummy data at the end of the list
 			for (std::string proj : allInfo)
 			{
 				std::vector <std::string> projElm = server_protocol::ParseMessage(proj);
 				if (projElm.size() == 3) {
-					wxButton* b = new wxButton(window, wxID_ANY,"Name: " + projElm.at(1) + "\n\n" + "Users: " + JoinString(server_protocol::ParseMessage(projElm.at(2)), ", "),
-						wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL);
+					wxButton* b = new wxButton(window, wxID_ANY, "\nName: " + projElm.at(1) + "\n\n" + "Users: " + JoinString(server_protocol::ParseMessage(projElm.at(2)), ", ") + "\n",
+						wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT | wxALIGN_RIGHT);//wxALIGN_CENTER_VERTICAL);
 					
 					b->SetFont(textFont);
+					b->SetBackgroundColour(ORANGE_BACKGROUND);
+					b->SetForegroundColour(wxColour(15,15,15));
 					b->SetName(projElm.at(0));
 					b->Bind(wxEVT_BUTTON, &ProjectDialog::OnButtonClicked, this);
-					sizer->Add(b, 1, wxEXPAND | wxTOP | wxLEFT | wxRIGHT, 10);
+					sizer->Add(b, 0, wxEXPAND | wxTOP | wxLEFT | wxRIGHT, 10);
 				}
 			}
 			if (sizer->GetItemCount() == 0) {
@@ -57,9 +60,12 @@ ProjectDialog::ProjectDialog(ServerClient* c, wxWindow* parent) : wxDialog(paren
 		wxFont font(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
 		text->SetFont(font);
 		sizer->Add(text, 1, wxEXPAND|wxALL, 15);
-		wxStaticText* comment = new wxStaticText(window, wxID_ANY, "You can login through the user button in the upper right corner");
-		sizer->Add(comment, 1, wxEXPAND | wxALL, 15);
+		wxStaticText* comment = new wxStaticText(window, wxID_ANY, "You can login using the user button in the upper right corner");
+		window->SetMinSize(wxSize(400, 120));
+		sizer->Add(comment, 0, wxEXPAND | wxALL, 15);
+		sizer->AddSpacer(10);
 	}
+	sizer->FitInside(window);
 	window->SetSizer(sizer);
 	SetSizerAndFit(mainSizer);
 }
