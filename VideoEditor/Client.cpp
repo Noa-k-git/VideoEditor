@@ -118,11 +118,25 @@ void ServerClient::SendKeys()
 std::tuple<bool, std::string> ServerClient::Signup(const std::string& username, const std::string& email, std::string password)
 {
     std::tuple<bool, std::string> info;
-    EncryptPassword(password);
-    std::string msg = server_protocol::BuildMessage({ username, email, password });
-    info = W_SEND_RECEIVE("SIGNUP", msg);
-    if (std::get<0>(info)) {
-        userId = std::stoi(std::get<1>(info));
+    auto isOnlySpaces = [](const std::string& str) {
+        return std::all_of(str.begin(), str.end(), [](char c) {
+            return std::isspace(static_cast<unsigned char>(c));
+            });
+    };
+    if (isOnlySpaces(username) || isOnlySpaces(email))
+    {
+        info = { false, "All fields are required" };
+    }
+    else if (isOnlySpaces(password)) {
+        info = { false, "Password must contain numbers or letters" };
+    }
+    else {
+        EncryptPassword(password);
+        std::string msg = server_protocol::BuildMessage({ username, email, password });
+        info = W_SEND_RECEIVE("SIGNUP", msg);
+        if (std::get<0>(info)) {
+            userId = std::stoi(std::get<1>(info));
+        }
     }
     return info;
 }
