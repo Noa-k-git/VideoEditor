@@ -154,7 +154,10 @@ UserDialog::UserDialog(ServerClient* c, wxWindow* parent) : wxDialog(parent, wxI
 	logoutButton = new SmallBitmapButton(this, wxID_ANY, logouticon, wxDefaultPosition, wxSize(30, 30), wxSize(30, 30));
 	logoutButton->SetToolTip(logoutString);
 	logoutButton->SetBackgroundColour(WINDOW_BRIGHT_BACKGOUND_COLOUR);
-	logoutButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent& event_) {client->Logout(); });
+	logoutButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent& event_) {
+		statusText->SetLabel("");
+		client->Logout(); });
+
 
 	mainSizer->Add(logoutButton, 0, wxEXPAND|wxTOP| wxBU_AUTODRAW , 60);
 	SetSizerAndFit(mainSizer);

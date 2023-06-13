@@ -9,7 +9,9 @@ const wxSize BTN_ICON_SIZE = wxSize(15, 15);
 const wxSize BTN_SIZE = wxSize(25, 30);
 
 #endif
-
+/// <summary>
+/// A class that wraps a bitmap button and define a basic layout for it
+/// </summary>
 class SmallBitmapButton: public wxBitmapButton
 {
 public:

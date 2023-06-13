@@ -6,6 +6,9 @@
 	#include <wx/wx.h>
 #endif
 
+/// <summary>
+/// The Application
+/// </summary>
 class App: public wxApp
 {
 public:

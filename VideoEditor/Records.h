@@ -5,6 +5,10 @@
 //template <typename T,
 //    typename = std::enable_if_t<std::is_base_of_v<UniqueName, T>>>
 
+/// <summary>
+/// A template class that wraps a vector and gives it new attributes
+/// </summary>
+/// <typeparam name="T"></typeparam>
 template <typename T> 
 class Records {
 public:

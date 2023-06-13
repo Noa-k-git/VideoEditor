@@ -2,6 +2,10 @@
 #include "SeqSourcePanel.h"
 #include "ClipItemPanel.h"
 #include "Client.h"
+
+/// <summary>
+/// The window that allows the user to edits his sequences
+/// </summary>
 class SeqControlWindow : public wxScrolledWindow
 {
 public:

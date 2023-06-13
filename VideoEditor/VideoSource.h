@@ -32,8 +32,10 @@ extern "C" {
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 
+/// <summary>
+/// A class that represents a video source object
+/// </summary>
 class VideoSource :
-    //public ISource<std::vector<cv::Mat>>, public IImg, public IPlayable
     public ISource<AVFrame*>
 {
 public:
@@ -41,7 +43,17 @@ public:
     VideoSource(std::string path, std::string name);
     VideoSource(std::string, std::string data, bool load = false);
     ~VideoSource() override;
+    /// <summary>
+    /// Loading a video source from a string
+    /// </summary>
+    /// <param name="">The project path</param>
+    /// <param name="">The string data</param>
     void Load(std::string, std::string);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="">The defult path</param>
+    /// <returns>A string that describe the Video source object</returns>
     std::string Write(std::string);
     int GetSize() override;
     SyncObject<AVFrame*>* GetChunk(int at) override;

@@ -9,10 +9,11 @@
 #include "BufferedBitmap.h"
 #include "Sequence.h"
 
-// TODO: add a variable that contains the name of the sequence/videosource and then check if the name still exists
 template <typename T>
 using duration = std::chrono::duration<T>;
-
+/// <summary>
+/// The subwindow that shows the a video
+/// </summary>
 class ShowVideoPanel : public wxPanel
 {
 public:
@@ -48,10 +49,19 @@ private:
 	bool deleted;
 	std::string m_vidName;
 	IPlayable<AVFrame*>* m_playablePtr;
-
+	/// <summary>
+	/// Start playing the video
+	/// </summary>
 	void PlayVideo();
+	/// <summary>
+	/// Sets the video shown
+	/// </summary>
+	/// <param name="event">the event's string is the new video name</param>
 	void SetVideoName(wxCommandEvent& event);
 	void SetVideo();
+	/// <summary>
+	/// Showes the video in the window
+	/// </summary>
 	void ShowVideo();
 	void OnZoomIn(wxCommandEvent& event);
 	void OnZoomOut(wxCommandEvent& event);

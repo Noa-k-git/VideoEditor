@@ -1,4 +1,7 @@
 #pragma once
+/// <summary>
+/// constants window ids
+/// </summary>
 namespace window
 {
 	enum id

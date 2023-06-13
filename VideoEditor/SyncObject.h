@@ -1,6 +1,9 @@
 #pragma once
 #include <shared_mutex>
-
+/// <summary>
+/// A template class for synchronizing an object between two threads
+/// </summary>
+/// <typeparam name="T"></typeparam>
 template <typename T>
 class SyncObject
 {

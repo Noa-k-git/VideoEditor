@@ -7,7 +7,7 @@
 #include "Client.h"
 
 using namespace string_utils;
-
+// The dialog object for exporting sequence
 class ExportSeqDlg : public wxDialog {
 public:
 	ExportSeqDlg(ServerClient* c, wxWindow* parent);

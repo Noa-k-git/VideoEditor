@@ -9,7 +9,9 @@ extern "C" {
 #include <libavformat/avformat.h> // format API, used for reading and writing multimedia continer formats (mp4, avi..)
 #include <libswscale/swscale.h> // image scaling and color conversion API, converting pixel formats and resizing images 
 }
-
+/// <summary>
+/// Video clip object
+/// </summary>
 class VideoClip : public IPlayable<AVFrame*>
 {
 private:

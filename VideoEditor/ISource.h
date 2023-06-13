@@ -13,6 +13,11 @@ struct Info {
 	int resulusion[2]; // width, hight.
 	std::string type;
 };*/
+
+/// <summary>
+/// An abstruct class that defines properties to source objects
+/// </summary>
+/// <typeparam name="T"></typeparam>
 template <typename T>
 class ISource : public IPlayable<T>{
 public:

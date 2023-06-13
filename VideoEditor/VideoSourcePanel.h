@@ -7,7 +7,9 @@
 wxDECLARE_EVENT(ADD_TO_SEQUENCE_EVT, wxCommandEvent);
 wxDECLARE_EVENT(SHOW_VIDEO_EVT, wxCommandEvent);
 wxDECLARE_EVENT(WIDGET_DELETED_EVT, wxCommandEvent);
-
+/// <summary>
+/// Class that represents a video source item 
+/// </summary>
 class VideoSourcePanel :
     public wxPanel
 {

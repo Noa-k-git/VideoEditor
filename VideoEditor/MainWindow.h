@@ -25,7 +25,9 @@
  #ifndef WX_PRECOMP
 	#include <wx/wx.h>
 #endif
-
+ /// <summary>
+ /// The class that represent the main window object of the app
+ /// </summary>
  class MainWindow: public wxFrame
 {
 public:
@@ -37,21 +39,69 @@ public:
         long style = wxDEFAULT_FRAME_STYLE,
         const wxString& name = wxASCII_STR(wxFrameNameStr));
 	~MainWindow();
+    /// <summary>
+    /// Setting the current project name
+    /// </summary>
+    /// <param name="name">project name</param>
     void SetProjectName(std::string name);
+    /// <summary>
+    /// Creates the start dialog
+    /// </summary>
     void CreateStartDlg();
+    /// <summary>
+    /// Opens existing project
+    /// </summary>
+    /// <param name="event_">event</param>
     void OnOpenProject(wxCommandEvent& event_);
+    /// <summary>
+    /// Saving the changes made in the project
+    /// </summary>
+    /// <param name="event_">event</param>
     void OnSave(wxCommandEvent& event_);
+    /// <summary>
+    /// Saving and Pushing the project to the server
+    /// </summary>
+    /// <param name="event_">event</param>
     void OnPushProject(wxCommandEvent& event_);
+    /// <summary>
+    /// Showing the project's dialog
+    /// </summary>
+    /// <param name="event_">event</param>
     void OnPullProjects(wxCommandEvent& event_);
+    /// <summary>
+    /// Exporting the sequence to mp4 file
+    /// </summary>
+    /// <param name="event_"></param>
     void OnExportSequence(wxCommandEvent& event_);
+    /// <summary>
+    /// Creates new project
+    /// </summary>
+    /// <param name="event_"></param>
     void OnNew(wxCommandEvent& event_);
+    /// <summary>
+    /// Import new video
+    /// </summary>
+    /// <param name="event_">event</param>
     void OnImport(wxCommandEvent& event_);
+    /// <summary>
+    /// Showes the User dialog
+    /// </summary>
+    /// <param name="event_"></param>
     void OnUser(wxCommandEvent& event_);
+    /// <summary>
+    /// Creating new sequence
+    /// </summary>
+    /// <param name="event_">event</param>
     void OnNewSequence(wxCommandEvent& event_);
-    void onTest(wxCommandEvent& event_);
-    void onQuit(wxCommandEvent& event);
-    void onClose(wxCloseEvent& event);
-    void onHelp(wxCommandEvent& event);
+    //void onTest(wxCommandEvent& event_);
+    //void onQuit(wxCommandEvent& event);
+    //void onClose(wxCloseEvent& event);
+    //void onHelp(wxCommandEvent& event);
+
+    /// <summary>
+    /// Loading a project from a file
+    /// </summary>
+    /// <param name="">event</param>
     void OnLoadProjectFromFile(wxCommandEvent&);
     inline void OnRefresh(wxCommandEvent& event_);
 

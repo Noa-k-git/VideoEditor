@@ -16,7 +16,9 @@ using namespace string_utils;
 #define SERVER_PORT 8989
 #define SERVER_IP "10.0.0.15"
 #endif
-
+/// <summary>
+/// A namespace that contains the server protocol
+/// </summary>
 namespace server_protocol{
 	const int NUM_FIELD_LENGTH = 8;
 	const int CMD_FIELD_LENGTH = 16;

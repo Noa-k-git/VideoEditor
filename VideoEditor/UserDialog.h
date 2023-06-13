@@ -6,6 +6,9 @@
 #include "DesignConstatns.h"
 #include "SmallBitmapButton.h"
 #include "Client.h"
+/// <summary>
+/// The dialog for signing up, login and logout from an account
+/// </summary>
 class UserDialog : public wxDialog {
 public:
 	UserDialog(ServerClient* c, wxWindow* parent);

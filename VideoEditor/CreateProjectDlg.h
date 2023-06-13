@@ -8,6 +8,9 @@
 using namespace string_utils;
 wxDECLARE_EVENT(SAVE_PROJECT_EVENT, wxCommandEvent);
 
+/// <summary>
+/// The Dialog object for create new shared project dialog
+/// </summary>
 class CreateProjectDlg : public wxDialog {
 public:
 	CreateProjectDlg(ServerClient* client, wxWindow* parent);

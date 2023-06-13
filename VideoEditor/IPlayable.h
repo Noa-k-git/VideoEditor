@@ -1,6 +1,10 @@
 #pragma once
 #include "SyncObject.h"
 #include <string>
+/// <summary>
+/// An anbstruct class that defines a playable properties
+/// </summary>
+/// <typeparam name="T"></typeparam>
 template <typename T>
 class IPlayable {
 public:
